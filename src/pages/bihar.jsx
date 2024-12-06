@@ -5,10 +5,14 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
 import LoginForm from "../componenets/LoginForm";
+import { useNavigate } from 'react-router-dom';
 import image from '../assets/Images/loginback.avif'
 import 'animate.css';
 import { Link } from "react-router-dom";
+
+
 export const AuthBihar = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const [showJobForm, setShowJobForm] = useState(false);
 
@@ -213,9 +217,11 @@ export const AuthBihar = () => {
             console.log("res data", res);
             toast.success("User signed up successfully!");
             alert("signup sucess")
+        
             if (res.status === 201) {
                 toast.success("User signed up successfully!");
             }
+            navigate('/landing')
 
         } catch (error) {
             if (error.response && error.response.status === 400) {

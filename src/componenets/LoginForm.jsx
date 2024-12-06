@@ -4,7 +4,11 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useContext } from "react";
 import Context from "../context/context.jsx";
+import { useNavigate } from 'react-router-dom';
+
+
 const LoginForm = () => {
+  const navigate = useNavigate();
   const {fetchUserDetails}= useContext(Context)
   const {
     register,
@@ -36,6 +40,7 @@ const LoginForm = () => {
 
       alert("Login successfull")
       toast.success("You are logged in")
+      navigate('/landing')
       resetLoginForm()
       console.log(response);
       

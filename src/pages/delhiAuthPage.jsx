@@ -8,10 +8,11 @@ import LoginForm from "../componenets/LoginForm";
 import image from '../assets/Images/loginback.avif'
 import 'animate.css';
 import { Link } from "react-router-dom";
-
+import { useNavigate } from 'react-router-dom';
 const AuthDelhi = () => {
     const location = useLocation();
     const [showJobForm, setShowJobForm] = useState(false);
+    const navigate = useNavigate();
 
     // Extract state from URL query
     const state = new URLSearchParams(location.search).get("state") || "Delhi";
@@ -132,6 +133,7 @@ const AuthDelhi = () => {
 
             console.log("res data", res);
 toast.success("User signed up successfully!");
+navigate('/landing')
             alert("signup sucess")
            // if (res.status === 201) {
               //  toast.success("User signed up successfully!");
