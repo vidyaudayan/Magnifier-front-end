@@ -5,9 +5,12 @@ import { toast } from "react-toastify";
 import { useContext } from "react";
 import Context from "../context/context.jsx";
 import { useNavigate } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { setUserDetails } from "../features/user/userSlice.js";
 
 const LoginForm = () => {
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
   const {fetchUserDetails}= useContext(Context)
   const {
@@ -23,6 +26,8 @@ const LoginForm = () => {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`, data, {
         withCredentials: true
       });
+      const { token, user } = response.data;
+
 
       const dataApi = response.data;
   
@@ -36,7 +41,7 @@ const LoginForm = () => {
         localStorage.setItem('token', response.data.token); // Save the token in localStorage
        
     }
-
+    dispatch(setUserDetails(user));
 
       alert("Login successfull")
       toast.success("You are logged in")

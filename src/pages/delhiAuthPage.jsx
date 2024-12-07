@@ -9,10 +9,14 @@ import image from '../assets/Images/loginback.avif'
 import 'animate.css';
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUserDetails } from "../features/user/userSlice";
+
 const AuthDelhi = () => {
     const location = useLocation();
     const [showJobForm, setShowJobForm] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     // Extract state from URL query
     const state = new URLSearchParams(location.search).get("state") || "Delhi";
@@ -125,12 +129,13 @@ const AuthDelhi = () => {
             const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/signup`, data, {
                 withCredentials: true,
             })
+            const { token, user } = res.data;
             if (res.data.token) {
                 localStorage.setItem('token', res.data.token); // Save the token in localStorage
                 alert('Signup successful! You are now logged in.');
                 resetSignupForm()
             }
-
+            dispatch(setUserDetails(user));
             console.log("res data", res);
 toast.success("User signed up successfully!");
 navigate('/landing')

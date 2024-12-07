@@ -1,8 +1,35 @@
 import React, { useState } from "react";
 import logo from '../assets/Images/logo.png'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUserDetails } from "../features/user/userSlice";
+import axios from "axios";
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const user = useSelector((state) => state.user.user); // Get user from Redux store
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/user/logout`,{}, {
+        withCredentials: true
+      }, {headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+    }
+  });
+    
+
+      localStorage.removeItem('token'); 
+      dispatch(clearUserDetails()); 
+      navigate('/'); 
+    } catch (error) {
+      console.error('Logout failed:', error.response?.data || error.message);
+    }
+
+  }
+
 
   return (
     <header className="z-50 fixed top-0 w-full bg-blue-600 text-white shadow-lg">
@@ -36,6 +63,16 @@ const Navbar = () => {
     </Link>
     
     ))}
+
+    {/* Conditionally render Logout button */}
+    {user && (
+            <button
+              onClick={handleLogout}
+              className="ml-4 bg-red-600 px-4 py-2 rounded-md text-white hover:bg-red-700 transition duration-300"
+            >
+              Logout
+            </button>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -78,14 +115,25 @@ const Navbar = () => {
             {["Home", "About Us", "Magnifier Dashboard", "Contact Us", "Support"].map(
               (link, index) => (
                 <li key={index}>
-                  <a
+                  <Link
                     href={`#${link.toLowerCase().replace(/\s/g, "-")}`}
                     className="text-sm md:text-base hover:text-yellow-300 transition-colors duration-300"
                   >
                     {link}
-                  </a>
+                  </Link>
                 </li>
               )
+            )}
+             {/* Conditionally render Logout button */}
+             {user && (
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 px-4 py-2 rounded-md text-white hover:bg-red-700 transition duration-300"
+                >
+                  Logout
+                </button>
+              </li>
             )}
           </ul>
         </div>
