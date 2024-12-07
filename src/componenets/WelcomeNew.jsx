@@ -5,7 +5,7 @@ import bengalMap from '../assets/Images/westbengal.jpg';
 import { Link } from "react-router-dom";
 const WelcomeNew = () => {
   return (
-    <div className="h-80  bg-[url('src/assets/Images/background7.avif')] bg-cover  bg-center text-white">
+    <div className="h-80  bg-[url('./assets/Images/background7.avif')] bg-cover  bg-center text-white">
       {/* Navbar */}
       <nav className="w-full bg-blue-600 py-4 fixed top-0 left-0 shadow-lg z-50">
         <ul className="flex justify-around text-sm md:text-lg uppercase">
@@ -41,7 +41,7 @@ const WelcomeNew = () => {
         ].map((state, index) => (
           < button
             key={index}
-            className="relative mb-10 flex flex-col items-center bg-[url('src/assets/Images/background2.webp')] bg-cover bg-center  p-4 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
+            className="relative mb-10 flex flex-col items-center bg-[url('./assets/Images/background2.webp')] bg-cover bg-center  p-4 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
             aria-label={`Select ${state.name}`}
           >
             <span className="text-xl font-semibold absolute top-2 text-white bg-opacity-70 px-2 rounded">
