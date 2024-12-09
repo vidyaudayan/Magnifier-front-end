@@ -141,7 +141,7 @@ export const LandingPage = () => {
             const token = localStorage.getItem('token');
             //console.log( "landing token",token)
             const headers = { Authorization: `Bearer ${token}`, };
-            const response = axios.post(`${import.meta.env.VITE_BASE_URL}/post/create`, formData, { headers }, {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/post/create`, formData, { headers }, {
                 withCredentials: true,
             });
 
