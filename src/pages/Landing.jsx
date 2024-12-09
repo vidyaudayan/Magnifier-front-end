@@ -283,7 +283,7 @@ export const LandingPage = () => {
                 <div className="flex items-center mb-6">
 
 
-                    {user?.profilePic ? (
+                    {user?.profilePic ?(
                         <img
                             src={user.profilePic}
                             alt="User"
@@ -499,12 +499,21 @@ export const LandingPage = () => {
                             </button>
 
                             <div className="flex items-center mb-4">
-                                <img
-                                    src="https://via.placeholder.com/50"
-                                    alt="User"
-                                    className="w-12 h-12 rounded-full"
-                                />
-                                <p className="ml-4 text-lg font-semibold">Username</p>
+                            {user?.profilePic ?(
+                        <img
+                            src={user.profilePic}
+                            alt="User"
+                            className="w-6 h-6 rounded-full"
+                        />
+                    ) : (
+                        <span className="text-3xl text-gray-500">U</span>
+                    )}
+                                
+                                {
+                        user?.username ? (
+                            <p className="text-lg ml-4 font-semibold">{user?.username}</p>
+                        ) : ("")
+                    }
                             </div>
                             <input type="text" />
                             <textarea
