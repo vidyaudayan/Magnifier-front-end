@@ -114,18 +114,7 @@ export const LandingPage = () => {
 
     const handleCreatePost = async () => {
 
-        const tempPostId = Math.random().toString(36).substr(2, 9); // Temporary ID
-        const tempPost = {
-            _id: tempPostId, // Temporary ID
-            userId: { username: user.username, profilePic: user.profilePic }, // Current user's details
-            content: postContent,
-            mediaUrl: photo ? URL.createObjectURL(photo) : null, // Temporary preview of uploaded image
-            postType: photo ? "Photo" : "Text",
-            createdAt: new Date().toISOString(),
-        };
-
-    // Add placeholder post
-    setPosts((prevPosts) => [tempPost, ...prevPosts]);
+       
         try {
            
             const formData = new FormData();
@@ -159,11 +148,8 @@ export const LandingPage = () => {
                 withCredentials: true,
             });
             console.log('New Post Response:', response.data);
-            //setPosts([response.data, ...posts]); // Prepend the new post to the list
-              // Replace placeholder with actual response
-        setPosts((prevPosts) =>
-            prevPosts.map((post) => (post._id === tempPostId ? response.data : post))
-        );
+        setPosts([response.data, ...posts]); // Prepend the new post to the list
+              
 
             
             setPhoto(null);
@@ -171,13 +157,12 @@ export const LandingPage = () => {
             setPostContent("");
             setPhotoPreview(null);
             setPostOverlayOpen(false);
-            setLoading(false); //
+           
             toast.success("Post created successfully");
             //window.location.reload()
         } catch (error) {
             console.error("Error creating post:", error);
-            setPosts((prevPosts) => prevPosts.filter((post) => post._id !== tempPostId));
-            setLoading(false);
+           
             toast.error("Failed to create post");
         }
     };
@@ -571,10 +556,10 @@ export const LandingPage = () => {
                                 </div>
                                 <button
                                     onClick={handleCreatePost}
-                                    disabled={loading}
+                                   
                                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                                 >
-                                    {loading ? "Posting..." : "Post"}
+                                     Post
                                 </button>
                             </div>
                             {photoPreview && (
