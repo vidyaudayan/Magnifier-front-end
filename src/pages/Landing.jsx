@@ -36,7 +36,7 @@ export const LandingPage = () => {
     const [username, setUsername] = useState("Username"); 
     const [userId, setUserId] = useState("user123");
     const [showCommentBox, setShowCommentBox] = useState(false);
-
+    const [loading, setLoading] = useState(false); 
     const [commentsVisible, setCommentsVisible] = useState(false); 
     const [displayCount, setDisplayCount] = useState(6);
 
@@ -114,21 +114,20 @@ export const LandingPage = () => {
 
     const handleCreatePost = async () => {
 
+        const tempPostId = Math.random().toString(36).substr(2, 9); // Temporary ID
+        const tempPost = {
+            _id: tempPostId, // Temporary ID
+            userId: { username: user.username, profilePic: user.profilePic }, // Current user's details
+            content: postContent,
+            mediaUrl: photo ? URL.createObjectURL(photo) : null, // Temporary preview of uploaded image
+            postType: photo ? "Photo" : "Text",
+            createdAt: new Date().toISOString(),
+        };
+
+    // Add placeholder post
+    setPosts((prevPosts) => [tempPost, ...prevPosts]);
         try {
-            const tempPost = {
-                _id: Math.random().toString(36).substr(2, 9), // Temporary ID
-                userId: { username: user.username, profilePic: user.profilePic }, // Current user's details
-                content: postContent,
-                mediaUrl: photo ? URL.createObjectURL(photo) : null, // Temporary preview of uploaded image
-                postType,
-                createdAt: new Date().toISOString(),
-            };
-    
-            // Add placeholder post
-            setPosts([tempPost, ...posts]);
-          
-          
-          
+           
             const formData = new FormData();
 
             // Determine the type of post
@@ -141,6 +140,8 @@ export const LandingPage = () => {
             // Append the file if it's a photo or voice note
             if (photo) formData.append("media", photo); // Add file
             if (voiceNote) formData.append("media", voiceNote); // Add file
+          
+            setLoading(true); // Start loading
 
             console.log("Photo:", photo);
             console.log("Voice Note:", voiceNote);
@@ -161,7 +162,7 @@ export const LandingPage = () => {
             //setPosts([response.data, ...posts]); // Prepend the new post to the list
               // Replace placeholder with actual response
         setPosts((prevPosts) =>
-            prevPosts.map((post) => (post._id === tempPost._id ? response.data : post))
+            prevPosts.map((post) => (post._id === tempPostId ? response.data : post))
         );
 
             
@@ -170,10 +171,13 @@ export const LandingPage = () => {
             setPostContent("");
             setPhotoPreview(null);
             setPostOverlayOpen(false);
+            setLoading(false); //
             toast.success("Post created successfully");
             //window.location.reload()
         } catch (error) {
             console.error("Error creating post:", error);
+            setPosts((prevPosts) => prevPosts.filter((post) => post._id !== tempPostId));
+            setLoading(false);
             toast.error("Failed to create post");
         }
     };
@@ -567,9 +571,10 @@ export const LandingPage = () => {
                                 </div>
                                 <button
                                     onClick={handleCreatePost}
+                                    disabled={loading}
                                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                                 >
-                                    Post
+                                    {loading ? "Posting..." : "Post"}
                                 </button>
                             </div>
                             {photoPreview && (
