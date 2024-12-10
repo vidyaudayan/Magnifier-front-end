@@ -34,7 +34,7 @@ export const LandingPage = () => {
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState(""); 
     const [username, setUsername] = useState("Username"); 
-    const [userId, setUserId] = useState("user123");
+    const [userId, setUserId] = useState({ profilePic: "" });
     const [showCommentBox, setShowCommentBox] = useState(false);
     const [loading, setLoading] = useState(false); 
     const [commentsVisible, setCommentsVisible] = useState(false); 
@@ -176,8 +176,7 @@ export const LandingPage = () => {
             setPostOverlayOpen(false);
            
             toast.success("Post created successfully");
-            //window.location.reload()
-            //navigate('/landing')
+            
         } catch (error) {
             console.error("Error creating post:", error);
             setPosts((prevPosts) =>
@@ -213,7 +212,12 @@ export const LandingPage = () => {
                 });
                 const data = response.data;
                 if (response.status === 200) {
-                    setProfilePic(data.user?.profilePic || ""); // Assuming API returns updated user
+                   
+                    const updatedProfilePic = `${response.data.user?.profilePic}?t=${new Date().getTime()}`;
+                setProfilePic(updatedProfilePic); // Update the state for immediate reflection
+                setUserId((prevUser) => ({ ...prevUser, profilePic: updatedProfilePic })); // Update user state
+                   
+                    //setProfilePic(data.user?.profilePic || ""); // Assuming API returns updated user
                 } else {
                     console.error(response.data.error);
                 }
@@ -256,7 +260,9 @@ export const LandingPage = () => {
                     >
                         {user?.profilePic ? (
                             <img
-                                src={user.profilePic}
+                            src={userId?.profilePic || "/default-avatar.png"} 
+                                //src={user.profilePic}
+
                                 alt="User"
                                 className="w-20 h-20 rounded-full"
                             />
