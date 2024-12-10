@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUserDetails } from "../features/user/userSlice";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,6 +24,7 @@ const Navbar = () => {
 
       localStorage.removeItem('token'); 
       dispatch(clearUserDetails()); 
+      toast.success("You are logged out..")
       navigate('/'); 
     } catch (error) {
       console.error('Logout failed:', error.response?.data || error.message);

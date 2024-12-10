@@ -212,13 +212,13 @@ export const AuthBihar = () => {
             const { token, user } = res.data;
             if (res.data.token) {
                 localStorage.setItem('token', res.data.token); // Save the token in localStorage
-                alert('Signup successful! You are now logged in.');
+                //alert('Signup successful! You are now logged in.');
                 resetSignupForm()
             }
             dispatch(setUserDetails(user));
             console.log("res data", res);
             toast.success("User signed up successfully!");
-            alert("signup sucess")
+            //alert("signup sucess")
         
             if (res.status === 201) {
                 toast.success("User signed up successfully!");
@@ -387,7 +387,7 @@ export const AuthBihar = () => {
                         </button>
                     </form>
                     <Link to={'/job-application'}
-                        className="text-black mt-4 underline hover:scale-105 hover:ml-2 cursor-pointer"
+                        className="text-black mt-4 font-semibold pt-1 underline hover:scale-105 hover:ml-2 cursor-pointer"
                         onClick={() => setShowJobForm(!showJobForm)}
                     >
                         Apply for a Job

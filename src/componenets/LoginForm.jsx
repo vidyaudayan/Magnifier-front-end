@@ -43,7 +43,7 @@ const LoginForm = () => {
     }
     dispatch(setUserDetails(user));
 
-      alert("Login successfull")
+      //alert("Login successfull")
       toast.success("You are logged in")
       navigate('/landing')
       resetLoginForm()

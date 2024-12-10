@@ -132,7 +132,7 @@ const AuthDelhi = () => {
             const { token, user } = res.data;
             if (res.data.token) {
                 localStorage.setItem('token', res.data.token); // Save the token in localStorage
-                alert('Signup successful! You are now logged in.');
+                //alert('Signup successful! You are now logged in.');
                 resetSignupForm()
             }
             dispatch(setUserDetails(user));
@@ -306,7 +306,7 @@ navigate('/landing')
                         </button>
                     </form>
                     < Link to={'/job-application'} 
-                        className="text-black mt-4 underline hover:scale-105 hover:ml-2 cursor-pointer"
+                        className="text-black mt-4 underline font-semibold pt-1 hover:scale-105 hover:ml-2 cursor-pointer"
                         onClick={() => setShowJobForm(!showJobForm)}
                     >
                         Apply for a Job
