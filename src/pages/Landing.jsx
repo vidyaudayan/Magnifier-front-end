@@ -113,9 +113,9 @@ export const LandingPage = () => {
    
 
     const handleCreatePost = async () => {
-
+        const tempPostId = Math.random().toString(36)
         const tempPost = {
-            _id: Math.random().toString(36),
+            _id: tempPostId,
             userId: { username: user?.username || "Unknown", profilePic: user?.profilePic || "" },
             content: postContent,
             mediaUrl: photo ? URL.createObjectURL(photo) : null, // Temporary image preview
