@@ -260,7 +260,7 @@ export const LandingPage = () => {
                     >
                         {user?.profilePic ? (
                             <img
-                            src={userId?.profilePic || "/default-avatar.png"} 
+                            src={userId?.profilePic || user.profilePic} 
                                 //src={user.profilePic}
 
                                 alt="User"
