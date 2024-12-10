@@ -9,7 +9,7 @@ import axios from "axios";
 import { FaCamera } from 'react-icons/fa';
 import Context from "../context/context.jsx";
 import { TbLoadBalancer } from "react-icons/tb";
-
+import { useNavigate } from 'react-router-dom';
 
 import { useSelector } from 'react-redux';
 
@@ -19,7 +19,7 @@ import { setUserDetails } from '../features/user/userSlice.js';
 
 
 export const LandingPage = () => {
-
+    const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
     console.log("user header", user)
     const dispatch = useDispatch();
@@ -177,6 +177,7 @@ export const LandingPage = () => {
            
             toast.success("Post created successfully");
             //window.location.reload()
+            navigate('/landing')
         } catch (error) {
             console.error("Error creating post:", error);
            
