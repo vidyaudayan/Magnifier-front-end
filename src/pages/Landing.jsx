@@ -115,7 +115,20 @@ export const LandingPage = () => {
     const handleCreatePost = async () => {
 
         try {
-
+            const tempPost = {
+                _id: Math.random().toString(36).substr(2, 9), // Temporary ID
+                userId: { username: user.username, profilePic: user.profilePic }, // Current user's details
+                content: postContent,
+                mediaUrl: photo ? URL.createObjectURL(photo) : null, // Temporary preview of uploaded image
+                postType,
+                createdAt: new Date().toISOString(),
+            };
+    
+            // Add placeholder post
+            setPosts([tempPost, ...posts]);
+          
+          
+          
             const formData = new FormData();
 
             // Determine the type of post
@@ -144,8 +157,14 @@ export const LandingPage = () => {
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/post/create`, formData, { headers }, {
                 withCredentials: true,
             });
+            console.log('New Post Response:', response.data);
+            //setPosts([response.data, ...posts]); // Prepend the new post to the list
+              // Replace placeholder with actual response
+        setPosts((prevPosts) =>
+            prevPosts.map((post) => (post._id === tempPost._id ? response.data : post))
+        );
 
-            setPosts([response.data, ...posts]); // Prepend the new post to the list
+            
             setPhoto(null);
             setVoiceNote(null);
             setPostContent("");
