@@ -239,7 +239,7 @@ export const LandingPage = () => {
             }
         };
         fetchPosts();
-    }, []);
+    }, [posts]);
 
 
     return (
@@ -370,14 +370,14 @@ export const LandingPage = () => {
 
                                 <p className="text-xs text-gray-500">{post.createdAt?formatDate(post.createdAt):"Loading..."}</p>
                             </div>
-                            <p className="text-gray-700">{post.content || "Loading content..."}</p>
+                            {/*<p className="text-gray-700">{post.content || "Loading content..."}</p>
         {post.mediaUrl && post.postType === "Photo" && (
             <img
                 src={post.mediaUrl}
                 alt="Post media"
                 className="w-full rounded-md mt-3"
             />
-        )}
+        )}*/}
                         </div>
 
                         {/* Post Content */}
