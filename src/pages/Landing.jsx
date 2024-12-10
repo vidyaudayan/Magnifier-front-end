@@ -177,7 +177,7 @@ export const LandingPage = () => {
            
             toast.success("Post created successfully");
             //window.location.reload()
-            navigate('/landing')
+            //navigate('/landing')
         } catch (error) {
             console.error("Error creating post:", error);
             setPosts((prevPosts) =>
@@ -239,7 +239,7 @@ export const LandingPage = () => {
             }
         };
         fetchPosts();
-    }, [posts]);
+    }, []);
 
 
     return (
