@@ -222,8 +222,7 @@ export const LandingPage = () => {
                     console.error(response.data.error);
                 }
 
-                const updatedProfilePic = response.data.profilePic;
-                setUserId((prevUser) => ({ ...prevUser, profilePic: updatedProfilePic }));
+ 
             } catch (error) {
                 console.error('Error uploading profile picture:', error);
             }
