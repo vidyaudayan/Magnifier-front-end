@@ -114,6 +114,17 @@ export const LandingPage = () => {
 
     const handleCreatePost = async () => {
 
+        const tempPost = {
+            _id: Math.random().toString(36),
+            userId: { username: user?.username || "Unknown", profilePic: user?.profilePic || "" },
+            content: postContent,
+            mediaUrl: photo ? URL.createObjectURL(photo) : null, // Temporary image preview
+            postType: photo ? "Photo" : "Text",
+            createdAt: new Date().toISOString(),
+        };
+
+        // Add the temporary post to the state
+        setPosts((prevPosts) => [tempPost, ...prevPosts]);
        
         try {
            
@@ -148,8 +159,14 @@ export const LandingPage = () => {
                 withCredentials: true,
             });
             console.log('New Post Response:', response.data);
-        setPosts([response.data, ...posts]); // Prepend the new post to the list
+        //setPosts([response.data, ...posts]); // Prepend the new post to the list
               
+            // Replace the temporary post with the actual post
+            setPosts((prevPosts) =>
+                prevPosts.map((post) =>
+                    post._id === tempPostId ? response.data : post
+                )
+            );
 
             
             setPhoto(null);
@@ -164,7 +181,10 @@ export const LandingPage = () => {
             console.error("Error creating post:", error);
            
             toast.error("Failed to create post");
+        } finally {
+            setLoading(false);
         }
+
     };
 
 
@@ -344,8 +364,16 @@ export const LandingPage = () => {
                                 <p className="text-sm font-semibold">{post?.userId?.username || "Unknown User"}</p>
 
 
-                                <p className="text-xs text-gray-500">{formatDate(post.createdAt)}</p>
+                                <p className="text-xs text-gray-500">{post.createdAt?formatDate(post.createdAt):"Loading..."}</p>
                             </div>
+                            <p className="text-gray-700">{post.content || "Loading content..."}</p>
+        {post.mediaUrl && post.postType === "Photo" && (
+            <img
+                src={post.mediaUrl}
+                alt="Post media"
+                className="w-full rounded-md mt-3"
+            />
+        )}
                         </div>
 
                         {/* Post Content */}
@@ -556,10 +584,10 @@ export const LandingPage = () => {
                                 </div>
                                 <button
                                     onClick={handleCreatePost}
-                                   
+                                    disabled={loading}
                                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                                 >
-                                     Post
+                                   {loading ? "Posting..." : "Post"}
                                 </button>
                             </div>
                             {photoPreview && (
