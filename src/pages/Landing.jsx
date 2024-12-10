@@ -180,7 +180,10 @@ export const LandingPage = () => {
             navigate('/landing')
         } catch (error) {
             console.error("Error creating post:", error);
-           
+            setPosts((prevPosts) =>
+                prevPosts.filter((post) => post._id !== tempPostId)
+            );
+
             toast.error("Failed to create post");
         } finally {
             setLoading(false);
