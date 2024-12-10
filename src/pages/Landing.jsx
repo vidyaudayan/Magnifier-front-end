@@ -260,7 +260,11 @@ export const LandingPage = () => {
                     >
                         {user?.profilePic ? (
                             <img
-                            src={userId?.profilePic || user.profilePic} 
+                            src={
+                                userId?.profilePic
+                                  ? `${userId.profilePic}?t=${new Date().getTime()}`
+                                  : "/default-avatar.png"
+                              }
                                 //src={user.profilePic}
 
                                 alt="User"
