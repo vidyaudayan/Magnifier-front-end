@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logo from '../assets/Images/logo1.png'
+import logo from '../assets/Images/logo1.jpg'
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUserDetails } from "../features/user/userSlice";
