@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 
 import { setUserDetails } from '../features/user/userSlice.js';
-
+import { setProfilePicture } from "../features/user/userSlice.js";
 
 export const LandingPage = () => {
     const navigate = useNavigate();
@@ -39,7 +39,8 @@ export const LandingPage = () => {
     const [loading, setLoading] = useState(false); 
     const [commentsVisible, setCommentsVisible] = useState(false); 
     const [displayCount, setDisplayCount] = useState(6);
-
+    const { profilePicture, previousProfilePicture } = useSelector((state) => state.user);
+    const [newPicture, setNewPicture] = useState(null);
     const toggleAddComment = () => {
         setShowCommentBox(!showCommentBox);
     };
@@ -214,9 +215,9 @@ export const LandingPage = () => {
                 if (response.status === 200) {
                    
                     const updatedProfilePic = `${response.data.user?.profilePic}?t=${new Date().getTime()}`;
-                setProfilePic(updatedProfilePic); // Update the state for immediate reflection
-                setUserId((prevUser) => ({ ...prevUser, profilePic: updatedProfilePic })); // Update user state
-                   
+                //setProfilePic(updatedProfilePic); // Update the state for immediate reflection
+                //setUserId((prevUser) => ({ ...prevUser, profilePic: updatedProfilePic })); // Update user state
+                dispatch(setProfilePicture(updatedProfilePic));
                     //setProfilePic(data.user?.profilePic || ""); // Assuming API returns updated user
                 } else {
                     console.error(response.data.error);
