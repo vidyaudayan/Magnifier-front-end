@@ -22,6 +22,7 @@ import AuthBihar from './pages/bihar.jsx';
 import AuthBengal from './pages/bengal.jsx';
 import PrivateRoute from './componenets/PrivateRoute.jsx';
 import LandingPage from './pages/Landing.jsx';
+import AboutUsPage from './componenets/AboutUs.jsx';
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,11 @@ const router = createBrowserRouter([
         path: "/landing",
         element:<LandingPage/>,
       },
+      {
+        path: "/aboutus",
+        element:<AboutUsPage/>,
+      },
+     
      
     ],
   },
