@@ -20,7 +20,7 @@ import Jobapplication from './componenets/Jobapplication.jsx';
 import AuthDelhi from './pages/delhiAuthPage.jsx';
 import AuthBihar from './pages/bihar.jsx';
 import AuthBengal from './pages/bengal.jsx';
-import PrivateRoute from './componenets/PrivateRoute.js';
+import PrivateRoute from './componenets/PrivateRoute.jsx';
 import LandingPage from './pages/Landing.jsx';
 
 const router = createBrowserRouter([
