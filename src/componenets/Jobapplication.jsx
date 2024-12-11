@@ -3,10 +3,11 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Navbar from './Navbar';
-
+import { Navigate, useNavigate } from 'react-router-dom';
 
 
 const Jobapplication = () => {
+  const navigate= useNavigate()
     const {
         register: registerJob,
         handleSubmit: handleJobSubmit,
@@ -45,6 +46,7 @@ const Jobapplication = () => {
             console.log("Job application submitted successfully:", response);
             toast.success("Job application submitted!");
             resetJobForm();
+            navigate('/landing')
         } catch (error) {
             console.log("Error submitting job application:", error.response || error.message);
         }
