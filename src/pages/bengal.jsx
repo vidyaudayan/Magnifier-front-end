@@ -43,15 +43,21 @@ const AuthBengal = () => {
     // Populate Vidhan Sabha options
     useEffect(() => {
         const vidhanSabhas = {
-           "West Bengal": ["Alipurduars", "Ashoknagar", "Bally", "Bangaon", "Barabani", "Baranagar", "Baraipur", "Barjora", "Basirhat", "Bethuadahari", 
-  "Bishnupur", "Bolpur", "Cooch Behar North", "Cooch Behar South", "Chandernagore", "Chanditala", "Daspur", "Dharmadam", "Dum Dum", 
-  "Durgapur", "Galsi", "Gangarampur", "Haldia", "Hanskhali", "Haringhata", "Haripal", "Hasnabad", "Hingalganj", "Hugli", "Jangipur", 
-  "Jorasanko", "Joynagar", "Kaliaganj", "Kamarhati", "Kanksa", "Kolkata Dakshin", "Kolkata Uttar", "Kolar", "Malda Dakshin", "Malda Uttar", 
-  "Mathurapur", "Midnapore", "Mursidabad", "Murarai", "Nadia", "Naihati", "Nandigram", "Nandrol", "Nayagram", "Nobatpara", "Panchla", 
-  "Panskura", "Purba Medinipur", "Purulia", "Raghunathganj", "Rajapur", "Sagar", "Sainthia", "Saltora", "Srirampur", "Siliguri", 
-  "Sonarpur", "Sreerampur", "Sriniketan", "Tamluk", "Tarakeswar", "Uttarpara", "Uluberia", "Howrah", "Shibpur", "Chandannagar", 
-  "Jadavpur", "Ballygunge", "Behala", "Garia", "Kolkata South", "Kolkata West", "Kolkata East", "Barrackpore", "Chinsurah", "Maheshtala", 
-  "Kolar", "Baruipur", "Santipur", "Bongaon", "Rajbari", "Gajol", "Raiganj", "Kushmandi", "Balurghat"],
+           "West Bengal": ["Alipurduars", "Ashoknagar", "Bally", "Ballygunge", "Bangaon", "Barabani", "Baranagar", 
+"Barjora", "Baruipur", "Basirhat", "Behala", "Bethuadahari", "Bishnupur", "Bolpur", 
+"Bongaon", "Chandannagar", "Chandernagore", "Chanditala", "Chinsurah", "Cooch Behar North", 
+"Cooch Behar South", "Daspur", "Dharmadam", "Dum Dum", "Durgapur", "Gajol", "Galsi", 
+"Gangarampur", "Garia", "Haldia", "Hanskhali", "Haringhata", "Haripal", "Hasnabad", 
+"Hingalganj", "Howrah", "Hugli", "Jadavpur", "Jangipur", "Jorasanko", "Joynagar", 
+"Kaliaganj", "Kamarhati", "Kanksa", "Kolar", "Kolar", "Kolkata Dakshin", "Kolkata East", 
+"Kolkata South", "Kolkata Uttar", "Kolkata West", "Kushmandi", "Malda Dakshin", 
+"Malda Uttar", "Maheshtala", "Mathurapur", "Midnapore", "Murarai", "Mursidabad", 
+"Nadia", "Naihati", "Nandigram", "Nandrol", "Nayagram", "Nobatpara", "Panchla", 
+"Panskura", "Purba Medinipur", "Purulia", "Raiganj", "Raghunathganj", "Rajapur", 
+"Rajbari", "Sagar", "Sainthia", "Saltora", "Santipur", "Shibpur", "Siliguri", 
+"Sonarpur", "Sreerampur", "Sriniketan", "Srirampur", "Tamluk", "Tarakeswar", 
+"Uluberia", "Uttarpara"
+],
 
         };
         setVidhanSabhaOptions(vidhanSabhas[state] || []);

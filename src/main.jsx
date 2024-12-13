@@ -23,6 +23,7 @@ import AuthBengal from './pages/bengal.jsx';
 import PrivateRoute from './componenets/PrivateRoute.jsx';
 import LandingPage from './pages/Landing.jsx';
 import AboutUsPage from './componenets/AboutUs.jsx';
+import Dashboard from './componenets/LeftSideLand.jsx';
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: "/aboutus",
         element:<AboutUsPage/>,
+      },
+      {
+        path: "/left",
+        element:<Dashboard/>,
       },
      
      
