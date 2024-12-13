@@ -88,9 +88,10 @@ export const LandingPage = () => {
                     : `${import.meta.env.VITE_BASE_URL}/post/${postId}/dislike`;
 
             const response = await axios.patch(url, {}, { withCredentials: true });
-
+            const { post, walletAmount } = response.data;
             // Update the specific post's likes/dislikes in state
             setPosts(posts.map(post => (post._id === postId ? response.data : post)));
+          
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
@@ -328,7 +329,7 @@ export const LandingPage = () => {
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
                         <span>👍 {metrics.totalLikes}</span>
-                        <span>❤️<BiSolidDislike /> {metrics.totalDislikes}</span>
+                        <span>👎 {metrics.totalDislikes}</span>
                         
                     
                     </div>
