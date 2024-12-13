@@ -50,7 +50,8 @@ export const LandingPage = () => {
         setShowComments(!showComments);
     };
 
-
+    const [metrics, setMetrics] = useState({ walletAmount: 0, postCount: 0,
+                          totalLikes: 0, totalDislikes: 0 });
 
     const handleAddComment = async (postId) => {
         if (!newComment.trim()) return;
@@ -255,6 +256,22 @@ export const LandingPage = () => {
         fetchPosts();
     }, []);
 
+    useEffect(() => {
+        const fetchMetrics = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/usermatrics`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                },{withCredentials:true});
+                setMetrics(response.data);
+            } catch (error) {
+                console.error("Error fetching metrics", error);
+            }
+        };
+
+        fetchMetrics();
+    }, []);
+
+
 
     return (
         <div className="min-h-screen  bg-gray-100 flex flex-col lg:flex-row gap-4 pr-8 py-4  mt-20">
@@ -303,23 +320,23 @@ export const LandingPage = () => {
                 {/* Wallet Box */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Wallet Balance</p>
-                    <p className="text-lg font-bold text-green-600">200</p>
+                    <p className="text-lg font-bold text-green-600">{metrics.walletAmount}</p>
                 </div>
 
                 {/* Reactions Box */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
-                        <span>👍 50</span>
-                        <span>❤️ 30</span>
-                        <span>👏 20</span>
+                        <span>👍 {metrics.totalLikes}</span>
+                        <span>❤️ {metrics.totalDislikes}</span>
+                        
                     </div>
                 </div>
 
                 {/* Posts Count */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Posts</p>
-                    <p className="text-lg font-bold text-blue-600">15</p>
+                    <p className="text-lg font-bold text-blue-600">{metrics.postCount}</p>
                 </div>
 
                 {/* Settings */}
