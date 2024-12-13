@@ -90,8 +90,10 @@ export const LandingPage = () => {
             const response = await axios.patch(url, {}, { withCredentials: true });
             const { post, walletAmount } = response.data;
             // Update the specific post's likes/dislikes in state
-            setPosts(posts.map(post => (post._id === postId ? post : post)));
-          
+            //setPosts(posts.map(post => (post._id === postId ? post : post)));
+            setPosts(prevPosts =>
+                prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
+            );
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
