@@ -10,7 +10,7 @@ import { FaCamera } from 'react-icons/fa';
 import Context from "../context/context.jsx";
 import { TbLoadBalancer } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
-
+import { BiSolidDislike } from "react-icons/bi";
 import { useSelector } from 'react-redux';
 
 import { useDispatch } from 'react-redux';
@@ -328,8 +328,9 @@ export const LandingPage = () => {
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
                         <span>👍 {metrics.totalLikes}</span>
-                        <span>❤️ {metrics.totalDislikes}</span>
+                        <span>❤️<BiSolidDislike /> {metrics.totalDislikes}</span>
                         
+                    
                     </div>
                 </div>
 

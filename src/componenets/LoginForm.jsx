@@ -7,6 +7,7 @@ import Context from "../context/context.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from "../features/user/userSlice.js";
+import useWallet from "./hooks/useWallet.jsx";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ const LoginForm = () => {
     formState: { errors },
     reset:resetLoginForm,
   } = useForm();
+  const [walletAmount, setWalletAmount] = useWallet();
 
   const onSubmit =async (data) => {
     console.log("Login Data:", data);
@@ -42,6 +44,19 @@ const LoginForm = () => {
        
     }
     dispatch(setUserDetails(user));
+
+    try {
+      const walletResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/wallet`, {withCredentials:true}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const { walletAmount: initializedAmount } = walletResponse.data;
+      setWalletAmount(initializedAmount); // Update wallet in frontend
+      console.log("Wallet Initialized:", initializedAmount);
+    } catch (walletError) {
+      console.error("Error initializing wallet:", walletError);
+    }
 
       //alert("Login successfull")
       toast.success("You are logged in")

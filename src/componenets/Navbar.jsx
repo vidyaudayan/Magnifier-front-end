@@ -184,7 +184,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="z-50 fixed top-0 w-full bg-blue-600 text-white shadow-lg lg:h-32">
+    <header className="z-50 fixed top-0 w-full bg-blue-600 text-white shadow-lg lg:h-24">
       <nav className="container mx-auto flex items-center justify-between px-4 lg:px-8 py-3">
         {/* Logo and Name */}
         <div className="flex items-center space-x-3">
