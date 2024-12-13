@@ -117,7 +117,7 @@ export const LandingPage = () => {
 
    
 
-    const handleCreatePost = async () => {
+    {/*const handleCreatePost = async () => {
         const tempPostId = Math.random().toString(36)
         const tempPost = {
             _id: tempPostId,
@@ -196,9 +196,58 @@ export const LandingPage = () => {
             setPhoto(null);
         }
 
+    };*/}
+
+    const handleCreatePost = async () => {
+        const tempPostId = Math.random().toString(36);
+        const tempPost = {
+            _id: tempPostId,
+            userId: { username: user?.username || "Unknown", profilePic: user?.profilePic || "" },
+            content: postContent,
+            media: photo ? URL.createObjectURL(photo) : null,
+            postType: photo ? "Photo" : "Text",
+            createdAt: new Date().toISOString(),
+        };
+    
+        setPosts((prevPosts) => [tempPost, ...prevPosts]);
+    
+        try {
+            const formData = new FormData();
+            formData.append('postType', photo ? "Photo" : "Text");
+            formData.append('content', postContent);
+            if (photo) formData.append("media", photo);
+    
+            const token = localStorage.getItem('token');
+            const headers = { Authorization: `Bearer ${token}` };
+    
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}/post/create`,
+                formData,
+                { headers },
+                { withCredentials: true }
+            );
+    
+            setPosts((prevPosts) =>
+                prevPosts.map((post) =>
+                    post._id === tempPostId ? response.data : post
+                )
+            );
+    
+            toast.success("Post created successfully");
+        } catch (error) {
+            console.error("Error creating post:", error);
+            setPosts((prevPosts) =>
+                prevPosts.filter((post) => post._id !== tempPostId)
+            );
+            toast.error("Failed to create post");
+        } finally {
+            if (photo) URL.revokeObjectURL(tempPost.media);
+            setLoading(false);
+            setPostContent("");
+            setPhoto(null);
+        }
     };
-
-
+    
 
     const handleProfilePicUpload = async (event) => {
 
