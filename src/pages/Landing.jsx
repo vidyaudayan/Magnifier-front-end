@@ -146,7 +146,7 @@ export const LandingPage = () => {
             if (photo) formData.append("media", photo); // Add file
             if (voiceNote) formData.append("media", voiceNote); // Add file
           
-            setLoading(true); // Start loading
+            //setLoading(true); // Start loading
 
             console.log("Photo:", photo);
             console.log("Voice Note:", voiceNote);
@@ -174,11 +174,11 @@ export const LandingPage = () => {
             );
 
             
-            setPhoto(null);
-            setVoiceNote(null);
-            setPostContent("");
-            setPhotoPreview(null);
-            setPostOverlayOpen(false);
+            //setPhoto(null);
+            //setVoiceNote(null);
+            //setPostContent("");
+            //setPhotoPreview(null);
+            //setPostOverlayOpen(false);
            
             toast.success("Post created successfully");
             
@@ -190,7 +190,10 @@ export const LandingPage = () => {
 
             toast.error("Failed to create post");
         } finally {
+            if (photo) URL.revokeObjectURL(tempPost.media);
             setLoading(false);
+            setPostContent("");
+            setPhoto(null);
         }
 
     };
