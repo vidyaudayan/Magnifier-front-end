@@ -89,7 +89,8 @@ export const LandingPage = () => {
                     ? `${import.meta.env.VITE_BASE_URL}/post/${postId}/like`
                     : `${import.meta.env.VITE_BASE_URL}/post/${postId}/dislike`;
 
-            const response = await axios.patch(url, {}, { withCredentials: true });
+            const response = await axios.patch(url, {},{
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}}, { withCredentials: true });
             const { post, walletAmount } = response.data;
             // Update the specific post's likes/dislikes in state
             //setPosts(posts.map(post => (post._id === postId ? post : post)));
