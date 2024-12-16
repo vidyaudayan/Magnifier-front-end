@@ -45,7 +45,7 @@ const LoginForm = () => {
     }
     dispatch(setUserDetails(user));
 
-    try {
+    {/*try {
       const walletResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/wallet`, {withCredentials:true}, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -56,8 +56,15 @@ const LoginForm = () => {
       console.log("Wallet Initialized:", initializedAmount);
     } catch (walletError) {
       console.error("Error initializing wallet:", walletError);
-    }
+    }*/}
 
+
+    const walletResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/wallet`, {withCredentials:true}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setWalletAmount(walletResponse.data.walletAmount); // Update wallet state
       //alert("Login successfull")
       toast.success("You are logged in")
       navigate('/landing')
