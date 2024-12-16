@@ -41,6 +41,8 @@ export const LandingPage = () => {
     const [displayCount, setDisplayCount] = useState(6);
     const { profilePicture, previousProfilePicture } = useSelector((state) => state.user);
     const [newPicture, setNewPicture] = useState(null);
+    const [wallet, setWallet] = useState();
+   
     const toggleAddComment = () => {
         setShowCommentBox(!showCommentBox);
     };
@@ -91,6 +93,7 @@ export const LandingPage = () => {
             const { post, walletAmount } = response.data;
             // Update the specific post's likes/dislikes in state
             //setPosts(posts.map(post => (post._id === postId ? post : post)));
+            setWallet(walletAmount);
             setPosts(prevPosts =>
                 prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
             );
