@@ -8,7 +8,7 @@ const useWallet = (userId) => {
   useEffect(() => {
     const initializeWallet = async () => {
       try {
-        const response = await axios.post('/wallet/initialize', {}, {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/wallet`, {}, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
