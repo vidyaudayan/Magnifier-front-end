@@ -245,6 +245,7 @@ export const LandingPage = () => {
             setLoading(false);
             setPostContent("");
             setPhoto(null);
+            setPostOverlayOpen(false); 
         }
     };
     
