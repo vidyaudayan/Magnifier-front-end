@@ -401,15 +401,15 @@ export const LandingPage = () => {
                 {/* Wallet Box */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Wallet Balance</p>
-                    <p className="text-lg font-bold text-green-600">{walletAmount}</p>
+                    <p className="text-lg font-bold text-green-600">{metrics.walletAmount}</p>
                 </div>
 
                 {/* Reactions Box */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
-                        <span>👍 {totalLikes}</span>
-                        <span>👎 {totalDislikes}</span>
+                        <span>👍 {metrics.totalLikes}</span>
+                        <span>👎 {metrics.totalDislikes}</span>
                         
                     
                     </div>
@@ -418,7 +418,7 @@ export const LandingPage = () => {
                 {/* Posts Count */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Posts</p>
-                    <p className="text-lg font-bold text-blue-600">{postCount}</p>
+                    <p className="text-lg font-bold text-blue-600">{metrics.postCount}</p>
                 </div>
 
                 {/* Settings */}
