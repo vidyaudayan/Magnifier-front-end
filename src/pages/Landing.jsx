@@ -14,13 +14,15 @@ import { BiSolidDislike } from "react-icons/bi";
 import { useSelector } from 'react-redux';
 
 import { useDispatch } from 'react-redux';
-
+import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
 import { setProfilePicture } from "../features/user/userSlice.js";
 
 export const LandingPage = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
+    const { walletAmount, totalLikes, totalDislikes, postCount } = useSelector((state) => state.user);
+   
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
@@ -97,6 +99,14 @@ export const LandingPage = () => {
             setWallet(walletAmount);
             setPosts(prevPosts =>
                 prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
+            );
+
+            dispatch(
+                updateMetrics({
+                    walletAmount,
+                    userReactions,
+                    postCount,
+                })
             );
         } catch (error) {
             console.error("Error updating reactions:", error);
@@ -317,19 +327,30 @@ export const LandingPage = () => {
     }, []);
 
     useEffect(() => {
-        const fetchMetrics = async () => {
+        const dispatch = useDispatch();
+        const fetchMetrics = async (dispatch) => {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/usermatrics`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 },{withCredentials:true});
                 setMetrics(response.data);
+                const { walletAmount, totalLikes,totalDislikes, postCount } = response.data;
+
+                // Dispatch fetched metrics to Redux store
+                dispatch(
+                    updateMetrics({
+                        walletAmount,
+                        totalLikes, totalDislikes,
+                        postCount,
+                    })
+                );
             } catch (error) {
                 console.error("Error fetching metrics", error);
             }
         };
-
+        dispatch(fetchMetrics());
         fetchMetrics();
-    }, []);
+    }, [dispatch]);
 
 
 
@@ -380,15 +401,15 @@ export const LandingPage = () => {
                 {/* Wallet Box */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Wallet Balance</p>
-                    <p className="text-lg font-bold text-green-600">{metrics.walletAmount}</p>
+                    <p className="text-lg font-bold text-green-600">{walletAmount}</p>
                 </div>
 
                 {/* Reactions Box */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
-                        <span>👍 {metrics?.totalLikes}</span>
-                        <span>👎 {metrics?.totalDislikes}</span>
+                        <span>👍 {totalLikes}</span>
+                        <span>👎 {totalDislikes}</span>
                         
                     
                     </div>
@@ -397,7 +418,7 @@ export const LandingPage = () => {
                 {/* Posts Count */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Posts</p>
-                    <p className="text-lg font-bold text-blue-600">{metrics.postCount}</p>
+                    <p className="text-lg font-bold text-blue-600">{postCount}</p>
                 </div>
 
                 {/* Settings */}
