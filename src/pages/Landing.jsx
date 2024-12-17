@@ -327,8 +327,8 @@ export const LandingPage = () => {
     }, []);
 
     useEffect(() => {
-        const dispatch = useDispatch();
-        const fetchMetrics = async (dispatch) => {
+      
+        const fetchMetrics = async () => {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/usermatrics`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -337,20 +337,20 @@ export const LandingPage = () => {
                 const { walletAmount, totalLikes,totalDislikes, postCount } = response.data;
 
                 // Dispatch fetched metrics to Redux store
-                dispatch(
+                {/*dispatch(
                     updateMetrics({
                         walletAmount,
                         totalLikes, totalDislikes,
                         postCount,
-                    })
-                );
+                    })*/}
+                
             } catch (error) {
                 console.error("Error fetching metrics", error);
             }
         };
-        dispatch(fetchMetrics());
+        //dispatch(fetchMetrics());
         fetchMetrics();
-    }, [dispatch]);
+    }, []);
 
 
 
