@@ -104,7 +104,7 @@ export const LandingPage = () => {
             dispatch(
                 updateMetrics({
                     walletAmount,
-                    userReactions,
+                   totalLikes,totalDislikes,
                     postCount,
                 })
             );
