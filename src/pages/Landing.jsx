@@ -101,11 +101,11 @@ export const LandingPage = () => {
                 prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
             );*/}
 
-            const updatedPost = response.data.updatedPost;
+            const updatedPost = response.data.post;
 
-        setPosts((prevPosts) =>
-            prevPosts.map((p) => (p._id === postId ? updatedPost : p))
-        );
+            setPosts(prevPosts =>
+                prevPosts.map(p => (p._id === postId ? { ...p, ...updatedPost } : p))
+            );
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
@@ -316,7 +316,14 @@ export const LandingPage = () => {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, {
                     withCredentials: true,
                 });;
-                setPosts(response.data); // Assuming API returns an array of posts
+                //setPosts(response.data); // Assuming API returns an array of posts
+            
+                const fetchedPosts = response.data || []; // Ensure it's an array
+                setPosts(fetchedPosts.map(post => ({
+                    ...post,
+                    userId: post.userId || {}, // Default to an empty object if userId is missing
+                })));
+            
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
