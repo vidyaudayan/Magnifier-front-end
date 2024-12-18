@@ -17,7 +17,7 @@ import { useDispatch } from 'react-redux';
 import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
 import { setProfilePicture } from "../features/user/userSlice.js";
-import { updatePostReaction } from "../features/user/userSlice.js";
+import { updatePostReaction } from "../features/post/postSlice.js";
 import { setPosts } from "../features/user/userSlice.js";
 export const LandingPage = () => {
     const navigate = useNavigate();
@@ -112,6 +112,10 @@ export const LandingPage = () => {
             dispatch(updatePostReaction({ postId, updatedPost: post }));
             dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
 
+
+            setPosts(prevPosts =>
+                prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
+              );
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
