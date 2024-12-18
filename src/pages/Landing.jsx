@@ -18,7 +18,7 @@ import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
 import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/post/postSlice.js";
-import { setPosts } from "../features/post/postSlice.js";
+
 export const LandingPage = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
