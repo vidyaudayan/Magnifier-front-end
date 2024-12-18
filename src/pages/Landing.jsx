@@ -97,11 +97,15 @@ export const LandingPage = () => {
             // Update the specific post's likes/dislikes in state
             //setPosts(posts.map(post => (post._id === postId ? post : post)));
             //setWallet(walletAmount);
-            setPosts(prevPosts =>
+            {/*setPosts(prevPosts =>
                 prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
-            );
+            );*/}
 
-           
+            const updatedPost = response.data.updatedPost;
+
+        setPosts((prevPosts) =>
+            prevPosts.map((p) => (p._id === postId ? updatedPost : p))
+        );
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
