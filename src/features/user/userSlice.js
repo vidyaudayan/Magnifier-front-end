@@ -58,6 +58,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUserDetails, clearUserDetails, setProfilePicture,updateMetrics,  } = userSlice.actions;
+export const { setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction } = userSlice.actions;
 
 export default userSlice.reducer;
