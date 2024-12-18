@@ -36,6 +36,8 @@ export const userSlice = createSlice({
     totalLikes: 0, // Total likes received
     totalDislikes: 0, // User's reactions to posts
     postCount: 0, 
+    posts: [], // Add posts to track updates here
+
   },
   reducers: {
     setUserDetails: (state, action) => {
@@ -55,6 +57,17 @@ export const userSlice = createSlice({
       state.postCount = postCount;
       console.log('Metrics updated:', action.payload);
     },
+    updatePostReaction: (state, action) => {
+      const { postId, updatedPost } = action.payload;
+      state.posts = state.posts.map((post) =>
+        post._id === postId ? { ...post, ...updatedPost } : post
+      );
+      console.log('Post reaction updated:', action.payload);
+    },
+    setPosts: (state, action) => {
+      state.posts = action.payload;
+      console.log('Posts fetched:', action.payload);
+    },
     clearUserDetails: (state) => {
       state.user = null;
       state.profilePicture = null;
@@ -63,11 +76,13 @@ export const userSlice = createSlice({
       state.totalLikes = 0;
       state.totalDislikes = 0;
       state.postCount = 0;
+      state.posts = []; // Clear posts as well
       console.log('User logged out');
     },
   },
 });
 
-export const { setUserDetails, clearUserDetails, setProfilePicture,updateMetrics } = userSlice.actions;
+export const { setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,
+  setPosts } = userSlice.actions;
 
 export default userSlice.reducer;

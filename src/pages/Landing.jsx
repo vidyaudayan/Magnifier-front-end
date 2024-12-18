@@ -101,11 +101,16 @@ export const LandingPage = () => {
                 prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
             );*/}
 
-            const updatedPost = response.data.post;
+            {/*const updatedPost = response.data.post;
 
             setPosts(prevPosts =>
                 prevPosts.map(p => (p._id === postId ? { ...p, ...updatedPost } : p))
-            );
+            );*/}
+            const { post, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
+
+            dispatch(updatePostReaction({ postId, updatedPost: post }));
+            dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
+
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
@@ -338,7 +343,7 @@ export const LandingPage = () => {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/usermatrics`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 },{withCredentials:true});
-                setMetrics(response.data);
+                //setMetrics(response.data);
                 const { walletAmount, totalLikes,totalDislikes, postCount } = response.data;
 
                 // Dispatch fetched metrics to Redux store
