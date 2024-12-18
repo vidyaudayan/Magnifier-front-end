@@ -17,7 +17,8 @@ import { useDispatch } from 'react-redux';
 import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
 import { setProfilePicture } from "../features/user/userSlice.js";
-
+import { updatePostReaction } from "../features/user/userSlice.js";
+import { setPosts } from "../features/user/userSlice.js";
 export const LandingPage = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
