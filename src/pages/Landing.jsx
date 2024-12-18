@@ -26,7 +26,7 @@ export const LandingPage = () => {
     const totalLikes = useSelector(state => state?.user?.totalLikes);
     const totalDislikes = useSelector(state => state?.user?.totalDislikes);
     
-    const posts = useSelector(state => state.posts.posts);
+    const posts = useSelector(state => state.posts?.posts|| []);
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
