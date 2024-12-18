@@ -48,7 +48,7 @@ export const userSlice = createSlice({
       console.log('Profile picture updated', action.payload);
     },
     updateMetrics: (state, action) => {
-      const { walletAmount, userReactions, postCount } = action.payload;
+      const { walletAmount,totalLikes, totalDislikes, postCount } = action.payload;
       state.walletAmount = walletAmount;
       state.totalLikes = totalLikes;
       state.totalDislikes = totalDislikes;
