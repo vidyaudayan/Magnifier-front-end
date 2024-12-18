@@ -23,8 +23,8 @@ export const LandingPage = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
     const { walletAmount,  postCount } = useSelector((state) => state.user);
-    const totalLikes = useSelector(state => state.metrics.totalLikes);
-    const totalDislikes = useSelector(state => state.metrics.totalDislikes);
+    const totalLikes = useSelector(state => state?.user?.totalLikes);
+    const totalDislikes = useSelector(state => state?.user?.totalDislikes);
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
