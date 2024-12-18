@@ -93,7 +93,7 @@ export const LandingPage = () => {
 
             const response = await axios.patch(url, {},{
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}}, { withCredentials: true });
-            const { post, walletAmount,totalLikes, totalDislikes, postCount  } = response.data;
+            //const { post, walletAmount,totalLikes, totalDislikes, postCount  } = response.data;
             // Update the specific post's likes/dislikes in state
             //setPosts(posts.map(post => (post._id === postId ? post : post)));
             //setWallet(walletAmount);
@@ -101,13 +101,7 @@ export const LandingPage = () => {
                 prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
             );
 
-            dispatch(
-                updateMetrics({
-                    walletAmount,
-                   totalLikes,totalDislikes,
-                    postCount,
-                })
-            );
+           
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
@@ -337,12 +331,13 @@ export const LandingPage = () => {
                 const { walletAmount, totalLikes,totalDislikes, postCount } = response.data;
 
                 // Dispatch fetched metrics to Redux store
-                {/*dispatch(
+                dispatch(
                     updateMetrics({
                         walletAmount,
                         totalLikes, totalDislikes,
                         postCount,
-                    })*/}
+                    })
+                )
                 
             } catch (error) {
                 console.error("Error fetching metrics", error);
