@@ -122,7 +122,9 @@ export const LandingPage = () => {
             const { post, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
 // Dispatch to Redux store
 
-
+setPosts(prevPosts =>
+    prevPosts.map(p => p._id === postId ? { ...p, ...post } : p)
+);
             dispatch(updatePostReaction({ postId, updatedPost: post }));
             dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
 
