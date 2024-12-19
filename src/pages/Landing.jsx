@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
-import { setPosts } from "../features/post/postSlice.js";
+import { setPosts } from "../features/user/userSlice.js";
 import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/user/userSlice.js";
 //import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
@@ -27,7 +27,7 @@ export const LandingPage = () => {
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
     // Access Redux state
-    const { walletAmount, totalLikes, totalDislikes, postCount,  } = useSelector(
+    const {posts,walletAmount, totalLikes, totalDislikes, postCount,  } = useSelector(
         (state) => state.user
     );
 
@@ -42,7 +42,7 @@ export const LandingPage = () => {
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
     const [voiceNote, setVoiceNote] = useState(null);
-   const [posts, setPosts] = useState([]);
+   //const [posts, setPosts] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState("");
     const [username, setUsername] = useState("Username");
@@ -440,8 +440,8 @@ export const LandingPage = () => {
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
-                        <span>👍 {totalLikes}</span>
-                        <span>👎 {totalDislikes}</span>
+                        <span>👍 {user.totalLikes}</span>
+                        <span>👎 {user.totalDislikes}</span>
                         
                     
                     </div>
