@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
+import { setPosts } from "../features/user/userSlice.js";
 import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/user/userSlice.js";
 //import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
@@ -26,7 +27,7 @@ export const LandingPage = () => {
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
     // Access Redux state
-    const { walletAmount, totalLikes, totalDislikes, postCount, isLoadingPosts } = useSelector(
+    const { walletAmount, totalLikes, totalDislikes, postCount, isLoadingPosts,posts } = useSelector(
         (state) => state.user
     );
 
@@ -41,7 +42,7 @@ export const LandingPage = () => {
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
     const [voiceNote, setVoiceNote] = useState(null);
-const [posts, setPosts] = useState([]);
+//const [posts, setPosts] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState("");
     const [username, setUsername] = useState("Username");
@@ -339,12 +340,12 @@ const [posts, setPosts] = useState([]);
                 });;
                 //setPosts(response.data); // Assuming API returns an array of posts
             
-                const fetchedPosts = response.data || []; // Ensure it's an array
-                setPosts(fetchedPosts.map(post => ({
+                //const fetchedPosts = response.data || []; // Ensure it's an array
+                {/*setPosts(fetchedPosts.map(post => ({
                     ...post,
                     userId: post.userId || {}, // Default to an empty object if userId is missing
-                })));
-            
+                })));*/}
+                dispatch(setPosts(response.data || [])); 
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
@@ -379,7 +380,7 @@ const [posts, setPosts] = useState([]);
         fetchMetrics();
     }, []);
 
-    // Fetch metrics and posts on component mount
+ 
     
 
 
