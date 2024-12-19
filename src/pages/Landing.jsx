@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
-import { setPosts } from "../features/user/userSlice.js";
+import { setPosts } from "../features/post/postSlice.js";
 import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/user/userSlice.js";
 //import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
@@ -27,12 +27,12 @@ export const LandingPage = () => {
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
     // Access Redux state
-    const {posts, walletAmount, totalLikes, totalDislikes, postCount,  } = useSelector(
+    const { walletAmount, totalLikes, totalDislikes, postCount,  } = useSelector(
         (state) => state.user
     );
 
 
-    //const posts = useSelector(state => state.posts?.posts|| []);
+    const posts = useSelector(state => state.posts?.posts|| []);
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
