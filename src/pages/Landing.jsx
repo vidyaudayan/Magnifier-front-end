@@ -18,14 +18,19 @@ import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
 import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/user/userSlice.js";
-
+//import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
 export const LandingPage = () => {
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
-    const { walletAmount,  postCount } = useSelector((state) => state.user);
-    const totalLikes = useSelector(state => state?.user?.totalLikes);
-    const totalDislikes = useSelector(state => state?.user?.totalDislikes);
-    
+    //const { walletAmount,  postCount } = useSelector((state) => state.user);
+    //const totalLikes = useSelector(state => state?.user?.totalLikes);
+    // totalDislikes = useSelector(state => state?.user?.totalDislikes);
+    // Access Redux state
+    const { walletAmount, totalLikes, totalDislikes, postCount, posts, isLoadingPosts } = useSelector(
+        (state) => state.user
+    );
+
+
     //const posts = useSelector(state => state.posts?.posts|| []);
     console.log("user header", user)
     const dispatch = useDispatch();
@@ -36,19 +41,19 @@ export const LandingPage = () => {
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
     const [voiceNote, setVoiceNote] = useState(null);
-       const [posts, setPosts] = useState([]);
+    //const [posts, setPosts] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
-    const [profilePic, setProfilePic] = useState(""); 
-    const [username, setUsername] = useState("Username"); 
+    const [profilePic, setProfilePic] = useState("");
+    const [username, setUsername] = useState("Username");
     const [userId, setUserId] = useState({ profilePic: "" });
     const [showCommentBox, setShowCommentBox] = useState(false);
-    const [loading, setLoading] = useState(false); 
-    const [commentsVisible, setCommentsVisible] = useState(false); 
+    const [loading, setLoading] = useState(false);
+    const [commentsVisible, setCommentsVisible] = useState(false);
     const [displayCount, setDisplayCount] = useState(6);
     const { profilePicture, previousProfilePicture } = useSelector((state) => state.user);
     const [newPicture, setNewPicture] = useState(null);
     const [wallet, setWallet] = useState();
-   
+
     const toggleAddComment = () => {
         setShowCommentBox(!showCommentBox);
     };
@@ -58,8 +63,10 @@ export const LandingPage = () => {
         setShowComments(!showComments);
     };
 
-    const [metrics, setMetrics] = useState({ walletAmount: 0, postCount: 0,
-                          totalLikes: 0, totalDislikes: 0 });
+    const [metrics, setMetrics] = useState({
+        walletAmount: 0, postCount: 0,
+        totalLikes: 0, totalDislikes: 0
+    });
 
     const handleAddComment = async (postId) => {
         if (!newComment.trim()) return;
@@ -86,7 +93,7 @@ export const LandingPage = () => {
     };
 
 
-    
+
 
     const handleReaction = async (postId, reactionType) => {
         try {
@@ -95,8 +102,9 @@ export const LandingPage = () => {
                     ? `${import.meta.env.VITE_BASE_URL}/post/${postId}/like`
                     : `${import.meta.env.VITE_BASE_URL}/post/${postId}/dislike`;
 
-            const response = await axios.patch(url, {},{
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}}, { withCredentials: true });
+            const response = await axios.patch(url, {}, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            }, { withCredentials: true });
             //const { post, walletAmount,totalLikes, totalDislikes, postCount  } = response.data;
             // Update the specific post's likes/dislikes in state
             //setPosts(posts.map(post => (post._id === postId ? post : post)));
@@ -111,14 +119,14 @@ export const LandingPage = () => {
                 prevPosts.map(p => (p._id === postId ? { ...p, ...updatedPost } : p))
             );*/}
             const { post, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
+// Dispatch to Redux store
+
 
             dispatch(updatePostReaction({ postId, updatedPost: post }));
             dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
 
 
-            setPosts(prevPosts =>
-                prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
-              );
+            //setPosts(prevPosts =>prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p)));
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
@@ -140,7 +148,7 @@ export const LandingPage = () => {
         }
     };
 
-   
+
 
     {/*const handleCreatePost = async () => {
         const tempPostId = Math.random().toString(36)
@@ -233,31 +241,31 @@ export const LandingPage = () => {
             postType: photo ? "Photo" : "Text",
             createdAt: new Date().toISOString(),
         };
-    
+
         setPosts((prevPosts) => [tempPost, ...prevPosts]);
-    
+
         try {
             const formData = new FormData();
             formData.append('postType', photo ? "Photo" : "Text");
             formData.append('content', postContent);
             if (photo) formData.append("media", photo);
-    
+
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
-    
+
             const response = await axios.post(
                 `${import.meta.env.VITE_BASE_URL}/post/create`,
                 formData,
                 { headers },
                 { withCredentials: true }
             );
-    
+
             setPosts((prevPosts) =>
                 prevPosts.map((post) =>
                     post._id === tempPostId ? response.data : post
                 )
             );
-    
+
             toast.success("Post created successfully");
         } catch (error) {
             console.error("Error creating post:", error);
@@ -270,10 +278,10 @@ export const LandingPage = () => {
             setLoading(false);
             setPostContent("");
             setPhoto(null);
-            setPostOverlayOpen(false); 
+            setPostOverlayOpen(false);
         }
     };
-    
+
 
     const handleProfilePicUpload = async (event) => {
 
@@ -295,27 +303,27 @@ export const LandingPage = () => {
                 });
                 const data = response.data;
                 if (response.status === 200) {
-                   
+
                     //const updatedProfilePic = `${response.data.user?.profilePic}?t=${new Date().getTime()}`;
-                //setProfilePic(updatedProfilePic); // Update the state for immediate reflection
-                //setUserId((prevUser) => ({ ...prevUser, profilePic: updatedProfilePic })); // Update user state
-               // dispatch(setProfilePicture(updatedProfilePic));
+                    //setProfilePic(updatedProfilePic); // Update the state for immediate reflection
+                    //setUserId((prevUser) => ({ ...prevUser, profilePic: updatedProfilePic })); // Update user state
+                    // dispatch(setProfilePicture(updatedProfilePic));
                     //setProfilePic(data.user?.profilePic || ""); // Assuming API returns updated user
-               
-               
+
+
                     const updatedProfilePic = response.data.user?.profilePic;
 
                     // Update Redux state immediately after successful upload
                     dispatch(setUserDetails({ ...response.data.user }));
-    
+
                     // Optionally, update the local state (if you're using one)
-                    setProfilePic(updatedProfilePic); 
-               
+                    setProfilePic(updatedProfilePic);
+
                 } else {
                     console.error(response.data.error);
                 }
 
- 
+
             } catch (error) {
                 console.error('Error uploading profile picture:', error);
             }
@@ -371,6 +379,9 @@ export const LandingPage = () => {
         fetchMetrics();
     }, []);
 
+    // Fetch metrics and posts on component mount
+    
+
 
 
     return (
@@ -387,11 +398,11 @@ export const LandingPage = () => {
                     >
                         {user?.profilePic ? (
                             <img
-                            src={
-                                user.profilePic
-                                  ? `${user.profilePic}?t=${new Date().getTime()}`
-                                  : "/default-avatar.png"
-                              }
+                                src={
+                                    user.profilePic
+                                        ? `${user.profilePic}?t=${new Date().getTime()}`
+                                        : "/default-avatar.png"
+                                }
                                 //src={user.profilePic}
 
                                 alt="User"
@@ -418,10 +429,13 @@ export const LandingPage = () => {
                 </div>
 
                 {/* Wallet Box */}
+
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
+                
                     <p className="text-sm font-medium">Wallet Balance</p>
                     <p className="text-lg font-bold text-green-600">{walletAmount}</p>
-                </div>
+                
+                    </div>
 
                 {/* Reactions Box */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
@@ -438,7 +452,11 @@ export const LandingPage = () => {
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Posts</p>
                     <p className="text-lg font-bold text-blue-600">{postCount}</p>
+            
                 </div>
+                   
+
+                
 
                 {/* Settings */}
                 <div className="flex items-center space-x-2 cursor-pointer">
@@ -454,7 +472,7 @@ export const LandingPage = () => {
                 <div className="flex items-center mb-6">
 
 
-                    {user?.profilePic ?(
+                    {user?.profilePic ? (
                         <img
                             src={user.profilePic}
                             alt="User"
@@ -480,7 +498,7 @@ export const LandingPage = () => {
                         className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4"
                     >
                         {/* Header: User Image, Name, and Date */}
-                        <div className="flex items-center space-x-4 mb-4">
+                <div className="flex items-center space-x-4 mb-4">
                             {post.userId?.profilePic ? (
                                 <img
                                     src={post.userId.profilePic} alt={`${post.userId.username || 'User'}'s Profile`}
@@ -508,18 +526,18 @@ export const LandingPage = () => {
 
                                 <p className="text-xs text-gray-500">{post.createdAt?formatDate(post.createdAt):"Loading..."}</p>
                             </div>
-                            {/*<p className="text-gray-700">{post.content || "Loading content..."}</p>
+                            <p className="text-gray-700">{post.content || "Loading content..."}</p>
         {post.mediaUrl && post.postType === "Photo" && (
             <img
                 src={post.mediaUrl}
                 alt="Post media"
                 className="w-full rounded-md mt-3"
             />
-        )}*/}
-                        </div>
+        )}
+            </div>
 
-                        {/* Post Content */}
-                        <div className="mb-4">
+            {/* Post Content */}
+            <div className="mb-4">
                             <p className="text-sm text-gray-800">
                                 {post.content && post.content.split(" ").length > 8 ? (
                                     <>
@@ -552,7 +570,7 @@ export const LandingPage = () => {
                         </div>
 
                         {/* Likes and Comments Count */}
-                        <div className="flex gap-3 justify-between items-center text-sm text-gray-500 mb-4">
+            <div className="flex gap-3 justify-between items-center text-sm text-gray-500 mb-4">
                             <div className="flex gap-2">
                                 <p className="hover:text-green-500">{post.likes || 0} Likes</p>
                                 <p className="hover:text-red-500">{post.dislikes || 0} Dislikes</p>
@@ -563,7 +581,7 @@ export const LandingPage = () => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex gap-4 text-md  text-gray-700 mb-4">
+            <div className="flex gap-4 text-md  text-gray-700 mb-4">
                             <button
                                 onClick={() => handleReaction(post._id, "like")}
                                 className="hover:text-blue-500"
@@ -589,96 +607,105 @@ export const LandingPage = () => {
                                 📤 Share
                             </button>
                         </div>
+             
 
-                        {/* Add Comment Section */}
-                        <div className="flex items-center space-x-3 mb-4">
-                            <textarea
-                                className="flex-1 border border-gray-300 rounded-md p-2 resize-none text-sm"
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                placeholder="Write a comment..."
-                            />
-                            <button
-                                onClick={() => handleAddComment(post._id)}
-                                className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+
+
+
+
+
+
+            {/* Add Comment Section */}
+            <div className="flex items-center space-x-3 mb-4">
+                <textarea
+                    className="flex-1 border border-gray-300 rounded-md p-2 resize-none text-sm"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Write a comment..."
+                />
+                <button
+                    onClick={() => handleAddComment(post._id)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+                >
+                    Add
+                </button>
+            </div>
+
+            {/* Comment Section */}
+            {commentsVisible && (
+                <div className="mt-4">
+                    {post.comments
+                        .slice()
+                        .reverse()
+                        .slice(0, displayCount)
+                        .map((commentObj, index) => (
+                            <div
+                                key={index}
+                                className="bg-gray-100 flex gap-2 border border-gray-300 rounded-md p-3 mb-2"
                             >
-                                Add
-                            </button>
-                        </div>
 
-                        {/* Comment Section */}
-                        {commentsVisible && (
-                            <div className="mt-4">
-                                {post.comments
-                                    .slice()
-                                    .reverse()
-                                    .slice(0, displayCount)
-                                    .map((commentObj, index) => (
-                                        <div
-                                            key={index}
-                                            className="bg-gray-100 flex gap-2 border border-gray-300 rounded-md p-3 mb-2"
-                                        >
-
-                                            {commentObj.userId?.profilePic ? (
-                                                <img
-                                                    src={commentObj.userId.profilePic}
-                                                    alt="User"
-                                                    className="h-5 w-5 rounded-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-                                                    {commentObj.userId?.username?.charAt(0).toUpperCase() || 'A'}
-                                                </div>
-                                            )}
-                                            <p className="text-sm">
-                                                <strong>{commentObj.userId?.username || 'Anonymous'}:</strong> {commentObj.comment}
-                                            </p>
-
-
-                                        </div>
-                                    ))}
-
-                                {/* Load More Button */}
-                                {displayCount < post.comments.length && (
-                                    <button
-                                        className="text-slate-500 mt-2 hover:text-slate-700 border hover:border-slate-400 p-1 rounded-md "
-                                        onClick={() => setDisplayCount((prev) => prev + 6)} // Increment display count
-                                    >
-                                        Load More Comments
-                                    </button>
+                                {commentObj.userId?.profilePic ? (
+                                    <img
+                                        src={commentObj.userId.profilePic}
+                                        alt="User"
+                                        className="h-5 w-5 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                                        {commentObj.userId?.username?.charAt(0).toUpperCase() || 'A'}
+                                    </div>
                                 )}
+                                <p className="text-sm">
+                                    <strong>{commentObj.userId?.username || 'Anonymous'}:</strong> {commentObj.comment}
+                                </p>
 
-                                {/* Close Comments Section */}
-                                {displayCount >= post.comments.length && (
-                                    <button
-                                        className="text-slate-500 mt-2 hover:text-slate-700 border hover:border-slate-400 p-1 rounded-md"
-                                        onClick={() => setCommentsVisible(false)} // Close the comments section
-                                    >
-                                        Close Comments
-                                    </button>
-                                )}
 
                             </div>
-                        )}
-                    </div>
-                ))}
+                        ))}
 
-                {/* Post Overlay */}
-                {postOverlayOpen && (
-                    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white relative rounded-lg shadow-lg w-3/4 lg:w-1/2 p-6">
+                    {/* Load More Button */}
+                    {displayCount < post.comments.length && (
+                        <button
+                            className="text-slate-500 mt-2 hover:text-slate-700 border hover:border-slate-400 p-1 rounded-md "
+                            onClick={() => setDisplayCount((prev) => prev + 6)} // Increment display count
+                        >
+                            Load More Comments
+                        </button>
+                    )}
 
-                            {/* Close Button */}
-                            <button
-                                onClick={() => setPostOverlayOpen(false)}
-                                className="absolute top-4 right-4 text-black text-2xl"
-                                aria-label="Close"
-                            >
-                                <IoCloseSharp />
-                            </button>
+                    {/* Close Comments Section */}
+                    {displayCount >= post.comments.length && (
+                        <button
+                            className="text-slate-500 mt-2 hover:text-slate-700 border hover:border-slate-400 p-1 rounded-md"
+                            onClick={() => setCommentsVisible(false)} // Close the comments section
+                        >
+                            Close Comments
+                        </button>
+                    )}
 
-                            <div className="flex items-center mb-4">
-                            {user?.profilePic ?(
+                </div>
+            )}
+        </div>
+    ))
+}
+
+{/* Post Overlay */ }
+{
+    postOverlayOpen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white relative rounded-lg shadow-lg w-3/4 lg:w-1/2 p-6">
+
+                {/* Close Button */}
+                <button
+                    onClick={() => setPostOverlayOpen(false)}
+                    className="absolute top-4 right-4 text-black text-2xl"
+                    aria-label="Close"
+                >
+                    <IoCloseSharp />
+                </button>
+
+                <div className="flex items-center mb-4">
+                    {user?.profilePic ? (
                         <img
                             src={user.profilePic}
                             alt="User"
@@ -687,73 +714,74 @@ export const LandingPage = () => {
                     ) : (
                         <span className="text-3xl text-gray-500">U</span>
                     )}
-                                
-                                {
+
+                    {
                         user?.username ? (
                             <p className="text-lg ml-4 font-semibold">{user?.username}</p>
                         ) : ("")
                     }
-                            </div>
-                            <input type="text" />
-                            <textarea
-                                value={postContent}
-                                onChange={(e) => setPostContent(e.target.value)}
-                                placeholder="What's on your mind?"
-                                className="w-full border border-gray-300 rounded-md p-3 mb-4 text-sm focus:outline-none focus:ring focus:ring-blue-200 resize-none"
+                </div>
+                <input type="text" />
+                <textarea
+                    value={postContent}
+                    onChange={(e) => setPostContent(e.target.value)}
+                    placeholder="What's on your mind?"
+                    className="w-full border border-gray-300 rounded-md p-3 mb-4 text-sm focus:outline-none focus:ring focus:ring-blue-200 resize-none"
+                />
+                <div className="flex items-center justify-between">
+                    <div className="flex space-x-4">
+                        <label className="bg-gray-100 p-2 rounded-md hover:bg-gray-200 cursor-pointer">
+                            📷 Photo
+                            <input
+                                type="file"
+                                accept="image/*"
+                                name="media"
+                                className="hidden"
+                                onChange={handlePhotoUpload}
                             />
-                            <div className="flex items-center justify-between">
-                                <div className="flex space-x-4">
-                                    <label className="bg-gray-100 p-2 rounded-md hover:bg-gray-200 cursor-pointer">
-                                        📷 Photo
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            name="media"
-                                            className="hidden"
-                                            onChange={handlePhotoUpload}
-                                        />
-                                    </label>
-                                    <label className="bg-gray-100 p-2 rounded-md hover:bg-gray-200 cursor-pointer">
-                                        🎤 Voice Note
-                                        <input
-                                            type="file"
-                                            accept="audio/*"
-                                            className="hidden"
-                                            name="media"
-                                            onChange={handleVoiceNoteUpload}
-                                        />
-                                    </label>
-                                </div>
-                                <button
-                                    onClick={handleCreatePost}
-                                    disabled={loading}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                                >
-                                   {loading ? "Posting..." : "Post"}
-                                </button>
-                            </div>
-                            {photoPreview && (
-                                <div className="mb-4">
-                                    <p className="text-sm font-medium">Photo Preview:</p>
-                                    <img
-                                        src={photoPreview}
-                                        alt="Selected"
-                                        className="w-full max-h-64 object-contain rounded-md border border-gray-300"
-                                    />
-                                </div>
-                            )}
-                            {voiceNote && (
-                                <div className="mb-4">
-                                    <p className="text-sm font-medium">Voice Note:</p>
-                                    <p className="text-gray-600">{voiceNote.name}</p>
-                                </div>
-                            )}
-                        </div>
+                        </label>
+                        <label className="bg-gray-100 p-2 rounded-md hover:bg-gray-200 cursor-pointer">
+                            🎤 Voice Note
+                            <input
+                                type="file"
+                                accept="audio/*"
+                                className="hidden"
+                                name="media"
+                                onChange={handleVoiceNoteUpload}
+                            />
+                        </label>
+                    </div>
+                    <button
+                        onClick={handleCreatePost}
+                        disabled={loading}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                    >
+                        {loading ? "Posting..." : "Post"}
+                    </button>
+                </div>
+                {photoPreview && (
+                    <div className="mb-4">
+                        <p className="text-sm font-medium">Photo Preview:</p>
+                        <img
+                            src={photoPreview}
+                            alt="Selected"
+                            className="w-full max-h-64 object-contain rounded-md border border-gray-300"
+                        />
+                    </div>
+                )}
+                {voiceNote && (
+                    <div className="mb-4">
+                        <p className="text-sm font-medium">Voice Note:</p>
+                        <p className="text-gray-600">{voiceNote.name}</p>
                     </div>
                 )}
             </div>
-
         </div>
+    )
+}
+            </div >
+
+        </div >
     )
 }
 
