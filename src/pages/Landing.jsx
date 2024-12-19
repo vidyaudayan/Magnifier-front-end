@@ -54,7 +54,7 @@ export const LandingPage = () => {
     const { profilePicture, previousProfilePicture } = useSelector((state) => state.user);
     const [newPicture, setNewPicture] = useState(null);
     const [wallet, setWallet] = useState();
-
+    const [postsFetched, setPostsFetched] = useState(false);
     const toggleAddComment = () => {
         setShowCommentBox(!showCommentBox);
     };
@@ -324,6 +324,7 @@ export const LandingPage = () => {
 
     useEffect(() => {
         const fetchPosts = async () => {
+            if (postsFetched) return;
             try {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, {
                     withCredentials: true,
@@ -337,12 +338,13 @@ export const LandingPage = () => {
                 })));*/}
                
                 dispatch(setPosts(response.data || [])); 
+                setPostsFetched(true); 
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
         };
         fetchPosts();
-    }, [dispatch]);
+    }, [dispatch,postsFetched]);
 
     useEffect(() => {
       

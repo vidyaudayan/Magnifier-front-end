@@ -43,16 +43,19 @@ export const userSlice = createSlice({
     setPosts: (state, action) => {
       //state.posts = action.payload;
       //console.log('Posts fetched:', action.payload);
-      const fetchedPosts = action.payload;
-      const existingPosts = state.posts;
-  
-      // Remove duplicates by checking post ID
-      const newPosts = fetchedPosts.filter(post =>
-          !existingPosts.some(existingPost => existingPost._id === post._id)
-      );
-  
-      state.posts = [...existingPosts, ...newPosts]; // Combine existing and new posts
-      console.log('Posts fetched:', state.posts);
+      state.posts = [];
+     
+      const newPosts = action.payload;
+
+    // Remove duplicate posts by checking the post ID
+    const existingPostIds = new Set(state.posts.map(post => post._id));
+
+    // Filter out posts that already exist
+    const uniquePosts = newPosts.filter(post => !existingPostIds.has(post._id));
+
+    // Update state with unique posts
+    state.posts = [...uniquePosts];
+    console.log('Posts fetched:', state.posts);
     
     },
     clearUserDetails: (state) => {
