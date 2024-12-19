@@ -342,12 +342,18 @@ setPosts(prevPosts =>
                 });;
                 //setPosts(response.data); // Assuming API returns an array of posts
             
-                //const fetchedPosts = response.data || []; // Ensure it's an array
+                const fetchedPosts = response.data || []; // Ensure it's an array
                 {/*setPosts(fetchedPosts.map(post => ({
                     ...post,
                     userId: post.userId || {}, // Default to an empty object if userId is missing
                 })));*/}
-                dispatch(setPosts(response.data || [])); 
+                dispatch(setPosts((prevPosts) => {
+                    const existingPostsIds = new Set(prevPosts.map(post => post._id));
+                    const newPosts = fetchedPosts.filter(post => !existingPostsIds.has(post._id));
+                    return [...prevPosts, ...newPosts];
+                }));
+
+                //dispatch(setPosts(response.data || [])); 
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
