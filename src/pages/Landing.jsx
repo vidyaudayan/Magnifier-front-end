@@ -32,7 +32,7 @@ export const LandingPage = () => {
     );
 
 
-    const posts = useSelector(state => state.posts?.posts|| []);
+    //const posts = useSelector(state => state.posts?.posts|| []);
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
@@ -42,7 +42,7 @@ export const LandingPage = () => {
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
     const [voiceNote, setVoiceNote] = useState(null);
-//const [posts, setPosts] = useState([]);
+   const [posts, setPosts] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState("");
     const [username, setUsername] = useState("Username");
