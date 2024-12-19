@@ -27,7 +27,7 @@ export const LandingPage = () => {
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
     // Access Redux state
-    const { walletAmount, totalLikes, totalDislikes, postCount, isLoadingPosts,posts } = useSelector(
+    const { walletAmount, totalLikes, totalDislikes, postCount,  } = useSelector(
         (state) => state.user
     );
 
@@ -42,7 +42,7 @@ export const LandingPage = () => {
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
     const [voiceNote, setVoiceNote] = useState(null);
-//const [posts, setPosts] = useState([]);
+const [posts, setPosts] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState("");
     const [username, setUsername] = useState("Username");
@@ -106,19 +106,7 @@ export const LandingPage = () => {
             const response = await axios.patch(url, {}, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             }, { withCredentials: true });
-            //const { post, walletAmount,totalLikes, totalDislikes, postCount  } = response.data;
-            // Update the specific post's likes/dislikes in state
-            //setPosts(posts.map(post => (post._id === postId ? post : post)));
-            //setWallet(walletAmount);
-            {/*setPosts(prevPosts =>
-                prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p))
-            );*/}
-
-            {/*const updatedPost = response.data.post;
-
-            setPosts(prevPosts =>
-                prevPosts.map(p => (p._id === postId ? { ...p, ...updatedPost } : p))
-            );*/}
+            
             const { post, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
 // Dispatch to Redux store
 
@@ -340,7 +328,7 @@ setPosts(prevPosts =>
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, {
                     withCredentials: true,
                 });;
-                //setPosts(response.data); // Assuming API returns an array of posts
+                setPosts(response.data); // Assuming API returns an array of posts
             
                 {/*const fetchedPosts = response.data || []; // Ensure it's an array
                 setPosts(fetchedPosts.map(post => ({
