@@ -27,7 +27,7 @@ export const LandingPage = () => {
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
     // Access Redux state
-    const { walletAmount, totalLikes, totalDislikes, postCount,  } = useSelector(
+    const {posts, walletAmount, totalLikes, totalDislikes, postCount,  } = useSelector(
         (state) => state.user
     );
 
@@ -42,7 +42,7 @@ export const LandingPage = () => {
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
     const [voiceNote, setVoiceNote] = useState(null);
-const [posts, setPosts] = useState([]);
+//const [posts, setPosts] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState("");
     const [username, setUsername] = useState("Username");
@@ -110,9 +110,9 @@ const [posts, setPosts] = useState([]);
             const { post, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
 // Dispatch to Redux store
 
-setPosts(prevPosts =>
+{/*setPosts(prevPosts =>
     prevPosts.map(p => p._id === postId ? { ...p, ...post } : p)
-);
+);*/}
             dispatch(updatePostReaction({ postId, updatedPost: post }));
             dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
 
@@ -328,7 +328,7 @@ setPosts(prevPosts =>
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, {
                     withCredentials: true,
                 });;
-                setPosts(response.data); // Assuming API returns an array of posts
+                //setPosts(response.data); // Assuming API returns an array of posts
             
                 {/*const fetchedPosts = response.data || []; // Ensure it's an array
                 setPosts(fetchedPosts.map(post => ({
@@ -342,7 +342,7 @@ setPosts(prevPosts =>
             }
         };
         fetchPosts();
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
       
