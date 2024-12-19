@@ -26,7 +26,7 @@ export const LandingPage = () => {
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
     // Access Redux state
-    const { walletAmount, totalLikes, totalDislikes, postCount, posts, isLoadingPosts } = useSelector(
+    const { walletAmount, totalLikes, totalDislikes, postCount, isLoadingPosts } = useSelector(
         (state) => state.user
     );
 
@@ -41,7 +41,7 @@ export const LandingPage = () => {
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
     const [voiceNote, setVoiceNote] = useState(null);
-    //const [posts, setPosts] = useState([]);
+const [posts, setPosts] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState("");
     const [username, setUsername] = useState("Username");
