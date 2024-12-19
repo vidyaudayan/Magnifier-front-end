@@ -233,7 +233,7 @@ export const LandingPage = () => {
             createdAt: new Date().toISOString(),
         };
 
-        setPosts((prevPosts) => [tempPost, ...prevPosts]);
+        //setPosts((prevPosts) => [tempPost, ...prevPosts]);
 
         try {
             const formData = new FormData();
@@ -251,11 +251,11 @@ export const LandingPage = () => {
                 { withCredentials: true }
             );
 
-            setPosts((prevPosts) =>
+            {/*setPosts((prevPosts) =>
                 prevPosts.map((post) =>
                     post._id === tempPostId ? response.data : post
                 )
-            );
+            );*/}
 
             toast.success("Post created successfully");
         } catch (error) {
@@ -440,8 +440,8 @@ export const LandingPage = () => {
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
-                        <span>👍 {user.totalLikes}</span>
-                        <span>👎 {user.totalDislikes}</span>
+                        <span>👍 {totalLikes}</span>
+                        <span>👎 {totalDislikes}</span>
                         
                     
                     </div>
