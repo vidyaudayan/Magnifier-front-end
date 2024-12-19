@@ -323,8 +323,10 @@ export const LandingPage = () => {
     const displayProfilePic = profilePic || `https://via.placeholder.com/80`;
 
     useEffect(() => {
+        let isMounted = true; 
         const fetchPosts = async () => {
-            if (postsFetched) return;
+          
+            if (postsFetched|| !isMounted) return;
             try {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, {
                     withCredentials: true,
@@ -344,6 +346,9 @@ export const LandingPage = () => {
             }
         };
         fetchPosts();
+        return () => {
+            isMounted = false;
+          };
     }, [dispatch,postsFetched]);
 
     useEffect(() => {
