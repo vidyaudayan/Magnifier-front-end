@@ -246,7 +246,7 @@ navigate('/landing')
                     type="email"
                     placeholder="Email"
                     className="w-full mb-3 p-2 border border-slate-400 rounded"
-                    {...register("email", {
+                    {...registerSignup("email", {
                         required: "Email is required",
                         pattern: {
                             value: /^\S+@\S+\.\S+$/,
@@ -255,7 +255,7 @@ navigate('/landing')
                         onChange: (e) => setEmail(e.target.value),
                     })}
                 />
-                {errors.email && (
+                {signupErrors.email && (
                     <p className="text-red-500 text-sm">{errors.email.message}</p>
                 )}
             </div>
@@ -267,9 +267,9 @@ navigate('/landing')
                         type="text"
                         placeholder="Enter OTP"
                         className="w-full mb-3 p-2 border border-slate-400 rounded"
-                        {...register("otp", { required: "OTP is required" })}
+                        {...registerSignup("otp", { required: "OTP is required" })}
                     />
-                    {errors.otp && (
+                    {signupErrors.otp && (
                         <p className="text-red-500 text-sm">{errors.otp.message}</p>
                     )}
                     <button
