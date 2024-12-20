@@ -15,6 +15,12 @@ import { setUserDetails } from "../features/user/userSlice";
 const AuthDelhi = () => {
     const location = useLocation();
     const [showJobForm, setShowJobForm] = useState(false);
+//otp verification
+const [email, setEmail] = useState("");
+const [otpSent, setOtpSent] = useState(false);
+const [otp, setOtp] = useState("");
+const [token, setToken] = useState(null);
+    
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -94,6 +100,36 @@ navigate('/landing')
             console.log(error);
 
         };
+    };
+
+    const handleSendOtp = async () => {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/send-otp`, { email });
+            if (response.status === 200) {
+                setOtpSent(true);
+                toast.success("OTP sent to your email", { position: "top-center" });
+            }
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Failed to send OTP. Please try again.",
+                { position: "top-center" }
+            );
+        }
+    };
+    
+    const handleVerifyOtp = async () => {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-otp`, { email, otp });
+            if (response.status === 200) {
+                setToken(response.data.token);
+                toast.success("OTP verified successfully!", { position: "top-center" });
+            }
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Failed to verify OTP. Please try again.",
+                { position: "top-center" }
+            );
+        }
     };
 
 
@@ -189,7 +225,7 @@ navigate('/landing')
                             ))}
                         </select>
 
-                        <input
+                        {/*<input
                             type="email"
                             placeholder="Email"
                             className="w-full mb-3 p-2 border border-slate-400 rounded"
@@ -203,7 +239,57 @@ navigate('/landing')
                         />
                         {signupErrors.email && (
                             <p className="text-red-500 text-sm">{signupErrors.email.message}</p>
-                        )}
+                        )}*/}
+
+<div className="mb-4">
+                <input
+                    type="email"
+                    placeholder="Email"
+                    className="w-full mb-3 p-2 border border-slate-400 rounded"
+                    {...register("email", {
+                        required: "Email is required",
+                        pattern: {
+                            value: /^\S+@\S+\.\S+$/,
+                            message: "Invalid email address",
+                        },
+                        onChange: (e) => setEmail(e.target.value),
+                    })}
+                />
+                {errors.email && (
+                    <p className="text-red-500 text-sm">{errors.email.message}</p>
+                )}
+            </div>
+
+            {/* OTP Section */}
+            {otpSent ? (
+                <div className="mb-4">
+                    <input
+                        type="text"
+                        placeholder="Enter OTP"
+                        className="w-full mb-3 p-2 border border-slate-400 rounded"
+                        {...register("otp", { required: "OTP is required" })}
+                    />
+                    {errors.otp && (
+                        <p className="text-red-500 text-sm">{errors.otp.message}</p>
+                    )}
+                    <button
+                        type="button"
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                        onClick={() => handleVerifyOtp(getValues("otp"))}
+                    >
+                        Verify OTP
+                    </button>
+                </div>
+            ) : (
+                <button
+                    type="button"
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    onClick={handleSendOtp}
+                >
+                    Send OTP
+                </button>
+            )}
+
 
                         <input
                             type="text"
