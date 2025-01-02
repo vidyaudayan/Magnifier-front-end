@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import Navbar from "../componenets/Navbar.jsx";
+import NavbarLanding from "../componenets/NavbarLanding.jsx";
 import { formatDate } from "../utils/dateUtils.js";
 import { toast } from "react-toastify";
 import { IoSettings } from "react-icons/io5";
@@ -115,7 +116,7 @@ export const LandingPage = () => {
 );*/}
             dispatch(updatePostReaction({ postId, updatedPost: post }));
             dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
-
+            
 
             //setPosts(prevPosts =>prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p)));
         } catch (error) {
@@ -256,7 +257,7 @@ export const LandingPage = () => {
                     post._id === tempPostId ? response.data : post
                 )
             );*/}
-
+        
             toast.success("Post created successfully");
         } catch (error) {
             console.error("Error creating post:", error);
@@ -358,7 +359,7 @@ export const LandingPage = () => {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/usermatrics`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 },{withCredentials:true});
-                //setMetrics(response.data);
+                setMetrics(response.data);
                 const { walletAmount, totalLikes,totalDislikes, postCount } = response.data;
 
                 // Dispatch fetched metrics to Redux store
@@ -384,8 +385,8 @@ export const LandingPage = () => {
 
 
     return (
-        <div className="min-h-screen  bg-gray-100 flex flex-col lg:flex-row gap-4 pr-8 py-4  mt-20">
-            <Navbar />
+        <div className="min-h-screen  bg-gray-100 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-24 mt-14">
+            <NavbarLanding />
 
             {/* Left Section */}
             <div className="lg:w-1/4 w-full max-h-[600px] bg-white border border-gray-300 rounded-lg lg:ml-32 ml-6 p-4  space-y-6 shadow-sm">
@@ -440,8 +441,8 @@ export const LandingPage = () => {
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
-                        <span>👍 {totalLikes}</span>
-                        <span>👎 {totalDislikes}</span>
+                        <span>👍 {metrics.totalLikes}</span>
+                        <span>👎 {metrics.totalDislikes}</span>
                         
                     
                     </div>
@@ -450,7 +451,7 @@ export const LandingPage = () => {
                 {/* Posts Count */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Posts</p>
-                    <p className="text-lg font-bold text-blue-600">{postCount}</p>
+                    <p className="text-lg font-bold text-blue-600">{metrics.postCount}</p>
             
                 </div>
                    
@@ -525,14 +526,7 @@ export const LandingPage = () => {
 
                                 <p className="text-xs text-gray-500">{post.createdAt?formatDate(post.createdAt):"Loading..."}</p>
                             </div>
-                            {/*<p className="text-gray-700">{post.content || "Loading content..."}</p>
-        {post.mediaUrl && post.postType === "Photo" && (
-            <img
-                src={post.mediaUrl}
-                alt="Post media"
-                className="w-full rounded-md mt-3"
-            />
-        )}*/}
+                            
             </div>
 
             {/* Post Content */}

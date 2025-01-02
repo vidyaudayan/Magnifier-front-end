@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Dashboard = () => {
+const LeftDashboard = () => {
     const [metrics, setMetrics] = useState({
         walletAmount: 0,
         postCount: 0,
@@ -50,4 +50,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default LeftDashboard;

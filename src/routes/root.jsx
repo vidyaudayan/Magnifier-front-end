@@ -11,7 +11,7 @@ import Context from "../context/context.jsx";
 import { createContext } from "react";
 import { useEffect } from "react";
 import axios from "axios";
-
+import Footer from "../componenets/Footer.jsx";
 export default function Root() {
   const dispatch= useDispatch()
 
@@ -65,9 +65,12 @@ export default function Root() {
       
     <main>
     <Outlet />
+   
     </main>
     </Context.Provider>,
+   
       </div>
+   
     </>
   );
 }

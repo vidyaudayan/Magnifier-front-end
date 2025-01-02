@@ -20,7 +20,8 @@ const [email, setEmail] = useState("");
 const [otpSent, setOtpSent] = useState(false);
 const [otp, setOtp] = useState("");
 const [token, setToken] = useState(null);
-    
+const [isOtpVerified, setIsOtpVerified] = useState(false); 
+   
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -35,6 +36,7 @@ const [token, setToken] = useState(null);
         register: registerSignup,
         handleSubmit: handleSignupSubmit,
         formState: { errors: signupErrors },
+        getValues,
         reset: resetSignupForm,
         setValue,  // To manually set the file value
     } = useForm();
@@ -118,11 +120,28 @@ navigate('/landing')
     };
     
     const handleVerifyOtp = async () => {
+     
+        if (!email) {
+            toast.error("Email is required!", { position: "top-center" });
+            return;
+        }
+    
+        const otp = getValues("otp");
+        console.log("Request Data:", { email, otp });
+        if (!otp) {
+            toast.error("OTP is required!", { position: "top-center" });
+            return;
+        }
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-otp`, { email, otp });
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-otp`, { email, otp }, {
+                headers: {
+                    "Content-Type": "application/json", // Explicit header
+                },
+            });
             if (response.status === 200) {
                 setToken(response.data.token);
                 toast.success("OTP verified successfully!", { position: "top-center" });
+                setIsOtpVerified(true); 
             }
         } catch (error) {
             toast.error(
@@ -215,7 +234,7 @@ navigate('/landing')
 
                         <select
                             className="w-full mb-3 p-2 text-gray-500 border border-slate-400 rounded"
-                            {...registerSignup("wardNumber", { required: "Vidhan Sabha is required" })}
+                            {...registerSignup("wardNumber")}
                         >
                             <option value="">Select Ward Number</option>
                             {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
@@ -239,7 +258,7 @@ navigate('/landing')
                         />
                         {signupErrors.email && (
                             <p className="text-red-500 text-sm">{signupErrors.email.message}</p>
-                        )}*/}
+                        )}
 
 <div className="mb-4">
                 <input
@@ -261,7 +280,7 @@ navigate('/landing')
             </div>
 
             {/* OTP Section */}
-            {otpSent ? (
+                {/*{otpSent ? (
                 <div className="mb-4">
                     <input
                         type="text"
@@ -288,7 +307,72 @@ navigate('/landing')
                 >
                     Send OTP
                 </button>
-            )}
+            )}*/}
+
+
+
+{/* Email Input */}
+<div className="mb-">
+    <input
+        type="email"
+        placeholder="Email"
+        className="w-full mb-3 p-2 border border-slate-400 rounded"
+        {...registerSignup("email", {
+            required: "Email is required",
+            pattern: {
+                value: /^\S+@\S+\.\S+$/,
+                message: "Invalid email address",
+            },
+            onChange: (e) => setEmail(e.target.value),
+        })}
+    />
+    {signupErrors.email && (
+        <p className="text-red-500 text-sm">{errors.email.message}</p>
+    )}
+</div>
+
+{/* OTP Section - Show only if not verified */}
+{!isOtpVerified && otpSent ? (
+    <div className="mb-4">
+        <input
+            type="text"
+            placeholder="Enter OTP"
+            className="w-full mb-3 p-2 border border-slate-400 rounded"
+            {...registerSignup("otp", { required: "OTP is required" })}
+        />
+        {signupErrors.otp && (
+            <p className="text-red-500 text-sm">{errors.otp.message}</p>
+        )}
+        <button
+            type="button"
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            onClick={() => handleVerifyOtp(getValues("otp"))}
+        >
+            Verify OTP
+        </button>
+    </div>
+) : null}
+
+{/* Send OTP Button - Hide after verification */}
+{!isOtpVerified && !otpSent && (
+    <button
+        type="button"
+        className="bg-blue-500 mb-4 text-white px-4 py-2 rounded"
+        onClick={handleSendOtp}
+    >
+        Send OTP
+    </button>
+)}
+
+{/* Show success message when verified */}
+{isOtpVerified && (
+    <div className="text-green-500 mb-2 text-sm font-semibold">
+        OTP successfully verified!
+    </div>
+)}
+
+
+
 
 
                         <input

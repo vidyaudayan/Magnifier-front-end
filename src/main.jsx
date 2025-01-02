@@ -23,8 +23,12 @@ import AuthBengal from './pages/bengal.jsx';
 import PrivateRoute from './componenets/PrivateRoute.jsx';
 import LandingPage from './pages/Landing.jsx';
 import AboutUsPage from './componenets/AboutUs.jsx';
-import Dashboard from './componenets/LeftSideLand.jsx';
-
+import Dashboard from './componenets/Dashboard.jsx';
+import ForgotPassword from './pages/forgotPassword.jsx';
+import ResetPassword from './pages/resetPassword.jsx';
+import ContactForm from './componenets/ContactUs.jsx';
+import Support from './componenets/Support.jsx';
+import FAQ from './componenets/FAQ.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -62,8 +66,30 @@ const router = createBrowserRouter([
         element:<AboutUsPage/>,
       },
       {
-        path: "/left",
+        path: "/dashboard",
         element:<Dashboard/>,
+      },
+      {
+        path: "/contact",
+        element:<ContactForm/>,
+      },
+      
+      {
+        path: "/support",
+        element:<Support/>,
+      },
+      {
+        path: "/faq",
+        element:<FAQ/>,
+      },
+     
+      {
+        path: "/forgot-password",
+        element:<ForgotPassword/>,
+      },
+      {
+        path: "/reset-password/:token",
+        element:<ResetPassword/>,
       },
      
      

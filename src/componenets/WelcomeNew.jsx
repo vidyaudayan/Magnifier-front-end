@@ -3,17 +3,20 @@ import delhiMap from '../assets/Images/delhi.jpg';
 import biharMap from '../assets/Images/bihar.jpg';
 import bengalMap from '../assets/Images/westbengal.jpg';
 import { Link } from "react-router-dom";
+import Footer from "./Footer";
 const WelcomeNew = () => {
   return (
     <div className="h-80  bg-[url('./assets/Images/background7.avif')] bg-cover  bg-center text-white">
       {/* Navbar */}
       <nav className="w-full bg-blue-600 py-4 fixed top-0 left-0 shadow-lg z-50">
         <ul className="flex justify-around text-sm md:text-lg uppercase">
-          <li className="hover:text-gray-300 transition duration-300 cursor-pointer">Home</li>
-          <li className="hover:text-gray-300 transition duration-300 cursor-pointer">About Us</li>
-          <li className="hover:text-gray-300 transition duration-300 cursor-pointer">Magnifier Dashboard</li>
-          <li className="hover:text-gray-300 transition duration-300 cursor-pointer">Contact Us</li>
-          <li className="hover:text-gray-300 transition duration-300 cursor-pointer">Support</li>
+<Link to="/" className="hover:text-gray-300 transition duration-300 cursor-pointer">Home</Link>
+<Link to="/aboutus" className="hover:text-gray-300 transition duration-300 cursor-pointer">About Us</Link>
+<Link to="/dashboard" className="hover:text-gray-300 transition duration-300 cursor-pointer">Magnifier dashboard</Link>
+<Link to="/contact" className="hover:text-gray-300 transition duration-300 cursor-pointer">Contact Us</Link>
+<Link to="/support" className="hover:text-gray-300 transition duration-300 cursor-pointer">support</Link>
+
+
         </ul>
       </nav>
 
@@ -58,6 +61,7 @@ const WelcomeNew = () => {
           </button>
         ))}
       </div>
+      <Footer/>
     </div>
   );
 };

@@ -194,7 +194,7 @@ export const AuthBihar = () => {
 
                         <select
                             className="w-full mb-3 p-2 text-gray-500 border border-slate-400 rounded"
-                            {...registerSignup("wardNumber", { required: "Vidhan Sabha is required" })}
+                            {...registerSignup("wardNumber")}
                         >
                             <option value="">Select Ward Number</option>
                             {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
