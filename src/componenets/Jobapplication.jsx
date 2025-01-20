@@ -98,39 +98,74 @@ const Jobapplication = () => {
             </div>
            
       
-            <div>
-              <input
-                type="text"
-                placeholder="Qualification"
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                {...registerJob("qualification", { required: "Qualification is required" })}
-              />
-              {jobErrors.qualification && (
-                <p className="text-red-500 text-sm mt-1">{jobErrors.qualification.message}</p>
-              )}
-            </div>
+
 
             <div>
-              <input
-                type="text"
-                placeholder="Experience"
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                {...registerJob("experience", { required: "Experience is required" })}
-              />
-              {jobErrors.experience && (
-                <p className="text-red-500 text-sm mt-1">{jobErrors.experience.message}</p>
-              )}
-            </div>
+  <select
+    className="w-full p-3 border text-gray-400 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+    {...registerJob("qualification", { required: "Qualification is required" })}
+  >
+    <option value="" disabled selected>
+     Qualification
+    </option>
+    <option value="10th">10th</option>
+    <option value="12th">12th</option>
+    <option value="graduation">Graduation</option>
+    <option value="post-graduation">Post-Graduation</option>
+    <option value="other">Other</option>
+  </select>
+  {jobErrors.qualification && (
+    <p className="text-red-500 text-sm mt-1">{jobErrors.qualification.message}</p>
+  )}
+</div>
+
+            
+
+            <div>
+  <select
+    className="w-full p-3 border text-gray-400 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+    {...registerJob("experience", )}
+  >
+    <option value="" disabled selected>
+      Select Experience (in years)
+    </option>
+    {Array.from({ length: 10 }, (_, i) => (
+      <option key={i + 1} value={i + 1}>
+        {i + 1} {i + 1 === 1 ? "year" : "years"}
+      </option>
+    ))}
+  </select>
+  {jobErrors.experience && (
+    <p className="text-red-500 text-sm mt-1">{jobErrors.experience.message}</p>
+  )}
+</div>
+
       
             <div>
-              <label htmlFor="resume" className="block text-gray-700 mb-2 font-semibold">
+              <label htmlFor="resume" className="block text-gray-600 mb-2 font-semibold">
                 Upload your resume
               </label>
               <input
                 type="file"
                 id="resume"
                 accept=".pdf,.doc,.docx"
-                onChange={(e) => console.log(e.target.files[0])}
+               
+               
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const validFormats = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                    if (!validFormats.includes(file.type)) {
+                      setError('resume', {
+                        type: 'manual',
+                        message: 'Please upload a resume in PDF or DOC format',
+                      });
+                    } else {
+                      clearErrors('resume');
+                      console.log(file);
+                    }
+                  }
+                }}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 {...registerJob("resume", { required: "Resume is required" })}
               />

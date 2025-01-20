@@ -35,8 +35,11 @@ const Footer = () => {
                 <Link to="/support" className="hover:text-white transition">
                  Support
                 </Link>
-                <Link to="" className="hover:text-white transition">
-                 Privacy Policy
+                <Link to="/userguidelines" className="hover:text-white transition">
+                  User guidelines
+                </Link>
+                <Link to="termsandconditions" className="hover:text-white transition">
+                 Privacy Policy|Terms and conditions
                 </Link>
               </ul>
             </div>

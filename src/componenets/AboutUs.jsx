@@ -3,7 +3,7 @@
 
 import React from "react";
 import image1 from "../assets/Images/about1.avif"
-import card1 from "../assets/Images/card1.4.jpg"
+import card1 from "../assets/Images/card1.5.jpg"
 import card2 from "../assets/Images/card4.avif"
 import card3 from "../assets/Images/card3.2.png"
 import Navbar from "../componenets/Navbar";

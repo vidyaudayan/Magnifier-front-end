@@ -120,7 +120,7 @@ const ContactForm = () => {
 
             {/* File Upload */}
             <div>
-              <label className="block text-gray-700">Identity Proof </label>
+              <label className="block text-gray-700">Identity Proof (Office ID card/ party membership card is required) </label>
               <input
                 type="file"
                 {...register("identityProof", { required: "Identity Proof is required" })}

@@ -29,6 +29,8 @@ import ResetPassword from './pages/resetPassword.jsx';
 import ContactForm from './componenets/ContactUs.jsx';
 import Support from './componenets/Support.jsx';
 import FAQ from './componenets/FAQ.jsx';
+import UserGuidelines from './componenets/UserGuidelines.jsx';
+import TermsAndConditions from './componenets/TermsandConditions.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -81,6 +83,14 @@ const router = createBrowserRouter([
       {
         path: "/faq",
         element:<FAQ/>,
+      },
+      {
+        path: "/userguidelines",
+        element:<UserGuidelines/>,
+      },
+      {
+        path: "/termsandconditions",
+        element:<TermsAndConditions/>,
       },
      
       {
