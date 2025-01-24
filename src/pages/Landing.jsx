@@ -13,13 +13,15 @@ import { TbLoadBalancer } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
 import { BiSolidDislike } from "react-icons/bi";
 import { useSelector } from 'react-redux';
-
+import { UserOverlay } from "../componenets/UserOverlay.jsx";
 import { useDispatch } from 'react-redux';
 import { updateMetrics } from "../features/user/userSlice.js";
 import { setUserDetails } from '../features/user/userSlice.js';
 import { setPosts } from "../features/user/userSlice.js";
 import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/user/userSlice.js";
+import UserSearch from "../componenets/UserSearch.jsx";
+
 //import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
 export const LandingPage = () => {
     const navigate = useNavigate();
@@ -42,7 +44,7 @@ export const LandingPage = () => {
     const [postOverlayOpen, setPostOverlayOpen] = useState(false);
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
-    const [voiceNote, setVoiceNote] = useState(null);
+    const [VoiceNote, setVoiceNote] = useState(null);
    //const [posts, setPosts] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState("");
@@ -60,11 +62,12 @@ export const LandingPage = () => {
         setShowCommentBox(!showCommentBox);
     };
     const [showComments, setShowComments] = useState(false);
-
+    const [isOverlayOpen, setIsOverlayOpen] = useState(false);
     const toggleComments = () => {
         setShowComments(!showComments);
     };
-
+    const [filteredPosts, setFilteredPosts] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [metrics, setMetrics] = useState({
         walletAmount: 0, postCount: 0,
         totalLikes: 0, totalDislikes: 0
@@ -238,10 +241,16 @@ export const LandingPage = () => {
 
         try {
             const formData = new FormData();
-            formData.append('postType', photo ? "Photo" : "Text");
-            formData.append('content', postContent);
-            if (photo) formData.append("media", photo);
+           
+            const fileType = photo ? "photo" : (VoiceNote ? "audio" : "text");
 
+            //formData.append('postType', photo ? "Photo" : "Text");
+            formData.append('postType', fileType === 'audio' ? "VoiceNote" : (photo ? "Photo" : "Text"));
+
+
+            formData.append('content', postContent|| '');
+            if (photo) formData.append("media", photo);
+            if (VoiceNote) formData.append("media", VoiceNote);
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
 
@@ -258,7 +267,7 @@ export const LandingPage = () => {
                 )
             );*/}
         
-            toast.success("Post created successfully");
+            toast.success("Post created. Admin will review it before publishing.");
         } catch (error) {
             console.error("Error creating post:", error);
             setPosts((prevPosts) =>
@@ -270,6 +279,8 @@ export const LandingPage = () => {
             setLoading(false);
             setPostContent("");
             setPhoto(null);
+            setPhotoPreview(null)
+            setVoiceNote(null)
             setPostOverlayOpen(false);
         }
     };
@@ -322,6 +333,29 @@ export const LandingPage = () => {
         }
     };
     const displayProfilePic = profilePic || `https://via.placeholder.com/80`;
+   
+    
+    const fetchUserPosts = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/userPosts`, {
+                withCredentials: true,
+            })
+          setPosts(response.data);
+        } catch (error) {
+          console.error("Error fetching user posts:", error);
+        }
+      };
+    
+      const handleMouseEnter = () => {
+        setIsOverlayOpen(true);
+        if (posts.length === 0) {
+          fetchUserPosts();
+        }
+      };
+    
+      const handleMouseLeave = () => setIsOverlayOpen(false);
+
+
 
     useEffect(() => {
         let isMounted = true; 
@@ -340,7 +374,12 @@ export const LandingPage = () => {
                     userId: post.userId || {}, // Default to an empty object if userId is missing
                 })));*/}
                
-                dispatch(setPosts(response.data || [])); 
+                //dispatch(setPosts(response.data || [])); 
+                setFilteredPosts(response.data.data); 
+               const approvedPosts = response.data.filter((post) => post.status === "approved");
+               dispatch(setPosts(approvedPosts || [])); 
+                
+                
                 setPostsFetched(true); 
             } catch (error) {
                 console.error("Error fetching posts:", error);
@@ -350,7 +389,20 @@ export const LandingPage = () => {
         return () => {
             isMounted = false;
           };
+         
     }, [dispatch,postsFetched]);
+
+    // Handle user selection from search bar
+  const onUserSelect = (user) => {
+    setSelectedUser(user);
+    if (user) {
+      // Filter posts by selected user's ID
+      const userPosts = posts.filter((post) => post.userId === user._id);
+      setFilteredPosts(userPosts); // Update filtered posts
+    } else {
+      setFilteredPosts(posts); // Reset to show all posts if no user is selected
+    }
+  };
 
     useEffect(() => {
       
@@ -380,9 +432,57 @@ export const LandingPage = () => {
     }, []);
 
  
+const [searchQuery, setSearchQuery] = useState('');
+const [searchResults, setSearchResults] = useState([]);
+
+useEffect(() => {
+  const fetchUsers = async () => {
+    if (!searchQuery) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/search?query=${searchQuery}`, 
+                   );
+      setSearchResults(response.data.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const debounceFetch = setTimeout(fetchUsers, 300); // Debounce API calls
+  return () => clearTimeout(debounceFetch); // Cleanup timeout
+}, [searchQuery]);
+
+const handleUserClick = async (userId,user) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/posts/${userId}`);
+      //setPosts(response.data.data); // Update posts state
+     
+      const userPosts = response.data.data;
+
+      // Update posts state by appending user-specific posts
+      setPosts((prevPosts) => [
+        ...prevPosts.filter((post) => post.userId !== userId), // Avoid duplicate entries
+        ...userPosts,
+      ]);
+  
+     
+      console.log('Fetched Posts:', response.data.data);
+      setSelectedUser(user); // Save selected user
+      setSearchQuery(user.username); // Update search box with username
+      setSearchResults([]); // Clear search results
+      onUserSelect(user); 
     
-
-
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    }
+  };
+  const handleInputChange = (e) => {
+    setSearchQuery(e.target.value);
+    setSelectedUser(null); // Clear selected user if query changes
+  }
 
     return (
         <div className="min-h-screen  bg-gray-100 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-24 mt-14">
@@ -413,11 +513,33 @@ export const LandingPage = () => {
                         )}
                     </div>
 
-                    {
+                   {/* {
                         user?.username ? (
-                            <p className="text-lg font-semibold">{user.username}</p>
+                            <p className="text-lg font-semibold" onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}>{user.username}</p>
                         ) : ("")
-                    }
+                        
+                    }*/}
+                     <div className="relative inline-block">
+      <p
+        className="text-lg font-semibold cursor-pointer"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {user?.username}
+      </p>
+
+      {isOverlayOpen && (
+        <div
+          className="absolute top-10 left-0"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <UserOverlay user={user} posts={posts} />
+        </div>
+      )}
+    </div>
+                    
                     {/* Hidden file input */}
                     <input
                         type="file"
@@ -469,6 +591,50 @@ export const LandingPage = () => {
             <div className="lg:w-2/4 w-full bg-white border border-gray-300 rounded-lg ml-6 lg:ml-16 shadow-sm p-6">
                 {/* Write a Post Section */}
 
+
+                <div className="flex flex-col w-full p-4">
+  {/* Search Bar */}
+  {/*<UserSearch onUserSelect={onUserSelect} />*/}
+<div className="posts-section mt-4">
+        {Array.isArray(filteredPosts) && filteredPosts.length > 0 ? (
+          filteredPosts.map((post) => (
+            <div key={post._id} className="post-card border p-4 rounded-md mb-4">
+              <h3 className="font-bold text-lg">{post.title}</h3>
+              <p>{post.content}</p>
+            </div>
+          ))
+        ) : (
+          <p></p>
+        )}
+      </div>
+
+<input
+    type="text"
+    placeholder="Search for users..."
+    className="bg-gray-50 border border-gray-300 rounded-full p-2  ml-12 lg:w-[630px]"
+    value={searchQuery}
+    //onChange={(e) => setSearchQuery(e.target.value)}    
+    onChange={handleInputChange}
+  />
+
+  {/* Display Search Results */}
+  {!selectedUser &&searchResults.length > 0 && (
+    <div className="bg-white shadow-md rounded-md mb-4 p-2">
+      {searchResults.map((user) => (
+        <div key={user._id} className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"  onClick={() => handleUserClick(user._id,user)}>
+          <img
+            src={user.profilePic || 'default-profile-pic.jpg'}
+            alt="Profile"
+            className="w-8 h-8 rounded-full mr-2"
+          />
+          <p className="text-sm font-medium">{user.username}</p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+
                 <div className="flex items-center mb-6">
 
 
@@ -481,6 +647,10 @@ export const LandingPage = () => {
                     ) : (
                         <span className="text-3xl text-gray-500">U</span>
                     )}
+
+       
+
+
                     <div
                         className="ml-4 bg-gray-50 border border-gray-300 rounded-md p-2 w-full cursor-pointer"
                         onClick={() => setPostOverlayOpen(true)}
@@ -488,15 +658,18 @@ export const LandingPage = () => {
                         Write a post...
                     </div>
 
-
-                </div>
+       </div>
 
                 {/* Posts Section */}
                 {posts.map((post) => (
                     <div
                         key={post._id}
-                        className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4"
-                    >
+                       // className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4"
+                       className={`bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4 ${
+                        selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""
+                      }`}
+                   
+                   >
                         {/* Header: User Image, Name, and Date */}
                 <div className="flex items-center space-x-4 mb-4">
                             {post.userId?.profilePic ? (
@@ -762,10 +935,10 @@ export const LandingPage = () => {
                         />
                     </div>
                 )}
-                {voiceNote && (
+                {VoiceNote && (
                     <div className="mb-4">
                         <p className="text-sm font-medium">Voice Note:</p>
-                        <p className="text-gray-600">{voiceNote.name}</p>
+                        <p className="text-gray-600">{VoiceNote.name}</p>
                     </div>
                 )}
             </div>
