@@ -33,6 +33,7 @@ import UserGuidelines from './componenets/UserGuidelines.jsx';
 import TermsAndConditions from './componenets/TermsandConditions.jsx';
 import ProfilePage from './pages/profile.jsx';
 import PostDisplayPage from './pages/PostsDisplay.jsx';
+import LoginForm from './componenets/LoginForm.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: "/signup/west bengal",
         element:<AuthBengal/>,
+      },
+      {
+        path: "/login",
+        element:<LoginForm/>,
       },
       {
         path: "/job-application",

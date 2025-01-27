@@ -762,13 +762,25 @@ const handleUserClick = async (userId,user) => {
                                 👎 Dislike
                             </button>
                             <button
-                                onClick={() =>
-                                    navigator.share({
-                                        title: "Post",
-                                        text: "Check out this post!",
-                                        url: window.location.href,
-                                    })
-                                }
+                                onClick={() => {
+                                    // Check if the user is logged in
+                                    const isLoggedIn = !!localStorage.getItem("token"); // Replace this with your actual logic
+                            
+                                    // Set the URL based on login status
+                                    const shareUrl = isLoggedIn
+                                        ? `${window.location.origin}/login` // URL for logged-in users
+                                        : `${window.location.origin}/signup`; // URL for non-logged users
+                            
+                                    // Use the Share API
+                                    navigator
+                                        .share({
+                                            title: "Post",
+                                            text: "Check out this post!",
+                                            url: shareUrl,
+                                        })
+                                        .then(() => console.log("Successfully shared!"))
+                                        .catch((error) => console.error("Error sharing:", error));
+                                }}
                                 className="hover:text-green-500 text-md"
                             >
                                 📤 Share

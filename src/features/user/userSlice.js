@@ -8,6 +8,7 @@ export const userSlice = createSlice({
     user: null,
     profilePicture: null, // Current profile picture
     previousProfilePicture: null, // Previous profile picture
+   previousCoverPicture:null,
     walletAmount: 0, // User's wallet balance
     totalLikes: 0, // Total likes received
     totalDislikes: 0, // User's reactions to posts
@@ -24,6 +25,11 @@ export const userSlice = createSlice({
       state.previousProfilePicture = state.profilePicture; // Set the previous profile picture
       state.profilePicture = action.payload; // Update the current profile picture
       console.log('Profile picture updated', action.payload);
+    },
+    setCoverPicture: (state, action) => {
+      state.previousCoverPicture = state.coverPicture;
+      state.coverPicture = action.payload;
+      console.log('Cover picture updated', action.payload);
     },
     updateMetrics: (state, action) => {
       const { walletAmount,totalLikes, totalDislikes, postCount } = action.payload;
@@ -61,6 +67,7 @@ export const userSlice = createSlice({
     clearUserDetails: (state) => {
       state.user = null;
       state.profilePicture = null;
+      state.coverPicture=null
       state.previousProfilePicture = null;
       state.walletAmount = 0;
       state.totalLikes = 0;
@@ -72,7 +79,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction } = userSlice.actions;
+export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture } = userSlice.actions;
 
 export default userSlice.reducer;
 

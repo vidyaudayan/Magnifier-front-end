@@ -64,6 +64,7 @@ import Navbar from "../componenets/Navbar";
 import NavbarLanding from "../componenets/NavbarLanding";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../features/user/userSlice";
+import { setCoverPicture } from "../features/user/userSlice";
 const ProfilePage = () => {
   const dispatch = useDispatch()
   const [user, setUser] = useState({});
@@ -101,7 +102,7 @@ const[coverPic, setCoverPic]= useState(user.coverPic || "")
   
                       // Update Redux state immediately after successful upload
                       dispatch(setUserDetails({ ...response.data.user }));
-  
+                   dispatch(setCoverPicture())
                       // Optionally, update the local state (if you're using one)
                       setCoverPic(updatedCoverPic);
   
