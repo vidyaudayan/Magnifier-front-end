@@ -261,7 +261,7 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-blue-700">
           <ul className="flex flex-col items-center space-y-4 py-4">
-            {[
+            {/*{[
               "Home",
               "About Us",
               "Magnifier Dashboard",
@@ -276,7 +276,25 @@ const Navbar = () => {
                   {link}
                 </Link>
               </li>
-            ))}
+            ))}*/}
+
+{[
+  { name: "Home", path: "/" },
+  { name: "About Us", path: "/aboutus" },
+  { name: "Magnifier Dashboard", path: "/dashboard" },
+  { name: "Contact Us", path: "/contact" },
+  { name: "Support", path: "/support" },
+].map((link, index) => (
+  <li key={index}>
+    <Link
+      to={link.path}
+      className="text-sm hover:text-yellow-300 transition-colors duration-300"
+    >
+      {link.name}
+    </Link>
+  </li>
+))}
+
             {user && (
               <li>
                 <button

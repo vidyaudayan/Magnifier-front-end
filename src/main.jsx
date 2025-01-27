@@ -31,6 +31,8 @@ import Support from './componenets/Support.jsx';
 import FAQ from './componenets/FAQ.jsx';
 import UserGuidelines from './componenets/UserGuidelines.jsx';
 import TermsAndConditions from './componenets/TermsandConditions.jsx';
+import ProfilePage from './pages/profile.jsx';
+import PostDisplayPage from './pages/PostsDisplay.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -87,6 +89,14 @@ const router = createBrowserRouter([
       {
         path: "/userguidelines",
         element:<UserGuidelines/>,
+      },
+      {
+        path: "/profile",
+        element:<ProfilePage/>,
+      },
+      {
+        path: "/userposts",
+        element:<PostDisplayPage/>,
       },
       {
         path: "/termsandconditions",

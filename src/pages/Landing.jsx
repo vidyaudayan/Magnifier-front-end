@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import Navbar from "../componenets/Navbar.jsx";
 import NavbarLanding from "../componenets/NavbarLanding.jsx";
 import { formatDate } from "../utils/dateUtils.js";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { IoSettings } from "react-icons/io5";
 import postImage from '../assets/Images/post2.avif'
@@ -521,13 +522,13 @@ const handleUserClick = async (userId,user) => {
                         
                     }*/}
                      <div className="relative inline-block">
-      <p
+      <Link to="/profile"
         className="text-lg font-semibold cursor-pointer"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         {user?.username}
-      </p>
+      </Link>
 
       {isOverlayOpen && (
         <div
@@ -572,7 +573,7 @@ const handleUserClick = async (userId,user) => {
 
                 {/* Posts Count */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
-                    <p className="text-sm font-medium">Posts</p>
+                    <Link to="/userposts" className="text-sm font-medium">Posts</Link>
                     <p className="text-lg font-bold text-blue-600">{metrics.postCount}</p>
             
                 </div>
