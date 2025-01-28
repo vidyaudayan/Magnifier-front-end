@@ -34,8 +34,13 @@ const LoginFormShare= () => {
       if (response.data.success) {
         const queryParams = new URLSearchParams(location.search);
         const postId = queryParams.get("postId");
-        navigate(postId ? `/post/${postId}` : "/post");
+        //navigate(postId ? `/post/${postId}` : "/post");
+        navigate(`/postDisplayPage?postId=${postId}`);
+        
         fetchUserDetails();
+      }else {
+        // Navigate to the landing page otherwise
+        navigate("/");
       }
 
       if (response.data.token) {
