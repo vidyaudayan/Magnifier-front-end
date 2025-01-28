@@ -400,8 +400,8 @@ export const LandingPage = () => {
                
                 //dispatch(setPosts(response.data || [])); 
                 setFilteredPosts(response.data.data); 
-               const approvedPosts = response.data.filter((post) => post.status === "approved");
-               dispatch(setPosts(approvedPosts || [])); 
+               //const approvedPosts = response.data.filter((post) => post.status === "approved");
+               //dispatch(setPosts(approvedPosts || [])); 
                 
                if (postId) {
                 const highlightedPost = data.find((post) => post._id === postId);
@@ -697,7 +697,9 @@ const handleUserClick = async (userId,user) => {
                     <div
                         key={post._id}
                        // className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4"
-                       className={`bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4 ${
+                       className={`bg-white ${
+                        post._id === highlightPostId ? "bg-yellow-300" : ""
+                      } border border-gray-300 rounded-lg shadow-sm mb-6 p-4 ${
                         selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""
                       }`}
                    
