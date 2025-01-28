@@ -355,7 +355,23 @@ export const LandingPage = () => {
 
       const location = useLocation();
       const [highlightPostId, setHighlightPostId] = useState(null);
-
+      useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const postId = queryParams.get("highlightPostId");
+    
+        if (postId) {
+          fetchPostById(postId);
+        }
+      }, [location]);
+    
+      const fetchPostById = async (postId) => {
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post/${postId}`);
+          setHighlightPostId(response.data);
+        } catch (error) {
+          console.error("Error fetching post:", error);
+        }
+      };
     
     const fetchUserPosts = async () => {
         try {

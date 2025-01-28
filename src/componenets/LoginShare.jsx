@@ -34,7 +34,7 @@ const LoginFormShare= () => {
       if (response.data.success) {
         const queryParams = new URLSearchParams(location.search);
         const postId = queryParams.get("postId");
-        navigate(postId ? `/posts?highlightPost=${postId}` : "/posts");
+        navigate(postId ? `/post/${postId}` : "/post");
         fetchUserDetails();
       }
 
@@ -59,7 +59,7 @@ const LoginFormShare= () => {
       }
 
       toast.success("You are logged in");
-      navigate("/landing");
+      //navigate("/landing");
       resetLoginForm();
     } catch (error) {
       console.error("Error signing in:", error);
