@@ -11,7 +11,7 @@ const PostDisplayPage = () => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const postId = queryParams.get("highlightPost");
+    const postId = queryParams.get("postId");
     if (postId) {
       fetchPostById(postId);
     }
@@ -20,7 +20,7 @@ const PostDisplayPage = () => {
   const fetchPostById = async (postId) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/posts/${postId}`
+        `${import.meta.env.VITE_BASE_URL}/post/${postId}`
       );
       setPost(response.data);
     } catch (error) {

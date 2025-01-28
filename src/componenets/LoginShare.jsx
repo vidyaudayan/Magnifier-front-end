@@ -40,7 +40,7 @@ const LoginFormShare= () => {
         fetchUserDetails();
       }else {
         // Navigate to the landing page otherwise
-        navigate("/");
+        navigate("/landing");
       }
 
       if (response.data.token) {
