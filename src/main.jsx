@@ -34,6 +34,7 @@ import TermsAndConditions from './componenets/TermsandConditions.jsx';
 import ProfilePage from './pages/profile.jsx';
 import PostDisplayPage from './pages/PostsDisplay.jsx';
 import LoginForm from './componenets/LoginForm.jsx';
+import LoginFormShare from './componenets/LoginShare.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -59,7 +60,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element:<LoginForm/>,
+        element:<LoginFormShare/>,
       },
       {
         path: "/job-application",
