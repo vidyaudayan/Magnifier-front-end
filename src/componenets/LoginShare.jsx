@@ -35,7 +35,7 @@ const LoginFormShare= () => {
         const queryParams = new URLSearchParams(location.search);
         const postId = queryParams.get("postId");
         //navigate(postId ? `/post/${postId}` : "/post");
-        navigate(`/postDisplayPage?postId=${postId}`);
+        navigate(`/displaypost?postId=${postId}`);
         
         fetchUserDetails();
       }else {
