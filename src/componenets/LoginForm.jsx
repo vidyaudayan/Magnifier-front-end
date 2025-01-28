@@ -4,14 +4,14 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useContext } from "react";
 import Context from "../context/context.jsx";
-import { useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from "../features/user/userSlice.js";
 import useWallet from "./hooks/useWallet.jsx";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-
+  const location = useLocation();
   const navigate = useNavigate();
   const {fetchUserDetails}= useContext(Context)
   const {
@@ -32,6 +32,15 @@ const LoginForm = () => {
 
 
       const dataApi = response.data;
+      const success = true;
+      if (success) {
+        const queryParams = new URLSearchParams(location.search);
+        const postId = queryParams.get("postId");
+  
+        // Redirect to posts with the highlighted post
+        navigate(postId ? `/posts?highlightPost=${postId}` : "/posts");
+      }
+    
   
       if (dataApi.success) {
        

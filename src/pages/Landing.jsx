@@ -11,7 +11,7 @@ import axios from "axios";
 import { FaCamera } from 'react-icons/fa';
 import Context from "../context/context.jsx";
 import { TbLoadBalancer } from "react-icons/tb";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import { BiSolidDislike } from "react-icons/bi";
 import { useSelector } from 'react-redux';
 import { UserOverlay } from "../componenets/UserOverlay.jsx";
@@ -335,6 +335,27 @@ export const LandingPage = () => {
     };
     const displayProfilePic = profilePic || `https://via.placeholder.com/80`;
    
+
+    const handleShare = (post) => {
+        const postId = post._id; // Use the actual post's ID
+        const isLoggedIn = !!localStorage.getItem("token"); // Check login status
+        const shareUrl = isLoggedIn
+          ? `${window.location.origin}/login?postId=${postId}`
+          : `${window.location.origin}/signup?postId=${postId}`;
+    
+        navigator
+          .share({
+            title: "Check out this post!",
+            text: "Here's a great post for you to read!",
+            url: shareUrl,
+          })
+          .then(() => console.log("Successfully shared!"))
+          .catch((error) => console.error("Error sharing:", error));
+      };
+
+      const location = useLocation();
+      const [highlightPostId, setHighlightPostId] = useState(null);
+
     
     const fetchUserPosts = async () => {
         try {
@@ -361,7 +382,9 @@ export const LandingPage = () => {
     useEffect(() => {
         let isMounted = true; 
         const fetchPosts = async () => {
-          
+            const queryParams = new URLSearchParams(location.search);
+            const postId = queryParams.get("highlightPost");
+            setHighlightPostId(postId);
             if (postsFetched|| !isMounted) return;
             try {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, {
@@ -380,7 +403,15 @@ export const LandingPage = () => {
                const approvedPosts = response.data.filter((post) => post.status === "approved");
                dispatch(setPosts(approvedPosts || [])); 
                 
-                
+               if (postId) {
+                const highlightedPost = data.find((post) => post._id === postId);
+                const otherPosts = data.filter((post) => post._id !== postId);
+                setPosts([highlightedPost, ...otherPosts]);
+              } else {
+                //setPosts(data);
+                const approvedPosts = response.data.filter((post) => post.status === "approved");
+               dispatch(setPosts(approvedPosts || []));
+              }
                 setPostsFetched(true); 
             } catch (error) {
                 console.error("Error fetching posts:", error);
@@ -391,7 +422,7 @@ export const LandingPage = () => {
             isMounted = false;
           };
          
-    }, [dispatch,postsFetched]);
+    }, [dispatch,postsFetched,location.search]);
 
     // Handle user selection from search bar
   const onUserSelect = (user) => {
@@ -762,25 +793,9 @@ const handleUserClick = async (userId,user) => {
                                 👎 Dislike
                             </button>
                             <button
-                                onClick={() => {
-                                    // Check if the user is logged in
-                                    const isLoggedIn = !!localStorage.getItem("token"); // Replace this with your actual logic
-                            
-                                    // Set the URL based on login status
-                                    const shareUrl = isLoggedIn
-                                        ? `${window.location.origin}/login` // URL for logged-in users
-                                        : `${window.location.origin}/signup`; // URL for non-logged users
-                            
-                                    // Use the Share API
-                                    navigator
-                                        .share({
-                                            title: "Post",
-                                            text: "Check out this post!",
-                                            url: shareUrl,
-                                        })
-                                        .then(() => console.log("Successfully shared!"))
-                                        .catch((error) => console.error("Error sharing:", error));
-                                }}
+                              
+                              onClick={()=>handleShare(post)} 
+                              
                                 className="hover:text-green-500 text-md"
                             >
                                 📤 Share
