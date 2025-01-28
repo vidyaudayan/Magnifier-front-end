@@ -72,6 +72,10 @@ const router = createBrowserRouter([
         element:<LandingPage/>,
       },
       {
+        path: "/displaypost",
+        element:<PostDisplayPage/>,
+      },
+      {
         path: "/aboutus",
         element:<AboutUsPage/>,
       },
