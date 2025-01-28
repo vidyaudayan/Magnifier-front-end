@@ -22,7 +22,8 @@ const PostDisplayPage = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/post/${postId}`
       );
-      setPost(response.data);
+      console.log("postbyId",response.data)
+      setPost(response.data.data);
     } catch (error) {
       console.error("Error fetching post:", error);
     }
