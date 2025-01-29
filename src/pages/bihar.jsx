@@ -263,7 +263,7 @@ export const AuthBihar = () => {
                     </form>
                     <Link to={'/job-application'}
                         className="text-black mt-4 font-semibold pt-1 underline hover:scale-105 hover:ml-2 cursor-pointer"
-                        onClick={() => setShowJobForm(!showJobForm)}
+                     
                     >
                         Apply for a Job
                     </Link>

@@ -23,6 +23,7 @@ const Jobapplication = () => {
             formData.append("resume", data.resume[0]);  // Append the first file from the FileList
         } else {
             console.log("Resume file not selected!");
+            toast.error("Please upload a resume file");
             return;
         }
     
@@ -39,17 +40,22 @@ const Jobapplication = () => {
           const token = localStorage.getItem('token');
           console.log( "job token",token)
     const headers = { Authorization: `Bearer ${token}` };
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/jobapplication`, formData,{ headers },{
-                withCredentials: true,
-            });
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/jobapplication`, formData);
             alert("Job application submitted")
             console.log("Job application submitted successfully:", response);
             toast.success("Job application submitted!");
             resetJobForm();
-            navigate('/landing')
+            navigate('/login')
         } catch (error) {
             console.log("Error submitting job application:", error.response || error.message);
-        }
+        
+            if (error.response && error.response.data && error.response.data.message) {
+              toast.error(error.response.data.message);
+            } else {
+              toast.error("An unexpected error occurred. Please try again.");
+            }
+        
+          }
     };
     
   

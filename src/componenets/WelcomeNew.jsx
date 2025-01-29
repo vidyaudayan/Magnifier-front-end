@@ -6,10 +6,10 @@ import { Link } from "react-router-dom";
 import Footer from "./Footer";
 const WelcomeNew = () => {
   return (
-    <div className="h-80  bg-[url('./assets/Images/background7.avif')] bg-cover  bg-center text-white">
+    <div className="h-80  bg-[url('./assets/Images/background7.avif')] bg-cover  bg-center  text-white">
       {/* Navbar */}
       <nav className="w-full bg-blue-600 py-4 fixed top-0 left-0 shadow-lg z-50">
-        <ul className="flex justify-around text-sm md:text-lg uppercase">
+        <ul className="flex justify-around gap-2 px-2 text-sm md:text-lg uppercase">
 <Link to="/" className="hover:text-gray-300 transition duration-300 cursor-pointer">Home</Link>
 <Link to="/aboutus" className="hover:text-gray-300 transition duration-300 cursor-pointer">About Us</Link>
 <Link to="/dashboard" className="hover:text-gray-300 transition duration-300 cursor-pointer">Magnifier dashboard</Link>
@@ -21,7 +21,7 @@ const WelcomeNew = () => {
       </nav>
 
       {/* Content */}
-      <div className="flex flex-col items-center justify-center pt-24 text-center space-y-6">
+      <div className="flex flex-col items-center justify-center pt-24  text-center space-y-6">
         <h1 className="text-4xl md:text-6xl font-bold">Welcome to Magnifier</h1>
         <h2 className="text-3xl md:text-5xl ">
         मैग्निफायर में आपका स्वागत है</h2>

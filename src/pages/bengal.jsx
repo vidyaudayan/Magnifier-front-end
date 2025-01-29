@@ -249,7 +249,7 @@ const AuthBengal = () => {
                     </form>
                     <Link to={'/job-application'}
                         className="text-black mt-4 underline font-semibold pt-1 hover:scale-105 hover:ml-2 cursor-pointer"
-                        onClick={() => setShowJobForm(!showJobForm)}
+                        
                     >
                         Apply for a Job
                     </Link>
