@@ -161,13 +161,13 @@ const[posts,setPosts]= useState()
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/posts/${userId}`);
       const userPosts = response.data.data;
-
+console.log("searchuser",response)
       // Example post update logic
       {/*setPosts((prevPosts) => [
         ...prevPosts.filter((post) => post.userId !== userId),
         ...userPosts,
       ]);*/}
-
+      navigate(`/user/${userId}/posts`);
       setSelectedUser(user);
       setSearchQuery(user.username);
       setSearchResults([]);

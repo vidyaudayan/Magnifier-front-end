@@ -35,6 +35,7 @@ import ProfilePage from './pages/profile.jsx';
 import PostDisplayPage from './pages/PostsDisplay.jsx';
 import LoginForm from './componenets/LoginForm.jsx';
 import LoginFormShare from './componenets/LoginShare.jsx';
+import SearchUserPost from './componenets/SearchUserPost.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -103,7 +104,14 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element:<ProfilePage/>,
+
       },
+
+      {
+        path: "/user/:userId/posts",
+        element:<SearchUserPost/>,
+      },
+     
       {
         path: "/userposts",
         element:<PostDisplayPage/>,
@@ -121,6 +129,12 @@ const router = createBrowserRouter([
         path: "/reset-password/:token",
         element:<ResetPassword/>,
       },
+      {
+        path: "/reset-password/:token",
+        element:<ResetPassword/>,
+      },
+     
+     
      
      
     ],
