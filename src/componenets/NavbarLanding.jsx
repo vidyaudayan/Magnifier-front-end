@@ -128,7 +128,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearUserDetails } from "../features/user/userSlice";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import BreadCrumbs from "./Breadcrumbs";
 const NavbarLanding = ({ onUserSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const user = useSelector((state) => state.user.user);
@@ -206,6 +206,7 @@ console.log("searchuser",response)
 
   return (
     <header className="z-50 fixed top-0 w-full bg-blue-600 text-white shadow-lg lg:h-24">
+     
       <nav className="container mx-auto flex items-center justify-between px-4 lg:px-8 py-3">
         <div className="flex items-center space-x-3">
           <img
@@ -276,7 +277,11 @@ console.log("searchuser",response)
             </svg>
           </button>
         </div>
+        
       </nav>
+      <div className="bg-slate-100 p-1 pl-3 lg:pl-10">
+        <BreadCrumbs />
+      </div>
 
       {isOpen && (
         <div className="md:hidden bg-blue-700">

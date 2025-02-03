@@ -15,13 +15,19 @@ import { setUserDetails } from "../features/user/userSlice";
 const AuthDelhi = () => {
     const location = useLocation();
     const [showJobForm, setShowJobForm] = useState(false);
-//otp verification
-const [email, setEmail] = useState("");
-const [otpSent, setOtpSent] = useState(false);
-const [otp, setOtp] = useState("");
-const [token, setToken] = useState(null);
-const [isOtpVerified, setIsOtpVerified] = useState(false); 
-   
+    //otp verification
+    const [email, setEmail] = useState("");
+    const [otpSent, setOtpSent] = useState(false);
+    const [mobileOtpSent, setMobileOtpSent] = useState(false);
+    const [otp, setOtp] = useState("");
+    const [token, setToken] = useState(null);
+    const [isOtpVerified, setIsOtpVerified] = useState(false);
+    const [isMobileOtpVerified, setIsMobileOtpVerified] = useState(false);
+
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [mobileOtp, setMobileOtp] = useState('');
+    const [step, setStep] = useState(1);
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -54,17 +60,17 @@ const [isOtpVerified, setIsOtpVerified] = useState(false);
         const vidhanSabhas = {
             Delhi: [
                 "Adarsh Nagar", "Ambedkar Nagar", "Babarpur", "Badarpur", "Badli", "Ballimaran",
-"Bawana", "Bijwasan", "Burari", "Chandni Chowk", "Chhatarpur", "Deoli",
-"Delhi Cantonment", "Dwarka", "Gandhi Nagar", "Ghonda", "Gokalpur", "Greater Kailash",
-"Hari Nagar", "Janakpuri", "Jangpura", "Karawal Nagar", "Karol Bagh", "Kasturba Nagar",
-"Kalkaji", "Kirari", "Kondli", "Krishna Nagar", "Laxmi Nagar", "Madipur",
-"Malviya Nagar", "Mangolpuri", "Matiala", "Matia Mahal", "Mehrauli", "Model Town",
-"Moti Nagar", "Mundka", "Mustafabad", "Najafgarh", "Nangloi Jat", "Narela",
-"New Delhi", "Okhla", "Palam", "Patel Nagar", "Patparganj", "Rajinder Nagar",
-"Rajouri Garden", "Rithala", "Rohini", "R.K. Puram", "Sadar Bazar", "Sangam Vihar",
-"Seelampur", "Seemapuri", "Shahdara", "Shakur Basti", "Shalimar Bagh", "Sultanpur Majra",
-"Tilak Nagar", "Timarpur", "Tri Nagar", "Trilokpuri", "Tughlakabad", "Uttam Nagar",
-"Vikaspuri", "Vishwas Nagar", "Wazirpur" ],
+                "Bawana", "Bijwasan", "Burari", "Chandni Chowk", "Chhatarpur", "Deoli",
+                "Delhi Cantonment", "Dwarka", "Gandhi Nagar", "Ghonda", "Gokalpur", "Greater Kailash",
+                "Hari Nagar", "Janakpuri", "Jangpura", "Karawal Nagar", "Karol Bagh", "Kasturba Nagar",
+                "Kalkaji", "Kirari", "Kondli", "Krishna Nagar", "Laxmi Nagar", "Madipur",
+                "Malviya Nagar", "Mangolpuri", "Matiala", "Matia Mahal", "Mehrauli", "Model Town",
+                "Moti Nagar", "Mundka", "Mustafabad", "Najafgarh", "Nangloi Jat", "Narela",
+                "New Delhi", "Okhla", "Palam", "Patel Nagar", "Patparganj", "Rajinder Nagar",
+                "Rajouri Garden", "Rithala", "Rohini", "R.K. Puram", "Sadar Bazar", "Sangam Vihar",
+                "Seelampur", "Seemapuri", "Shahdara", "Shakur Basti", "Shalimar Bagh", "Sultanpur Majra",
+                "Tilak Nagar", "Timarpur", "Tri Nagar", "Trilokpuri", "Tughlakabad", "Uttam Nagar",
+                "Vikaspuri", "Vishwas Nagar", "Wazirpur"],
 
         };
         setVidhanSabhaOptions(vidhanSabhas[state] || []);
@@ -86,12 +92,12 @@ const [isOtpVerified, setIsOtpVerified] = useState(false);
             }
             dispatch(setUserDetails(user));
             console.log("res data", res);
-toast.success("User signed up successfully!");
-navigate('/landing')
+            toast.success("User signed up successfully!");
+            navigate('/landing')
             alert("signup sucess")
-           // if (res.status === 201) {
-              //  toast.success("User signed up successfully!");
-           // }
+            // if (res.status === 201) {
+            //  toast.success("User signed up successfully!");
+            // }
 
         } catch (error) {
             if (error.response && error.response.status === 400) {
@@ -118,14 +124,14 @@ navigate('/landing')
             );
         }
     };
-    
+
     const handleVerifyOtp = async () => {
-     
+
         if (!email) {
             toast.error("Email is required!", { position: "top-center" });
             return;
         }
-    
+
         const otp = getValues("otp");
         console.log("Request Data:", { email, otp });
         if (!otp) {
@@ -141,7 +147,7 @@ navigate('/landing')
             if (response.status === 200) {
                 setToken(response.data.token);
                 toast.success("OTP verified successfully!", { position: "top-center" });
-                setIsOtpVerified(true); 
+                setIsOtpVerified(true);
             }
         } catch (error) {
             toast.error(
@@ -151,6 +157,25 @@ navigate('/landing')
         }
     };
 
+
+    const handleSendMobileOtp = async () => {
+        try {
+            await axios.post(`${import.meta.env.VITE_BASE_URL}/user/send-mobileotp`, { phoneNumber });
+            alert('OTP sent successfully!');
+            setStep(2);
+        } catch (error) {
+            alert('Error sending OTP');
+        }
+    };
+
+    const handleVerifyMobileOtp = async () => {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`, { phoneNumber, otp });
+            alert(response.data.message);
+        } catch (error) {
+            alert('Invalid OTP');
+        }
+    };
 
     return (
         <div className="min-h-screen  bg-slate-200   flex flex-col  lg:flex-row justify-center lg:justify-evenly gap-6 lg:gap-0   mt-20">
@@ -237,7 +262,7 @@ navigate('/landing')
                             {...registerSignup("wardNumber")}
                         >
                             <option value="">Select Ward Number</option>
-                            {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
+                            {Array.from({ length: 500 }, (_, i) => i + 1).map((num) => (
                                 <option key={num} value={num}>
                                     {num}
                                 </option>
@@ -280,7 +305,7 @@ navigate('/landing')
             </div>
 
             {/* OTP Section */}
-                {/*{otpSent ? (
+                        {/*{otpSent ? (
                 <div className="mb-4">
                     <input
                         type="text"
@@ -311,85 +336,163 @@ navigate('/landing')
 
 
 
-{/* Email Input */}
-<div className="mb-">
-    <input
-        type="email"
-        placeholder="Email"
-        className="w-full mb-3 p-2 border border-slate-400 rounded"
-        {...registerSignup("email", {
-            required: "Email is required",
-            pattern: {
-                value: /^\S+@\S+\.\S+$/,
-                message: "Invalid email address",
-            },
-            onChange: (e) => setEmail(e.target.value),
-        })}
-    />
-    {signupErrors.email && (
-        <p className="text-red-500 text-sm">{errors.email.message}</p>
-    )}
-</div>
+                        {/* Email Input */}
+                        <div className="mb-">
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                className="w-full mb-3 p-2 border border-slate-400 rounded"
+                                {...registerSignup("email", {
+                                    required: "Email is required",
+                                    pattern: {
+                                        value: /^\S+@\S+\.\S+$/,
+                                        message: "Invalid email address",
+                                    },
+                                    onChange: (e) => setEmail(e.target.value),
+                                })}
+                            />
+                            {signupErrors.email && (
+                                <p className="text-red-500 text-sm">{signupErrors.email.message}</p>
+                            )}
+                        </div>
 
-{/* OTP Section - Show only if not verified */}
-{!isOtpVerified && otpSent ? (
-    <div className="mb-4">
-        <input
-            type="text"
-            placeholder="Enter OTP"
-            className="w-full mb-3 p-2 border border-slate-400 rounded"
-            {...registerSignup("otp", { required: "OTP is required" })}
-        />
-        {signupErrors.otp && (
-            <p className="text-red-500 text-sm">{errors.otp.message}</p>
-        )}
-        <button
-            type="button"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={() => handleVerifyOtp(getValues("otp"))}
-        >
-            Verify OTP
-        </button>
-    </div>
-) : null}
+                        {/* OTP Section - Show only if not verified */}
+                        {!isOtpVerified && otpSent ? (
+                            <div className="mb-4">
+                                <input
+                                    type="text"
+                                    placeholder="Enter OTP"
+                                    className="w-full mb-3 p-2 border border-slate-400 rounded"
+                                    {...registerSignup("otp", { required: "OTP is required" })}
+                                />
+                                {signupErrors.otp && (
+                                    <p className="text-red-500 text-sm">{signupErrors.otp.message}</p>
+                                )}
+                                <button
+                                    type="button"
+                                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                                    onClick={() => handleVerifyOtp(getValues("otp"))}
+                                >
+                                    Verify OTP
+                                </button>
+                            </div>
+                        ) : null}
 
-{/* Send OTP Button - Hide after verification */}
-{!isOtpVerified && !otpSent && (
-    <button
-        type="button"
-        className="bg-blue-500 mb-4 text-white px-4 py-2 rounded"
-        onClick={handleSendOtp}
-    >
-        Send OTP
-    </button>
-)}
-
-{/* Show success message when verified */}
-{isOtpVerified && (
-    <div className="text-green-500 mb-2 text-sm font-semibold">
-        OTP successfully verified!
-    </div>
-)}
-
-
-
-
-
-                        <input
-                            type="text"
-                            placeholder="Phone Number"
-                            className="w-full mb-3 p-2 border border-slate-400 rounded"
-                            {...registerSignup("phoneNumber", {
-                                required: "Phone Number is required",
-                                pattern: {
-                                    value: /^\d{10}$/,
-                                    message: "Invalid phone number",
-                                },
-                            })}
-                        />
-                        {signupErrors.phoneNumber && (
-                            <p className="text-red-500 text-sm">{signupErrors.phoneNumber.message}</p>
+                        {/* Send OTP Button - Hide after verification */}
+                        {!isOtpVerified && !otpSent && (
+                            <button
+                                type="button"
+                                className="bg-blue-500 mb-4 text-white px-4 py-2 rounded"
+                                onClick={handleSendOtp}
+                            >
+                                Send OTP
+                            </button>
                         )}
+
+                        {/* Show success message when verified */}
+                        {isOtpVerified && (
+                            <div className="text-green-500 mb-2 text-sm font-semibold">
+                                OTP successfully verified!
+                            </div>
+                        )}
+
+
+
+                        {/*<div>
+                            {step === 1 ? (
+                                <>
+                                    <input
+                                        type="text"
+                                        placeholder="Phone Number"
+                                        className="w-full mb-3 p-2 border border-slate-400 rounded"
+                                        {...registerSignup("phoneNumber", {
+                                            required: "Phone Number is required",
+                                            pattern: {
+                                                value: /^\d{10}$/,
+                                                message: "Invalid phone number",
+                                            },
+                                        })}
+                                    />
+                                    {signupErrors.phoneNumber && (
+                                        <p className="text-red-500 text-sm">{signupErrors.phoneNumber.message}</p>
+                                    )}
+
+                                    <button className="bg-blue-500 mb-4 text-white px-4 py-2 rounded" onClick={handleSendMobileOtp}>Send mobile OTP</button>
+                                </>
+                            ) : (
+                                <>
+                                    <h3>Enter the OTP</h3>
+                                    <input
+                                        type="text"
+                                        placeholder="OTP"
+                                        value={mobileOtp}
+                                        onChange={(e) => setMobileOtp(e.target.value)}
+                                    />
+                                    <button onClick={handleVerifyMobileOtp}>Verify Mobile OTP</button>
+                                </>
+                            )}
+                        </div>*/}
+
+
+                          <div className="mb-">
+                          <input
+                                        type="text"
+                                        placeholder="Phone Number"
+                                        className="w-full mb-3 p-2 border border-slate-400 rounded"
+                                        {...registerSignup("phoneNumber", {
+                                            required: "Phone Number is required",
+                                            pattern: {
+                                                value: /^\d{10}$/,
+                                                message: "Invalid phone number",
+                                            },
+                                        })}
+                                    />
+                                    {signupErrors.phoneNumber && (
+                                        <p className="text-red-500 text-sm">{signupErrors.phoneNumber.message}</p>
+                                    )}
+
+                        </div>
+
+                        {/* OTP Section - Show only if not verified */}
+                        {!isMobileOtpVerified && mobileOtpSent ? (
+                            <div className="mb-4">
+                                <input
+                                    type="text"
+                                    placeholder="Enter OTP"
+                                    className="w-full mb-3 p-2 border border-slate-400 rounded"
+                                    {...registerSignup("mobileOtp", { required: "Mobile OTP is required" })}
+                                />
+                                {signupErrors.mobileOtp && (
+                                    <p className="text-red-500 text-sm">{signupErrors.mobileOtp.message}</p>
+                                )}
+                                <button
+                                    type="button"
+                                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                                    onClick={() => handleVerifyMobileOtp}
+                                >
+                                    Verify Mobile OTP
+                                </button>
+                            </div>
+                        ) : null}
+
+                        {/* Send OTP Button - Hide after verification */}
+                        {!isMobileOtpVerified && !mobileOtpSent && (
+                            <button
+                                type="button"
+                                className="bg-blue-500 mb-4 text-white px-4 py-2 rounded"
+                                onClick={handleSendMobileOtp}
+                            >
+                                Send Mobile OTP
+                            </button>
+                        )}
+
+                        {/* Show success message when verified */}
+                        {isMobileOtpVerified && (
+                            <div className="text-green-500 mb-2 text-sm font-semibold">
+                               Mobile OTP successfully verified!
+                            </div>
+                        )}
+
 
                         <input
                             type="password"
@@ -416,10 +519,10 @@ navigate('/landing')
                             Sign Up
                         </button>
                     </form>
-                    < Link to={'/job-application'} 
+                    < Link to={'/job-application'}
                         className="text-black mt-4 underline font-semibold pt-1 hover:scale-105 hover:ml-2 cursor-pointer"
-                       
-                   >
+
+                    >
                         Apply for a Job
                     </Link>
                 </div>

@@ -10,6 +10,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import axios from "axios";
 import { FaCamera } from 'react-icons/fa';
 import Context from "../context/context.jsx";
+import BreadCrumbs from "../componenets/Breadcrumbs.jsx";
 import { TbLoadBalancer } from "react-icons/tb";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BiSolidDislike } from "react-icons/bi";
@@ -533,12 +534,12 @@ export const LandingPage = () => {
     }
 
     return (
-        <div className="min-h-screen  bg-gray-100 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-24 mt-14">
+        <div className="min-h-screen  bg-gray-100 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-28 mt-20">
             <NavbarLanding />
-
+      
             {/* Left Section */}
             <div className="lg:w-1/4 w-full max-h-[600px] bg-white border border-gray-300 rounded-lg lg:ml-32 ml-6 p-4  space-y-6 shadow-sm">
-                {/* User Info */}
+             {/* User Info */}
                 <div className="text-center">
                     <div
                         onClick={() => document.getElementById('profilePic').click()}
