@@ -73,6 +73,10 @@ const UserSearch = ({ onUserSelect }) => {
           ))}
         </div>
       )}
+      {/* Handle No User Found */} 
+{!selectedUser && searchQuery && searchResults.length === 0 && (
+  <p className="mt-2 text-gray-500">No user available</p>
+)}
     </div>
   );
 };

@@ -147,86 +147,6 @@ export const LandingPage = () => {
 
 
 
-    {/*const handleCreatePost = async () => {
-        const tempPostId = Math.random().toString(36)
-        const tempPost = {
-            _id: tempPostId,
-            userId: { username: user?.username || "Unknown", profilePic: user?.profilePic || "" },
-            content: postContent,
-            mediaUrl: photo ? URL.createObjectURL(photo) : null, // Temporary image preview
-            postType: photo ? "Photo" : "Text",
-            createdAt: new Date().toISOString(),
-        };
-
-        // Add the temporary post to the state
-        setPosts((prevPosts) => [tempPost, ...prevPosts]);
-       
-        try {
-           
-            const formData = new FormData();
-
-            // Determine the type of post
-            const postType = photo ? "Photo" : voiceNote ? "VoiceNote" : "Text";
-
-            // Append content based on post type
-            formData.append('postType', postType);
-            formData.append('content', postContent); // For text posts
-
-            // Append the file if it's a photo or voice note
-            if (photo) formData.append("media", photo); // Add file
-            if (voiceNote) formData.append("media", voiceNote); // Add file
-          
-            //setLoading(true); // Start loading
-
-            console.log("Photo:", photo);
-            console.log("Voice Note:", voiceNote);
-            console.log("form data", formData);
-
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}:`, value);
-            }
-
-
-            const token = localStorage.getItem('token');
-            //console.log( "landing token",token)
-            const headers = { Authorization: `Bearer ${token}`, };
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/post/create`, formData, { headers }, {
-                withCredentials: true,
-            });
-            console.log('New Post Response:', response.data);
-        //setPosts([response.data, ...posts]); // Prepend the new post to the list
-              
-            // Replace the temporary post with the actual post
-            setPosts((prevPosts) =>
-                prevPosts.map((post) =>
-                    post._id === tempPostId ? response.data : post
-                )
-            );
-
-            
-            //setPhoto(null);
-            //setVoiceNote(null);
-            //setPostContent("");
-            //setPhotoPreview(null);
-            //setPostOverlayOpen(false);
-           
-            toast.success("Post created successfully");
-            
-        } catch (error) {
-            console.error("Error creating post:", error);
-            setPosts((prevPosts) =>
-                prevPosts.filter((post) => post._id !== tempPostId)
-            );
-
-            toast.error("Failed to create post");
-        } finally {
-            if (photo) URL.revokeObjectURL(tempPost.media);
-            setLoading(false);
-            setPostContent("");
-            setPhoto(null);
-        }
-
-    };*/}
 
     const handleCreatePost = async () => {
         const tempPostId = Math.random().toString(36);
@@ -632,7 +552,7 @@ export const LandingPage = () => {
                 {/* Settings */}
                 <div className="flex items-center space-x-2 cursor-pointer">
                     <IoSettings />
-                    <p className="text-sm font-medium cursor-pointer">Settings</p>
+                    <Link to="/settings"  className="text-sm font-medium cursor-pointer">Settings</Link>
                 </div>
             </div>
 

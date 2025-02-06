@@ -44,31 +44,31 @@ export const AuthBihar = () => {
     useEffect(() => {
         const vidhanSabhas = {
             Bihar: [
-        "Agiaon", "Alamnagar", "Alamnagar", "Amarpur", "Amour", "Amdabad", "Arah", 
-"Araria", "Araria", "Aurangabad", "Aurangabad", "Bagaha", "Bahadurganj", 
+                "Adhaura",  "Agiaon", "Alamnagar", "Amarpur", "Amour", "Amdabad", "Arah", 
+"Araria","Arwal", "Aurangabad", "Aurangabad", "Bagaha", "Bahadurganj", 
 "Bajpatti", "Bakhtiarpur", "Banka", "Bankipur", "Banmankhi", "Barahat", 
 "Barari", "Barbigha", "Barhara", "Barh", "Barachatti", "Bariarpur", 
 "Bathnaha", "Baisi", "Belaganj", "Belhar", "Belsand", "Benipatti", 
-"Bettiah", "Bhabua", "Bihpur", "Bihariganj", "Bisfi", "Bodh Gaya", 
+"Bettiah", "Bhabua", "Bihpur", "Bihariganj","Bikram", "Bisfi", "Bodh Gaya", 
 "Brahmpur","Buxar", "Chanpatia", "Chakai", "Chainpur", "Chhatapur", "Chiraiya", 
-"Chenari", "Colgong", "Danapur", "Dehri", "Dhamdaha", "Dhaka", 
+"Chenari", "Colgong", "Danapur","Darauli", "Dehri", "Dhamdaha", "Dhaka", 
 "Digha", "Dumraon", "Fatuha", "Forbesganj", "Gaya", "Gaya Town", 
-"Ghosi", "Gobindpur", "Govindganj", "Gurua", "Harsidhi", "Harlakhi", 
-"Hisua", "Imamganj", "Jamui", "Jamui", "Jehanabad", "Jagdishpur", 
+"Ghosi", "Gobindpur", "Govindganj", "Gurua","Hajipur","Harsidhi", "Harlakhi", 
+"Hisua", "Imamganj","Islampur", "Jamui", "Jamui", "Jehanabad", "Jagdishpur", 
 "Jhanjharpur", "Jhajha", "Jokihat", "Kahalgaon", "Kalyanpur", 
-"Kasba", "Katihar", "Kargahar", "Karakat", "Khajauli", "Kishanganj", 
-"Korha", "Kurtha", "Kutumba", "Lauriya", "Laukaha", "Madhepura", 
-"Madhubani", "Mahishi", "Makhdumpur", "Maner", "Manihari", "Masaurhi", 
+"Kasba", "Katihar", "Kargahar", "Karakat", "Kesaria","Khajauli", "Kishanganj", 
+"Korha", "Kurtha", "Kutumba"," Lakhisarai", "Lauriya", "Laukaha", "Madhepura", 
+"Madhubani"," Maharajganj", "Mahishi", "Makhdumpur", "Maner", "Manihari", "Masaurhi", 
 "Matihari", "Mohania", "Motihari", "Mokama", "Munger", "Nabinagar", 
 "Narkatia", "Narkatiaganj", "Narpatganj", "Nautan", "Nawada", 
 "Nirmali", "Nokha", "Paliganj", "Parihar", "Patliputra", "Patna Sahib", 
 "Phulparas", "Pirpainti", "Pipra", "Piro", "Pranpur", "Ramnagar", 
-"Rafiganj", "Rajauli", "Rampur", "Raniganj", "Raxaul", "Riga", 
+"Rafiganj", "Raghopur","Rajauli", "Rampur", "Raniganj", "Raxaul", "Riga", 
 "Riga", "Rupauli", "Runnisaidpur", "Sandesh", "Saharsa", "Sasaram", 
 "Sheikhpura", "Sheohar", "Sherghati", "Shahpur", "Simri Bakhtiyarpur", 
-"Singheshwar", "Sitamarhi", "Sikandra", "Sikta", "Sugauli", "Sultanganj", 
+"Singheshwar", "Sitamarhi", "Sikandra", "Sikta","Siwan", "Sugauli", "Sultanganj", 
 "Supaul", "Sursand", "Tikari", "Tarari", "Tarapur", "Thakurganj", 
-"Triveniganj", "Valmiki Nagar", "Wazirganj", "Warsaliganj"
+"Triveniganj","Ujiarpur","Valmiki Nagar", "Wazirganj", "Warsaliganj"
 
             ],
 

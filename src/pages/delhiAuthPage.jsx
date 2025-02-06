@@ -160,20 +160,43 @@ const AuthDelhi = () => {
 
     const handleSendMobileOtp = async () => {
         try {
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/user/send-mobileotp`, { phoneNumber });
+        
+            const phoneNumber = getValues("phoneNumber"); // Fetch directly from form
+            console.log("mobile",phoneNumber)
+           
+            if (!phoneNumber) {
+              alert("Please enter your phone number");
+              return;
+            }
+            const formatPhoneNumber = (phoneNumber) => {
+                return phoneNumber.startsWith("+") ? phoneNumber : `+91${phoneNumber.trim()}`;
+              };
+          
+              const formattedNumber = formatPhoneNumber(phoneNumber);
+              console.log('Formatted Phone Number:', formattedNumber); // Debug here
+              
+            await axios.post(`${import.meta.env.VITE_BASE_URL}/user/send-mobileotp`, { phoneNumber: formattedNumber }
+              ,{ headers: { 'Content-Type': 'application/json' } });
             alert('OTP sent successfully!');
+              setMobileOtpSent(true);
             setStep(2);
         } catch (error) {
-            alert('Error sending OTP');
+            console.error('Error:', error);
+            alert(`Error sending OTP: ${error.response?.data?.error || error.message}`);
         }
     };
 
     const handleVerifyMobileOtp = async () => {
+        const { phoneNumber, mobileOtp } = getValues();
+        console.log("Phone number:", phoneNumber);
+        console.log("verify otp",mobileOtp)
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`, { phoneNumber, otp });
+            
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`, { phoneNumber,otp: mobileOtp });
             alert(response.data.message);
         } catch (error) {
-            alert('Invalid OTP');
+            console.error(error.response?.data);
+    alert(error.response?.data?.error || "Invalid OTP");
         }
     };
 
@@ -436,9 +459,11 @@ const AuthDelhi = () => {
 
                           <div className="mb-">
                           <input
-                                        type="text"
+                                        type="number"
                                         placeholder="Phone Number"
                                         className="w-full mb-3 p-2 border border-slate-400 rounded"
+                                        //value={phoneNumber}
+                                        //onChange={(e) => setPhoneNumber(e.target.value)}
                                         {...registerSignup("phoneNumber", {
                                             required: "Phone Number is required",
                                             pattern: {
@@ -468,7 +493,7 @@ const AuthDelhi = () => {
                                 <button
                                     type="button"
                                     className="bg-blue-500 text-white px-4 py-2 rounded"
-                                    onClick={() => handleVerifyMobileOtp}
+                                    onClick={ handleVerifyMobileOtp}
                                 >
                                     Verify Mobile OTP
                                 </button>
