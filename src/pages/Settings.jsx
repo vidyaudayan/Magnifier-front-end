@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from 'axios';
 import { Settings, Lock, HelpCircle, Shield, Trash2,UserRoundCog } from "lucide-react";
 import NavbarLanding from '../componenets/NavbarLanding';
 const SettingsPage = () => {
@@ -14,30 +14,50 @@ const SettingsPage = () => {
 
         
     const handleDeactivate = async () => {
-      try {
-        const response = await fetch(`/api/users/${userId}/deactivate`, {
-          method: 'PUT',
-        });
-        if (response.ok) {
-          setMessage('Your account deactivation is under review. Your account will be automatically deleted after 30 days. Until then, you can still access your account. If you wish to keep your account, please submit a request to prevent its deletion through the "Contact Us" section.');
-          setMessageType('success');
-          setIsSecondModalOpen(false);
-        } else {
-          const errorData = await response.json();
-          setMessage(`Error: ${errorData.message}`);
-          setMessageType('error');
-          setIsMessageVisible(true); // Show the error message
-        }
-      } catch (error) {
-        setMessage('Network error: Unable to deactivate account. Please try again later.');
-        setMessageType('error');
-        setIsMessageVisible(true); // Show the error message
-      }
+        setIsSecondModalOpen(false);
+        try {
+            const token = localStorage.getItem('token');
+            console.log("deact", token)
+            if (!token) {
+              setMessage('Authentication token not found.');
+              setMessageType('error');
+              setIsMessageVisible(true);
+              return;
+            }
+        
+            const headers = { Authorization: `Bearer ${token}` };
+            
+            const response = await axios.patch(
+              `${import.meta.env.VITE_BASE_URL}/user/deactivateaccount`,
+              {}, // Payload if required
+              { headers, withCredentials: true }
+            );
+console.log("deact", response)
+            if (response.status === 200) {
+              setMessageType('success');
+              setMessage(
+                'Your account deactivation is under review. Your account will be automatically deleted after 30 days. Until then, you can still access your account. If you wish to keep your account, please submit a request to prevent its deletion through the "Contact Us" section.'
+              );
+              setIsSecondModalOpen(false);
+            } else {
+              setMessageType('error');
+              setMessage('Unexpected response from the server.');
+            }
+          } catch (error) {
+            if (error.response&& error.response.data) {
+              // Handle server errors
+              setMessage(`Error: ${error.response.data.message}`);
+            } else {
+              setMessage(`Error: ${error.message}`);
+            }
+            setMessageType('unknown network error');
+          }
+          //setIsMessageVisible(true);
     };
   
   return (
     <>
-    <NavbarLanding />
+   
     <div className="max-w-4xl mx-auto p-4 sm:p-8 md:p-12 lg:p-16 rounded-lg shadow-lg mt-10">
       <h1 className="text-4xl font-bold mb-6 text-center mt-10">Settings</h1>
       <div className="p-4 space-y-6">
@@ -138,7 +158,7 @@ const SettingsPage = () => {
               </p>
               <div className="flex justify-end">
                 <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  className="bg-blue-500  cursor-pointer hover:bg-blue-600 text-white px-4 py-2 rounded"
                   onClick={handleDeactivate}
                 >
                   OK
