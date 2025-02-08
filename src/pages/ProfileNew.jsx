@@ -6,6 +6,11 @@ import { setUserDetails, setCoverPicture, updatePostReaction, updateMetrics } fr
 import { useLocation, useParams } from "react-router-dom";
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { IoMdClose } from "react-icons/io";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
+
 
 const ProfilePageNew = () => {
     const dispatch = useDispatch();
@@ -62,20 +67,23 @@ const ProfilePageNew = () => {
 
             const response = await axios.delete(
                 `${import.meta.env.VITE_BASE_URL}/post/delete/${postId}`,
-                {}, // Payload if required
+             
                 { headers, withCredentials: true }
             );
 
-            if (response.ok) {
-                alert("Your post is deleted.");
+            if (response.status===200) {
+                toast.success("Your post is deleted.");
+                //alert("Your post is deleted.");
                 setPosts(posts.filter(post => post._id !== postId));
             } else {
                 const data = await response.json();
-                alert(data.message || "Failed to delete the post");
+                //alert(response.data.message || "Failed to delete the post");
+                toast.error(response.data.message || "Failed to delete the post");
             }
         } catch (error) {
             console.error("Error deleting post:", error);
-            alert("Server error");
+           // alert("Server error");
+           toast.error("Server error");
         }
     };
 
