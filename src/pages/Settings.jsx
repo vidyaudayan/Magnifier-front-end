@@ -71,7 +71,7 @@ console.log("deact", response)
             <span>General Settings</span>
           </button>
           {showGeneralOptions && (
-            <Link to="/reset-password/:token" className="flex items-center gap-3 pl-10 p-3 hover:bg-gray-100 rounded-lg">
+            <Link to="/forgot-password" className="flex items-center gap-3 pl-10 p-3 hover:bg-gray-100 rounded-lg">
               <Lock className="w-5 h-5" />
               <span>Change Password</span>
             </Link>

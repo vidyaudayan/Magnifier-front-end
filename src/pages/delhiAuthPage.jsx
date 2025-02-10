@@ -194,6 +194,11 @@ const AuthDelhi = () => {
             
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`, { phoneNumber,otp: mobileOtp });
             alert(response.data.message);
+            if (response.status === 200) {
+                setToken(response.data.token);
+                toast.success("OTP verified successfully!", { position: "top-center" });
+                setIsMobileOtpVerified(true)
+            }
         } catch (error) {
             console.error(error.response?.data);
     alert(error.response?.data?.error || "Invalid OTP");

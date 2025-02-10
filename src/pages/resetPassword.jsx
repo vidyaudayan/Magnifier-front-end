@@ -29,6 +29,8 @@ const ResetPassword = () => {
         }
       });
       toast.success(response.data.message);
+      setPassword(""); 
+      setConfirmPassword(""); 
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to reset password!");
     }
