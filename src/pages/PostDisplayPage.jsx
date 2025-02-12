@@ -9,20 +9,36 @@ const PostDisplayPage = () => {
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [displayCount, setDisplayCount] = useState(5);
 
-  useEffect(() => {
+  {/*useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const postId = queryParams.get("postId")|| sessionStorage.getItem("postId");
+    let postId = queryParams.get("postId")|| sessionStorage.getItem("postId");
     console.log("Extracted postId:", postId); // Debugging step
     if (!postId) {
-      postId = sessionStorage.getItem("postId"); // Retrieve from storage if missing
-    } else {
-      sessionStorage.setItem("postId", postId); // Store for later use
-    }
+      const storedPostId = sessionStorage.getItem("postId");
+      if (storedPostId) {
+         fetchPostById(storedPostId);
+      }
+   } else {
+      sessionStorage.setItem("postId", postId);
+   }
    
     if (postId) {
       fetchPostById(postId);
     }
-  }, [location.search]);
+  }, [location.search]);*/}
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    let postId = queryParams.get("postId") || sessionStorage.getItem("postId");
+
+    console.log("Extracted postId:", postId); // Debugging step
+
+    if (postId) {
+        sessionStorage.setItem("postId", postId);
+        fetchPostById(postId);
+    }
+}, [location.search]);
+
 
   const fetchPostById = async (postId) => {
     try {
@@ -53,7 +69,8 @@ const PostDisplayPage = () => {
   const handleReaction = (type) => {
     const updatedPost = {
       ...post,
-      [type === "like" ? "likes" : "dislikes"]: (post[type] || 0) + 1,
+      likes: type === "like" ? (post.likes || 0) + 1 : post.likes,
+   dislikes: type === "dislike" ? (post.dislikes || 0) + 1 : post.dislikes,
     };
     setPost(updatedPost);
   };

@@ -33,14 +33,15 @@ const LoginFormShare= () => {
 
       if (response.data.success) {
         const queryParams = new URLSearchParams(location.search);
-        const postId = queryParams.get("postId");
+        let postId = queryParams.get("postId");
         //navigate(postId ? `/post/${postId}` : "/post");
         if (!postId) {
           postId = sessionStorage.getItem("postId"); // Retrieve from storage if missing
         } else {
           sessionStorage.setItem("postId", postId); // Store for later use
         }  
-         
+       
+
         
         navigate(`/displaypost?postId=${postId}`);
         

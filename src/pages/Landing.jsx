@@ -269,22 +269,27 @@ export const LandingPage = () => {
 
     const handleShare = (post) => {
         const postId = post._id; // Use the actual post's ID
-        const isLoggedIn = !!localStorage.getItem("token"); // Check login status
-        const shareUrl = isLoggedIn
+       // const isLoggedIn = !!localStorage.getItem("token"); // Check login status
+       const isLoggedIn = localStorage.getItem("token") !== null; 
+       const shareUrl = isLoggedIn
             ? `${window.location.origin}/login?postId=${postId}`
             : `${window.location.origin}/signup?postId=${postId}`;
-
-        navigator
-            .share({
-                title: "Check out this post!",
-                text: "Here's a great post for you to read!",
-                url: shareUrl,
-            })
-            .then(() => console.log("Successfully shared!"))
-            .catch((error) => console.error("Error sharing:", error));
+            if (navigator.share) {
+                navigator.share({
+                    title: "Check out this post!",
+                    text: "Here's a great post for you to read!",
+                    url: shareUrl,
+                })
+                .then(() => console.log("Successfully shared!"))
+                .catch((error) => console.error("Error sharing:", error));
+            } else {
+                navigator.clipboard.writeText(shareUrl)
+                    .then(() => alert("Link copied to clipboard!"))
+                    .catch((error) => console.error("Failed to copy:", error));
+            }
     };
 
-    const location = useLocation();
+    {/*const location = useLocation();
     const [highlightPostId, setHighlightPostId] = useState(null);
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
@@ -302,7 +307,7 @@ export const LandingPage = () => {
         } catch (error) {
             console.error("Error fetching post:", error);
         }
-    };
+    };*/}
 
     const fetchUserPosts = async () => {
         try {
