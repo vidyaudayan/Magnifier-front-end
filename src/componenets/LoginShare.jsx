@@ -43,13 +43,15 @@ const LoginFormShare= () => {
        
 
         
-        navigate(`/displaypost?postId=${postId}`);
-        
+        //navigate(`/displaypost?postId=${postId}`);
+        navigate("/displaypost");
         fetchUserDetails();
-      }else {
+      }
+      
+      {/*else {
      
         navigate("/landing");
-      }
+      }*/}
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
