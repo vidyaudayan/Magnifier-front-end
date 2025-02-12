@@ -34,10 +34,10 @@ const PostDisplayPage = () => {
     console.log("Extracted postId:", postId); // Debugging step
 
     if (postId) {
-        sessionStorage.setItem("postId", postId);
+        localStorage.setItem("postId", postId);
         fetchPostById(postId);
     }
-}, [location.search, sessionStorage.getItem("postId")]);
+}, [location.search, localStorage.getItem("postId")]);
 
 
   const fetchPostById = async (postId) => {

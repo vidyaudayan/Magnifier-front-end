@@ -39,9 +39,9 @@ const LoginFormShare= () => {
         //navigate(postId ? `/post/${postId}` : "/post");
        
       if (postId) {
-        sessionStorage.setItem("postId", postId); // Store in sessionStorage
+        localStorage.setItem("postId", postId); // Store in sessionStorage
       } else {
-        postId = sessionStorage.getItem("postId"); // Retrieve if missing
+        postId = localStorage.getItem("postId"); // Retrieve if missing
       }
       console.log("Stored/Retrieved postId:", postId);
         
