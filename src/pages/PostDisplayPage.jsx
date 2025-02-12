@@ -37,10 +37,15 @@ const PostDisplayPage = () => {
         sessionStorage.setItem("postId", postId);
         fetchPostById(postId);
     }
-}, [location.search]);
+}, [location.search, sessionStorage.getItem("postId")]);
 
 
   const fetchPostById = async (postId) => {
+    if (!postId) {
+      console.error("No postId provided");
+      return;
+  }
+
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/post/${postId}`
