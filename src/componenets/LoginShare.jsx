@@ -34,17 +34,22 @@ const LoginFormShare= () => {
       if (response.data.success) {
         const queryParams = new URLSearchParams(location.search);
         let postId = queryParams.get("postId");
-        //navigate(postId ? `/post/${postId}` : "/post");
-        if (!postId) {
-          postId = sessionStorage.getItem("postId"); // Retrieve from storage if missing
-        } else {
-          sessionStorage.setItem("postId", postId); // Store for later use
-        }  
-       
 
+        console.log("Extracted postId from URL:", postId);
+        //navigate(postId ? `/post/${postId}` : "/post");
+       
+      if (postId) {
+        sessionStorage.setItem("postId", postId); // Store in sessionStorage
+      } else {
+        postId = sessionStorage.getItem("postId"); // Retrieve if missing
+      }
+      console.log("Stored/Retrieved postId:", postId);
         
         //navigate(`/displaypost?postId=${postId}`);
-        navigate("/displaypost");
+     
+      // Navigate to displaypost with postId
+      navigate(postId ? `/displaypost?postId=${postId}` : "/displaypost");
+
         fetchUserDetails();
       }
       
