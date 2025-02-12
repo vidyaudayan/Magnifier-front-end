@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "./Navbar";
-
+import { Link } from "react-router-dom";
 const UserGuidelines = () => {
   return (
     <div className="min-h-screen min-w-full bg-gray-100 ">
@@ -70,15 +70,15 @@ const UserGuidelines = () => {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold mb-4">10. Contact and Support</h2>
+              <h2 className="text-xl font-semibold mb-4">4.Contact and Support</h2>
               <p>
                 For questions, concerns, or reporting issues, reach out to our support team at:{" "}
-                <a
-                  href="mailto:contactus@magnifier-platform.com"
+                <Link
+                 to={"/contact"}
                   className="text-blue-500 hover:underline"
                 >
                   contactus@magnifier-platform.com
-                </a>
+                </Link>
               </p>
             </section>
           </div>

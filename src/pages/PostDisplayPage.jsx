@@ -11,7 +11,14 @@ const PostDisplayPage = () => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const postId = queryParams.get("postId");
+    const postId = queryParams.get("postId")|| sessionStorage.getItem("postId");
+    console.log("Extracted postId:", postId); // Debugging step
+    if (!postId) {
+      postId = sessionStorage.getItem("postId"); // Retrieve from storage if missing
+    } else {
+      sessionStorage.setItem("postId", postId); // Store for later use
+    }
+   
     if (postId) {
       fetchPostById(postId);
     }

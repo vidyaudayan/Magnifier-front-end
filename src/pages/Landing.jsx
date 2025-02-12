@@ -75,6 +75,16 @@ export const LandingPage = () => {
         totalLikes: 0, totalDislikes: 0
     });
 
+    const [expandedPosts, setExpandedPosts] = useState({});
+
+
+    const handleViewMore = (postId) => {
+        setExpandedPosts((prev) => ({
+          ...prev,
+          [postId]: !prev[postId], // Toggle the expanded state
+        }));
+      };
+
     const handleAddComment = async (postId) => {
         if (!newComment.trim()) return;
 
@@ -633,7 +643,7 @@ export const LandingPage = () => {
                         {/* Post Content */}
                         <div className="mb-4">
                             <p className="text-sm text-gray-800">
-                                {post.content && post.content.split(" ").length > 8 ? (
+                                {post.content && post.content.split(" ").length > 8 && !expandedPosts[post._id]  ? (
                                     <>
                                         {post.content.split(" ").slice(0, 8).join(" ")}...{" "}
                                         <button
@@ -644,7 +654,17 @@ export const LandingPage = () => {
                                         </button>
                                     </>
                                 ) : (
-                                    post.content || "No content available"
+                                    <>
+        {post.content || "No content available"}
+        {post.content.split(" ").length > 8 && (
+          <button
+            className="text-blue-500 hover:underline text-xs ml-2"
+            onClick={() => handleViewMore(post._id)}
+          >
+             Less
+          </button>
+        )}
+      </>
                                 )}
                             </p>
                             {post.postType === "Photo" && (
