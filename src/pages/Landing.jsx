@@ -289,7 +289,7 @@ export const LandingPage = () => {
             }
     };
 
-    {/*const location = useLocation();
+    const location = useLocation();
     const [highlightPostId, setHighlightPostId] = useState(null);
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
@@ -307,7 +307,7 @@ export const LandingPage = () => {
         } catch (error) {
             console.error("Error fetching post:", error);
         }
-    };*/}
+    };
 
     const fetchUserPosts = async () => {
         try {
