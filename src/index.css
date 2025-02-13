@@ -2,5 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-
+.slides{
+    overflow: hidden;
+  white-space: nowrap;
+  }
+  
+  .slide{
+  display: inline-block;
+  animation: 35s slide infinite linear;
+  }
+  .slide span{
+  height: 50px;
+  }
+  .slides:hover .slide{
+    animation-play-state: paused;
+  }
+  @keyframes slide {
+    from{
+      transform: translateX(0);
+    }
+  to{
+      transform: translateX(-100%);
+    }
+  }
   

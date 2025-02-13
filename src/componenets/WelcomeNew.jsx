@@ -4,6 +4,7 @@ import biharMap from '../assets/Images/bihar.jpg';
 import bengalMap from '../assets/Images/westbengal.jpg';
 import { Link } from "react-router-dom";
 import Footer from "./Footer";
+import Marquee from "./Marquee";
 const WelcomeNew = () => {
   return (
     <div className="h-80  bg-[url('./assets/Images/background7.avif')] bg-cover  bg-center  text-white">
@@ -29,7 +30,10 @@ const WelcomeNew = () => {
         </h2>
         
       </div>
-      <div className="flex flex-col items-center justify-center pt-24 text-center ">
+     
+      <div className="flex flex-col items-center justify-center pt-16 lg:pt-5 text-center ">
+      <Marquee/>
+      
       <p className="text-xl md:text-xl font-bold pt-10 text-black">
         अपने राज्य पर क्लिक करें 
         </p>

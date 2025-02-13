@@ -9,23 +9,7 @@ const PostDisplayPage = () => {
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [displayCount, setDisplayCount] = useState(5);
 
-  {/*useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    let postId = queryParams.get("postId")|| sessionStorage.getItem("postId");
-    console.log("Extracted postId:", postId); // Debugging step
-    if (!postId) {
-      const storedPostId = sessionStorage.getItem("postId");
-      if (storedPostId) {
-         fetchPostById(storedPostId);
-      }
-   } else {
-      sessionStorage.setItem("postId", postId);
-   }
-   
-    if (postId) {
-      fetchPostById(postId);
-    }
-  }, [location.search]);*/}
+  
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);

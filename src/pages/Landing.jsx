@@ -24,8 +24,11 @@ import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/user/userSlice.js";
 import UserSearch from "../componenets/UserSearch.jsx";
 
+
 //import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
 export const LandingPage = () => {
+
+
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
     //const { walletAmount,  postCount } = useSelector((state) => state.user);
@@ -507,8 +510,7 @@ export const LandingPage = () => {
                     <div className="relative inline-block">
                         <Link to="/profile"
                             className="text-lg font-semibold cursor-pointer"
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
+                          
                         >
                             {user?.username}
                         </Link>
@@ -637,7 +639,7 @@ export const LandingPage = () => {
 
 
                             <div>
-                                <p className="text-sm font-semibold">{post?.userId?.username || "Unknown User"}</p>
+                                <Link to={`/profile/${post.userId?._id}`} className="text-sm font-semibold">{post?.userId?.username || "Unknown User"}</Link>
 
 
                                 <p className="text-xs text-gray-500">{post.createdAt ? formatDate(post.createdAt) : "Loading..."}</p>

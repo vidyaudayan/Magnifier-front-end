@@ -48,7 +48,15 @@ const LoginFormShare= () => {
         //navigate(`/displaypost?postId=${postId}`);
      
       // Navigate to displaypost with postId
-      navigate(postId ? `/displaypost?postId=${postId}` : "/displaypost");
+      //navigate(postId ? `/displaypost?postId=${postId}` : "/displaypost");
+
+      if (postId) {
+        setTimeout(() => {
+          navigate(`/displaypost?postId=${postId}`);
+        }, 500); // Delay to ensure storage
+      } else {
+        navigate("/displaypost"); // Default case
+      }
 
         fetchUserDetails();
       }

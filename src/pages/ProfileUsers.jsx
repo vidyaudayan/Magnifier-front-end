@@ -13,7 +13,7 @@ import { ToastContainer } from 'react-toastify';
 
 
 
-const ProfilePageNew = () => {
+const  ProfilePageUsers = () => {
     const dispatch = useDispatch();
     const { userId } = useParams();
 
@@ -94,7 +94,7 @@ const ProfilePageNew = () => {
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/userprofile`, {
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/userprofile/${userId}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 }, { withCredentials: true });
                 //setUser(response.data);
@@ -109,9 +109,7 @@ const ProfilePageNew = () => {
 
         const fetchUserPosts = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/userPosts`, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                });
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/posts/${userId}`, );
                 setPosts(response.data.data);
             } catch (error) {
                 console.error("Error fetching user posts:", error);
@@ -213,11 +211,11 @@ const ProfilePageNew = () => {
 
                                     {/* Three Dots Icon */}
                                     <div className="flex justify-between">
-                                    <button  className="relative z-10" onClick={() => setShowOverlay(showOverlay === post._id ? null : post._id)}>
+                                    {/*<button  className="relative z-10" onClick={() => setShowOverlay(showOverlay === post._id ? null : post._id)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-6 h-6 text-gray-600" viewBox="0 0 16 16">
                                             <path d="M3 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm5 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm5 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
                                         </svg>
-                                    </button>
+                                    </button>*/}
                                     </div>
                                 </div>
 
@@ -326,4 +324,4 @@ const ProfilePageNew = () => {
     );
 };
 
-export default ProfilePageNew;
+export default ProfilePageUsers;
