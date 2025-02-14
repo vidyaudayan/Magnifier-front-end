@@ -472,7 +472,7 @@ export const LandingPage = () => {
     }
 
     return (
-        <div className="min-h-screen  bg-gray-100 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-28 mt-20">
+        <div className="min-h-screen  bg-slate-50 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-28 mt-20">
             <NavbarLanding />
       
             {/* Left Section */}
@@ -678,7 +678,7 @@ export const LandingPage = () => {
                                 <img
                                     src={post.mediaUrl}
                                     alt="Post Media"
-                                    className="w-full rounded-md mt-3"
+                                    className="w-full h-[450px] object-cover rounded-md mt-3"
                                 />
                             )}
                             {post.postType === "VoiceNote" && (

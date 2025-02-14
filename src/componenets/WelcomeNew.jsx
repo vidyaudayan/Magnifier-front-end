@@ -32,7 +32,7 @@ const WelcomeNew = () => {
       </div>
      
       <div className="flex flex-col items-center justify-center pt-16 lg:pt-5 text-center ">
-      <Marquee/>
+      
       
       <p className="text-xl md:text-xl font-bold pt-10 text-black">
         अपने राज्य पर क्लिक करें 
