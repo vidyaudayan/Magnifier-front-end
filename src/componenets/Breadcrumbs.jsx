@@ -4,9 +4,9 @@ import { House ,UserPen} from 'lucide-react';
     '/': <House />,
     '/profile': <UserPen />,
     '/landing': 'Live Feed',
-    '/user': 'User',
+    '/user': 'user',
     '/profile/:userId': 'User Profile',
-    '/user/:userId/posts': 'Posts',
+    '/user/:userId/posts': 'Live Feed',
   };
   
   const BreadCrumbs = () => {

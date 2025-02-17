@@ -52,6 +52,13 @@ export const userSlice = createSlice({
       state.posts = [];
      
       const newPosts = action.payload;
+       // Ensure we update the correct post while keeping the rest unchanged
+    state.posts = state.posts.map((post) =>
+      newPosts.find((updatedPost) => updatedPost._id === post._id)
+          ? newPosts.find((updatedPost) => updatedPost._id === post._id)
+          : post
+  );
+
 
     // Remove duplicate posts by checking the post ID
     const existingPostIds = new Set(state.posts.map(post => post._id));

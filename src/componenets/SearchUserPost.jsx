@@ -179,7 +179,7 @@ const SearchUserPost = () => {
             )}
           </p>
           {post.postType === 'Photo' && (
-            <img src={post.mediaUrl} alt="Post Media" className="lg:w-1/2 rounded-md mt-3 shadow-md" />
+            <img src={post.mediaUrl} alt="Post Media" className="lg:w-1/2 rounded-md h-80 w-full object-cover mt-3 shadow-md" />
           )}
           {post.postType === 'VoiceNote' && (
             <audio controls src={post.mediaUrl} className="lg:w-1/2 mt-3 rounded-md" />

@@ -31,6 +31,8 @@ export const LandingPage = () => {
 
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
+   
+   
     //const { walletAmount,  postCount } = useSelector((state) => state.user);
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
@@ -44,13 +46,14 @@ export const LandingPage = () => {
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
+    
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [postOverlayOpen, setPostOverlayOpen] = useState(false);
     const [postContent, setPostContent] = useState("");
     const [photo, setPhoto] = useState(null);
     const [VoiceNote, setVoiceNote] = useState(null);
-    //const [posts, setPosts] = useState([]);
+    const [post, setPostss] = useState([]);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [profilePic, setProfilePic] = useState("");
     const [username, setUsername] = useState("Username");
@@ -103,9 +106,17 @@ export const LandingPage = () => {
             );
 
             // Update posts
-            setPosts(
+            {/*setPosts(
                 posts.map((post) => (post._id === postId ? response.data : post))
-            );
+            );*/}
+
+            const updatedPost = response.data; // Updated post received from backend
+
+            dispatch(setPosts(posts.map((post) =>
+                post._id === postId ? { ...post, comments: updatedPost.comments } : post
+            )));
+    
+            
             setNewComment("");
         } catch (error) {
             console.error("Error adding comment:", error);
@@ -132,7 +143,16 @@ export const LandingPage = () => {
             {/*setPosts(prevPosts =>
     prevPosts.map(p => p._id === postId ? { ...p, ...post } : p)
 );*/}
-            dispatch(updatePostReaction({ postId, updatedPost: post }));
+            //dispatch(updatePostReaction({ postId, updatedPost: post }));
+
+            dispatch(updatePostReaction({
+                postId,
+                updatedPost: {
+                    ...post,
+                    userId: posts.find(p => p._id === postId)?.userId || post.userId, // Keep existing userId data
+                }
+            }));
+            
             dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
 
 
@@ -346,7 +366,7 @@ export const LandingPage = () => {
                     withCredentials: true,
                 });;
                 //setPosts(response.data); // Assuming API returns an array of posts
-
+                setPostss(response.data);
                 {/*const fetchedPosts = response.data || []; // Ensure it's an array
                 setPosts(fetchedPosts.map(post => ({
                     ...post,
@@ -696,9 +716,11 @@ export const LandingPage = () => {
                                 <p className="hover:text-green-500">{post.likes || 0} Likes</p>
                                 <p className="hover:text-red-500">{post.dislikes || 0} Dislikes</p>
                             </div>
+                           
                             <div className="px-1">
                                 <p onClick={() => setCommentsVisible((prev) => !prev)} className="hover:text-blue-500 ">{post.comments?.length || 0} Comments</p>
                             </div>
+                         
                         </div>
 
                         {/* Action Buttons */}
