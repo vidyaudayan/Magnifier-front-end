@@ -9,8 +9,13 @@ export default {
       animation: {
         pulse: 'pulse 1s infinite', // Animation that repeats infinitely
         bounce: 'bounce 1s infinite', // You can use bounce or any other animation you prefer
+        fadeIn: "fadeIn 1.5s ease-in-out",
       },
       keyframes: {
+        fadeIn: {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 1 },
+        },
         pulse: {
           '0%': { opacity: '0.5' },
           '100%': { opacity: '1' },

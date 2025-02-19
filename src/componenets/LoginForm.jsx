@@ -85,6 +85,9 @@ const LoginForm = () => {
 
   return (
     <div className=" h-96 ml-5 mr-20 mt-6  bg-gradient-to-r from-slate-100 to-slate-100 p-6 rounded-lg shadow-md">
+         <p className="text-center text-md font-semibold text-gray-700  animate-pulse bounce">
+  If you are a registered user, Please <span className="text-blue-600 ">login here</span>
+</p>
       <h2 className="text-2xl text-center font-bold text-gray-800 mb-4">Log In</h2>
       <form className="lg:w-96 flex flex-col items-center" onSubmit={handleSubmit(onSubmit)}>
         {/* Username Field */}

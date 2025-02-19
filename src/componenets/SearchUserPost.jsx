@@ -14,6 +14,7 @@ const SearchUserPost = () => {
     const { userId } = useParams();
     const [posts, setPosts] = useState([]);
     const [user, setUser] = useState(null);
+    const [displayCount, setDisplayCount] = useState(6);
     const [newComment, setNewComment] = useState("");
     const [commentsVisible, setCommentsVisible] = useState(false);
     //const user = useSelector(state => state?.user?.user)

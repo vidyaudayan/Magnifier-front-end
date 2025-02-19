@@ -211,7 +211,10 @@ const AuthDelhi = () => {
             <div className=" max-w-5xl lg:w-[600px]  flex flex-wrap lg:mr-10  gap-0 p-6">
                 {/* Signup Form */}
                 <div className="w-full p-6 rounded-lg  shadow-md bg-gradient-to-r sm:flex-col from-slate-100 to-slate-100">
-                    <h2 className="text-2xl text-center  font-bold text-gray-800 mb-4">Sign Up </h2>
+                <p className="text-center text-md font-semibold text-gray-700  animate-pulse bounce">
+  If you are a new user, Please <span className="text-blue-600 ">register here</span>
+</p>
+                    <h2 className="text-2xl text-center  font-bold text-gray-800 mb-4 mt-2">Sign Up </h2>
                     <form className="" onSubmit={handleSignupSubmit(onSignupSubmit)}>
                         <input
                             type="text"

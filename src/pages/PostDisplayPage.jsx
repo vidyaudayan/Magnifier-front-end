@@ -76,7 +76,7 @@ const PostDisplayPage = () => {
           {post.content || "No content available"}
         </p>
         {post.postType === "Photo" && (
-          <img src={post.mediaUrl} alt="Post Media" className="w-full rounded-md mt-3" />
+          <img src={post.mediaUrl} alt="Post Media" className="w-48  object-cover rounded-md mt-3" />
         )}
         {post.postType === "VoiceNote" && (
           <audio controls src={post.mediaUrl} className="w-full mt-3" />

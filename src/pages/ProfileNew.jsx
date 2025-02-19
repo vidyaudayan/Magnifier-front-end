@@ -224,7 +224,7 @@ const ProfilePageNew = () => {
 
 
 
-                                {post.postType === "Photo" && <img src={post.mediaUrl} alt="Post" className="max-w-full rounded-lg mb-4" />}
+                                {post.postType === "Photo" && <img src={post.mediaUrl} alt="Post" className="w-full h-80 object-cover rounded-lg mb-4" />}
                                 < p className="text-gray-800" > {post.content}</p>
 
  {/* Overlay for Delete Option */}
