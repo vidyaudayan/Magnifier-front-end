@@ -7,6 +7,7 @@ import { clearUserDetails } from "../features/user/userSlice";
 import axios from "axios";
 import { toast } from "react-toastify";
 import BreadCrumbs from "./Breadcrumbs";
+import BreadCrumbsNew from "./BreadcrumbsNew";
 const NavbarLanding = ({ onUserSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const user = useSelector((state) => state.user.user);
@@ -158,7 +159,7 @@ console.log("searchuser",response)
       
     </nav>
     <div className="bg-slate-100 p-1 pl-3 lg:pl-10">
-      <BreadCrumbs />
+      <BreadCrumbsNew/>
     </div>
 
     {isOpen && (

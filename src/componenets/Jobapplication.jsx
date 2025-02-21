@@ -3,10 +3,12 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Navbar from './Navbar';
+import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 
 const Jobapplication = () => {
+  const [submitting, setSubmitting] = useState(false);
   const navigate= useNavigate()
     const {
         register: registerJob,
@@ -17,6 +19,7 @@ const Jobapplication = () => {
     
       const onJobSubmit = async (data) => {
         const formData = new FormData();
+        
     
         // Check if 'resume' is not empty and is a file object
         if (data.resume && data.resume.length > 0) {
@@ -35,6 +38,8 @@ const Jobapplication = () => {
         for (let pair of formData.entries()) {
             console.log(pair[0], pair[1]);
         }
+
+        setSubmitting(true);
     
         try {
           const token = localStorage.getItem('token');
@@ -45,7 +50,10 @@ const Jobapplication = () => {
             console.log("Job application submitted successfully:", response);
             toast.success("Job application submitted!");
             resetJobForm();
-            navigate('/login')
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+    setSubmitting(false);
+            navigate('/joblogin')
+
         } catch (error) {
             console.log("Error submitting job application:", error.response || error.message);
         
@@ -182,9 +190,19 @@ const Jobapplication = () => {
       
             <button
               type="submit"
-              className="w-full py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors"
-            >
-              Submit Job Application
+              //className="w-full py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+              disabled={submitting}
+              className={`px-4 py-2 bg-blue-600 text-white rounded flex items-center justify-center ${
+                submitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-800"
+              }`}
+           
+           >
+             
+              {submitting ? (
+        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      ) : (
+        " Submit Job Application"
+      )}
             </button>
           </form>
         </div>

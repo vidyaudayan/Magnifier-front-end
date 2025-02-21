@@ -39,6 +39,7 @@ import SearchUserPost from './componenets/SearchUserPost.jsx';
 import ProfilePageNew from './pages/ProfileNew.jsx';
 import SettingsPage from './pages/Settings.jsx';
 import ProfilePageUsers from './pages/ProfileUsers.jsx';
+import LoginJob from './componenets/Loginjob.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -64,6 +65,14 @@ const router = createBrowserRouter([
       },
       {
         path: "/login",
+        element:<LoginForm/>,
+      },
+      {
+        path: "/joblogin",
+        element:<LoginJob/>,
+      },
+      {
+        path: "/loginshare",
         element:<LoginFormShare/>,
       },
       {

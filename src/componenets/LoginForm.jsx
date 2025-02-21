@@ -2,6 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useState } from "react";
 import { useContext } from "react";
 import Context from "../context/context.jsx";
 import {useLocation, useNavigate } from 'react-router-dom';
@@ -13,6 +14,7 @@ const LoginForm = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const {fetchUserDetails}= useContext(Context)
   const {
     register,
@@ -23,6 +25,7 @@ const LoginForm = () => {
   const [walletAmount, setWalletAmount] = useWallet();
 
   const onSubmit =async (data) => {
+    setLoading(true);
     console.log("Login Data:", data);
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`, data, {
@@ -74,7 +77,8 @@ const LoginForm = () => {
       toast.success("You are logged in")
       navigate('/landing')
       resetLoginForm()
-      console.log(response);
+      
+    
       
       
     } catch (error) {
@@ -85,54 +89,54 @@ const LoginForm = () => {
 
   return (
     <div className=" h-96 ml-5 mr-20 mt-6  bg-gradient-to-r from-slate-100 to-slate-100 p-6 rounded-lg shadow-md">
-         <p className="text-center text-md font-semibold text-gray-700  animate-pulse bounce">
-  If you are a registered user, Please <span className="text-blue-600 ">login here</span>
+    <p className="text-center text-md font-semibold text-gray-700  animate-pulse bounce">
+If you are a registered user, Please <span className="text-blue-600 ">login here</span>
 </p>
-      <h2 className="text-2xl text-center font-bold text-gray-800 mb-4">Log In</h2>
-      <form className="lg:w-96 flex flex-col items-center" onSubmit={handleSubmit(onSubmit)}>
-        {/* Username Field */}
-        <input
-          type="text"
-          placeholder="Username"
-          className="w-full mb-3 p-2 border border-slate-400 rounded"
-          {...register("username", { required: "Username is required" })}
-        />
-        {errors.username && (
-          <p className="text-red-500 text-sm">{errors.username.message}</p>
-        )}
+ <h2 className="text-2xl text-center font-bold text-gray-800 mb-4">Log In</h2>
+ <form className="lg:w-96 flex flex-col items-center" onSubmit={handleSubmit(onSubmit)}>
+   {/* Username Field */}
+   <input
+     type="text"
+     placeholder="Username"
+     className="w-full mb-3 p-2 border border-slate-400 rounded"
+     {...register("username", { required: "Username is required" })}
+   />
+   {errors.username && (
+     <p className="text-red-500 text-sm">{errors.username.message}</p>
+   )}
 
-        {/* Password Field */}
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full mb-3 p-2 border border-slate-400 rounded"
-          {...register("password", { required: "Password is required" })}
-        />
-        {errors.password && (
-          <p className="text-red-500 text-sm">{errors.password.message}</p>
-        )}
+   {/* Password Field */}
+   <input
+     type="password"
+     placeholder="Password"
+     className="w-full mb-3 p-2 border border-slate-400 rounded"
+     {...register("password", { required: "Password is required" })}
+   />
+   {errors.password && (
+     <p className="text-red-500 text-sm">{errors.password.message}</p>
+   )}
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-800 text-white py-2 rounded"
-        >
-          Log In
-        </button>
-      </form>
+   {/* Submit Button */}
+   <button
+     type="submit"
+     className="w-full bg-blue-600 hover:bg-blue-800 text-white py-2 rounded"
+   >
+     Log In
+   </button>
+ </form>
 
-      <div className="w-full text-left mt-2">
-  <button
-    type="button"
-    className="text-slate-500 hover:underline"
-    onClick={() => navigate("/forgot-password")}
-  >
-    Forgot Password?
-  </button>
+ <div className="w-full text-left mt-2">
+<button
+type="button"
+className="text-slate-500 hover:underline"
+onClick={() => navigate("/forgot-password")}
+>
+Forgot Password?
+</button>
 </div>
 
-    </div>
-  );
+</div>
+  )        
 };
 
 export default LoginForm;

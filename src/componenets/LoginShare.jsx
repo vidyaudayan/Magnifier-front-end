@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { setUserDetails } from "../features/user/userSlice.js";
 import useWallet from "./hooks/useWallet.jsx";
 import { Link } from "react-router-dom";
+import Navbar from "./Navbar.jsx";
 const LoginFormShare= () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -97,6 +98,7 @@ const LoginFormShare= () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-slate-50">
+     <Navbar/>
       <div className="w-full max-w-md p-8 bg-white shadow-xl rounded-xl">
         <h2 className="text-3xl font-semibold text-center text-blue-700 mb-6">
           Log In
@@ -137,7 +139,7 @@ const LoginFormShare= () => {
 
           {/* Submit Button */}
           <button
-            type="submit"
+            type="submit" onClick={() => navigate("/displaypost")}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition duration-300"
           >
             Log In

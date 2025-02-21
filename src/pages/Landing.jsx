@@ -46,7 +46,8 @@ export const LandingPage = () => {
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
-    
+    const [submitting, setSubmitting] = useState(false);
+    const [stickyDuration, setStickyDuration] = useState("3600000");
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [postOverlayOpen, setPostOverlayOpen] = useState(false);
@@ -193,7 +194,7 @@ export const LandingPage = () => {
         };
 
         //setPosts((prevPosts) => [tempPost, ...prevPosts]);
-
+           setLoading(true)
         try {
             const formData = new FormData();
 
@@ -206,6 +207,8 @@ export const LandingPage = () => {
             formData.append('content', postContent || '');
             if (photo) formData.append("media", photo);
             if (VoiceNote) formData.append("media", VoiceNote);
+            formData.append("stickyDuration", stickyDuration);
+           
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
 
@@ -221,7 +224,8 @@ export const LandingPage = () => {
                     post._id === tempPostId ? response.data : post
                 )
             );*/}
-
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            setLoading(false);
             toast.success("Post created. Admin will review it before publishing.");
         } catch (error) {
             console.error("Error creating post:", error);
@@ -619,6 +623,7 @@ export const LandingPage = () => {
                     <div
                         className="ml-4 bg-gray-50 border border-gray-300 rounded-md p-2 w-full cursor-pointer"
                         onClick={() => setPostOverlayOpen(true)}
+                    
                     >
                         Write a post...
                     </div>
@@ -867,6 +872,31 @@ export const LandingPage = () => {
                                     placeholder="What's on your mind?"
                                     className="w-full border border-gray-300 rounded-md p-3 mb-4 text-sm focus:outline-none focus:ring focus:ring-blue-200 resize-none"
                                 />
+
+
+                            {/* Sticky Duration Dropdown */}
+            <div className="mb-6">
+              <label className="block  text-gray-700 mb-2">
+                Display your  post on Top For:
+              </label>
+              <select
+                value={stickyDuration}
+                onChange={(e) => setStickyDuration(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded  focus:outline-none focus:ring-2 focus:ring-blue-200"
+              >
+                <option value="3600000">1 Hour</option>
+                <option value="10800000">3 Hours</option>
+                <option value="21600000">6 Hours</option>
+                <option value="43200000">12 Hours</option>
+              </select>
+              {parseInt(stickyDuration) > 3600000 && (
+                <p className="mt-1 text-red-500 text-sm">
+                  For durations longer than 1 hour, please contact support.
+                </p>
+              )}
+            </div>
+
+
                                 <div className="flex items-center justify-between">
                                     <div className="flex space-x-4">
                                         <label className="bg-gray-100 p-2 rounded-md hover:bg-gray-200 cursor-pointer">
