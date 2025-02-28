@@ -23,7 +23,7 @@ import { setPosts } from "../features/user/userSlice.js";
 import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/user/userSlice.js";
 import UserSearch from "../componenets/UserSearch.jsx";
-
+import { FaThumbtack } from "react-icons/fa";
 
 //import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
 export const LandingPage = () => {
@@ -31,13 +31,13 @@ export const LandingPage = () => {
 
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
-   
+  // const { user } = useSelector((state) => state.user);
    
     //const { walletAmount,  postCount } = useSelector((state) => state.user);
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
     // Access Redux state
-    const { posts, walletAmount, totalLikes, totalDislikes, postCount, } = useSelector(
+    const {posts, walletAmount, totalLikes, totalDislikes, postCount, } = useSelector(
         (state) => state.user
     );
 
@@ -207,7 +207,7 @@ export const LandingPage = () => {
             formData.append('content', postContent || '');
             if (photo) formData.append("media", photo);
             if (VoiceNote) formData.append("media", VoiceNote);
-            formData.append("stickyDuration", stickyDuration);
+            //formData.append("stickyDuration", stickyDuration);
            
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
@@ -423,14 +423,14 @@ export const LandingPage = () => {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 }, { withCredentials: true });
                 setMetrics(response.data);
-                const { walletAmount, totalLikes, totalDislikes, postCount } = response.data;
+                const {  userName, profilePicture,walletAmount, totalLikes, totalDislikes, postCount } = response.data;
 
                 // Dispatch fetched metrics to Redux store
                 dispatch(
                     updateMetrics({
                         walletAmount,
                         totalLikes, totalDislikes,
-                        postCount,
+                        postCount, userName, profilePicture,
                     })
                 )
 
@@ -494,6 +494,20 @@ export const LandingPage = () => {
         setSearchQuery(e.target.value);
         setSelectedUser(null); // Clear selected user if query changes
     }
+
+    
+useEffect(() => {
+    const interval = setInterval(async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, ); 
+            dispatch(setPosts(response.data)); // Update Redux store
+        } catch (error) {
+            console.error("Error fetching posts:", error.response ? error.response.data : error.message);
+        }
+    }, 300000); 
+
+    return () => clearInterval(interval);
+}, [dispatch]);
 
     return (
         <div className="min-h-screen  bg-slate-50 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-28 mt-20">
@@ -631,15 +645,26 @@ export const LandingPage = () => {
                 </div>
 
                 {/* Posts Section */}
-                {posts.map((post) => (
+                {posts.map((post,index) => (
                     <div
                         key={post._id}
                         // className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4"
-                        className={`bg-white ${post._id === highlightPostId ? "bg-yellow-300" : ""
-                            } border border-gray-300 rounded-lg shadow-sm mb-6 p-4 ${selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""
-                            }`}
-
+                       //className={`bg-white ${post._id === highlightPostId ? "bg-yellow-300" : ""
+                            //} border border-gray-300 rounded-lg shadow-sm mb-6 p-4 ${selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""
+                           // }`}
+                           className={`relative bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4 
+                            ${post._id === highlightPostId ? "bg-yellow-300" : ""} 
+                            ${selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""}`}
+                           
                     >
+
+                          {/* 📌 Pin Icon for Pinned Posts */}
+        {post.sticky && (
+            <div className="absolute top-2 right-2 text-yellow-500">
+                <FaThumbtack size={20} />
+            </div>
+        )}
+
                         {/* Header: User Image, Name, and Date */}
                         <div className="flex items-center space-x-4 mb-4">
                             {post.userId?.profilePic ? (

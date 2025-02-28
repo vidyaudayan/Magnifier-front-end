@@ -32,7 +32,8 @@ export const userSlice = createSlice({
       console.log('Cover picture updated', action.payload);
     },
     updateMetrics: (state, action) => {
-      const { walletAmount,totalLikes, totalDislikes, postCount } = action.payload;
+      const {userName, profilePicture, walletAmount,totalLikes, totalDislikes, postCount } = action.payload;
+      state.user = { ...state.user, userName, profilePicture }; 
       state.walletAmount = walletAmount;
       state.totalLikes = totalLikes;
       state.totalDislikes = totalDislikes;
@@ -46,7 +47,7 @@ export const userSlice = createSlice({
       );
       console.log('Post reaction updated:', action.payload);
     },
-    setPosts: (state, action) => {
+    /*setPosts: (state, action) => {
       //state.posts = action.payload;
       //console.log('Posts fetched:', action.payload);
       state.posts = [];
@@ -70,7 +71,25 @@ export const userSlice = createSlice({
     state.posts = [...uniquePosts];
     console.log('Posts fetched:', state.posts);
     
-    },
+    },*/
+    setPosts: (state, action) => {
+      state.posts = [];
+  
+      const newPosts = action.payload;
+  
+      // Separate sticky and non-sticky posts
+      const stickyPosts = newPosts.filter(post => post.sticky && new Date(post.stickyUntil) > new Date());
+      const normalPosts = newPosts.filter(post => !post.sticky || new Date(post.stickyUntil) <= new Date());
+  
+      // Sort sticky posts by `stickyUntil` (most recent ones first)
+      stickyPosts.sort((a, b) => new Date(b.stickyUntil) - new Date(a.stickyUntil));
+  
+      // Merge sticky and normal posts, with sticky posts appearing first
+      state.posts = [...stickyPosts, ...normalPosts];
+  
+      console.log('Posts updated with sticky posts first:', state.posts);
+  },
+
     clearUserDetails: (state) => {
       state.user = null;
       state.profilePicture = null;

@@ -21,7 +21,7 @@ const BreadCrumbsNew = () => {
   const pathnames = location.pathname.split("/").filter((x) => x);
 
   return (
-    <nav className="text-sm text-gray-500 w-full flex flex-row bg-white px-4 py-2">
+    <nav className="text-sm text-gray-500 w-full flex flex-row bg-white-900  py-2">
       <ol className="flex flex-row gap-2">
         {/* Home Breadcrumb */}
         <li className="flex items-center">
@@ -29,6 +29,7 @@ const BreadCrumbsNew = () => {
             <House className="w-6 h-6 mr-1" /> 
           </button>
         </li>
+        
 
         {/* Other Breadcrumb Items */}
         {pathnames.map((value, index) => {           // Convert numbers to :userId
