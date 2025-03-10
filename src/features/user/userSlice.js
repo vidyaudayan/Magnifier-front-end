@@ -73,22 +73,44 @@ export const userSlice = createSlice({
     
     },*/
     setPosts: (state, action) => {
-      state.posts = [];
+     
   
-      const newPosts = action.payload;
+      {/*const newPosts = action.payload;
   
       // Separate sticky and non-sticky posts
       const stickyPosts = newPosts.filter(post => post.sticky && new Date(post.stickyUntil) > new Date());
       const normalPosts = newPosts.filter(post => !post.sticky || new Date(post.stickyUntil) <= new Date());
   
       // Sort sticky posts by `stickyUntil` (most recent ones first)
-      stickyPosts.sort((a, b) => new Date(b.stickyUntil) - new Date(a.stickyUntil));
+      stickyPosts.sort((a, b) => new Date(b.stickyUntil) - new Date(a.stickyUntil));*/}
   
-      // Merge sticky and normal posts, with sticky posts appearing first
-      state.posts = [...stickyPosts, ...normalPosts];
-  
-      console.log('Posts updated with sticky posts first:', state.posts);
+
+      const now = new Date();
+
+  // Filter sticky posts correctly
+  const stickyPosts = action.payload.filter(post => 
+      post.sticky && 
+      post.stickyUntil && 
+      new Date(post.stickyUntil) > now // Ensure it's still within the sticky time
+  );
+
+  // Filter normal posts (including expired sticky posts)
+  const normalPosts = action.payload.filter(post => 
+      !post.sticky || !post.stickyUntil || new Date(post.stickyUntil) <= now
+  );
+
+  // Sort sticky posts by `createdAt` (newer sticky posts first)
+  stickyPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  // Merge sticky posts first, followed by normal posts
+  state.posts = [...stickyPosts, ...normalPosts];
+
+  console.log("Sticky Posts:", stickyPosts);
+  console.log("All Posts (Sticky First):", state.posts);;
   },
+
+ 
+
 
     clearUserDetails: (state) => {
       state.user = null;

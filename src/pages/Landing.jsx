@@ -41,13 +41,23 @@ export const LandingPage = () => {
         (state) => state.user
     );
 
-
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+      
     //const posts = useSelector(state => state.posts?.posts|| []);
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
     const [submitting, setSubmitting] = useState(false);
     const [stickyDuration, setStickyDuration] = useState("3600000");
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedDuration, setSelectedDuration] = useState(null);
+    
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [postOverlayOpen, setPostOverlayOpen] = useState(false);
@@ -84,6 +94,11 @@ export const LandingPage = () => {
 
     const [expandedPosts, setExpandedPosts] = useState({});
 
+
+    const handleDurationClick = (durationText) => {
+        setSelectedDuration(durationText);
+        setShowPopup(true);
+      };
 
     const handleViewMore = (postId) => {
         setExpandedPosts((prev) => ({
@@ -299,7 +314,7 @@ export const LandingPage = () => {
        // const isLoggedIn = !!localStorage.getItem("token"); // Check login status
        const isLoggedIn = localStorage.getItem("token") !== null; 
        const shareUrl = isLoggedIn
-            ? `${window.location.origin}/login?postId=${postId}`
+            ? `${window.location.origin}/displaypost?postId=${postId}`
             : `${window.location.origin}/signup?postId=${postId}`;
             if (navigator.share) {
                 navigator.share({
@@ -509,6 +524,28 @@ useEffect(() => {
     return () => clearInterval(interval);
 }, [dispatch]);
 
+const handleOkClick = () => {
+    const postData = {
+      content: postContent,
+      media: photoPreview,
+      voiceNote: VoiceNote,
+    };
+  
+    localStorage.setItem("pendingPost", JSON.stringify(postData));
+    navigate("/pricing"); // Redirect to pricing page
+  };
+  
+  useEffect(() => {
+    const savedPost = JSON.parse(localStorage.getItem("pendingPost"));
+    if (savedPost) {
+      setPostContent(savedPost.content || "");
+      setPhotoPreview(savedPost.media || null);
+      setVoiceNote(savedPost.voiceNote || null);
+      setStickyDuration(savedPost.stickyDuration || ""); // Now it includes the selected duration
+    }
+  }, []);
+  
+
     return (
         <div className="min-h-screen  bg-slate-50 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-28 mt-20">
             <NavbarLanding />
@@ -693,6 +730,7 @@ useEffect(() => {
 
 
                                 <p className="text-xs text-gray-500">{post.createdAt ? formatDate(post.createdAt) : "Loading..."}</p>
+
                             </div>
 
                         </div>
@@ -906,20 +944,43 @@ useEffect(() => {
               </label>
               <select
                 value={stickyDuration}
-                onChange={(e) => setStickyDuration(e.target.value)}
+                onChange={(e) => {
+                    setStickyDuration(e.target.value);
+                    handleDurationClick(e.target.options[e.target.selectedIndex].text);
+                  }}
+                
                 className="w-full p-2 border border-gray-300 rounded  focus:outline-none focus:ring-2 focus:ring-blue-200"
               >
+             
                 <option value="3600000">1 Hour</option>
                 <option value="10800000">3 Hours</option>
                 <option value="21600000">6 Hours</option>
                 <option value="43200000">12 Hours</option>
               </select>
-              {parseInt(stickyDuration) > 3600000 && (
-                <p className="mt-1 text-red-500 text-sm">
-                  For durations longer than 1 hour, please contact support.
-                </p>
-              )}
+              {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white w-72 h-54 p-5 rounded shadow-lg">
+            <p className="mb-4">
+              Hi {user.username}, Pin Posts are a premium service on the Web Magnifier platform. To view pricing and available time slots, please click on Ok
+            </p>
+            <button
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 hover:scale-105 text-white rounded"
+              onClick={() => setShowPopup(false)}
+            >
+              Close
+            </button>
+            <button
+                className="px-4 py-2 ml-2 w-16 bg-blue-500 hover:bg-blue-600 hover:scale-105 text-white rounded"
+                onClick={handleOkClick} 
+              >
+                OK
+              </button>
+          </div>
+        </div>
+      )}
             </div>
+
+            
 
 
                                 <div className="flex items-center justify-between">

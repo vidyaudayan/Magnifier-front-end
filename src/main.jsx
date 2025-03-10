@@ -17,7 +17,7 @@ import WelcomeNew from './componenets/WelcomeNew.jsx';
 
 import DelhiSignup from './componenets/DelhiSignup.jsx'
 import Jobapplication from './componenets/Jobapplication.jsx';
-import AuthDelhi from './pages/delhiAuthPage.jsx';
+import AuthDelhi from './pages/NewDelhiAuthPage.jsx';
 import AuthBihar from './pages/bihar.jsx';
 import AuthBengal from './pages/bengal.jsx';
 import PrivateRoute from './componenets/PrivateRoute.jsx';
@@ -40,6 +40,9 @@ import ProfilePageNew from './pages/ProfileNew.jsx';
 import SettingsPage from './pages/Settings.jsx';
 import ProfilePageUsers from './pages/ProfileUsers.jsx';
 import LoginJob from './componenets/Loginjob.jsx';
+import PricingPage from './pages/Pricing.jsx';
+import PaymentPage from './pages/Paymentpage.jsx';
+import VerificationPage from './pages/VerificationPage.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -79,6 +82,11 @@ const router = createBrowserRouter([
         path: "/job-application",
         element:<Jobapplication /> ,
       },
+      {
+        path: "/verification",
+        element:<VerificationPage /> ,
+      },
+     
      
       {
         path: "/landing",
@@ -158,7 +166,17 @@ const router = createBrowserRouter([
       {
         path: "/settings",
         element:<SettingsPage/>,
+      },
+      {
+        path:"/pricing",
+        element:<PricingPage/>
+      },
+      {
+        path:"/payment",
+        element:<PaymentPage/>
       }
+     
+     
      
      
      
