@@ -82,12 +82,15 @@ export default function PricingPage() {
   const handleSlotSelection = async (slot) => {
     try {
 
-
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slot`, {
-        postId: selectedPostId,
+      const token = localStorage.getItem('token');
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slot`,{
+    
         startHour: slot.startHour,
         endHour: slot.endHour
-      });
+      },{
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true, // Ensure this matches your backend's CORS setup
+      }, );
 
       toast.success("Slot booked successfully!");
       setShowSlotModal(false);
@@ -100,7 +103,7 @@ export default function PricingPage() {
     }
   };
 
-  const handleConfirmBooking = async () => {
+  {/*const handleConfirmBooking = async () => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slot`, {
         startHour: confirmedSlot.startHour,
@@ -123,7 +126,24 @@ export default function PricingPage() {
       console.error("Error booking slot:", error);
       toast.error("Failed to book slot.");
     }
+  };*/}
+
+  const handleConfirmBooking = async () => {
+    try {
+     
+      navigate("/payment", {
+        state: {
+          duration: selectedDuration,
+          startHour: confirmedSlot.startHour,
+          endHour: confirmedSlot.endHour,
+        },
+      });
+    } catch (error) {
+      console.error("Error confirming booking:", error);
+      toast.error("Failed to proceed to payment.");
+    }
   };
+  
   
 
 
@@ -223,7 +243,8 @@ export default function PricingPage() {
         </button>
         <button
           className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={() => navigate("/payment")}
+          //onClick={() => navigate("/payment")}
+          onClick={handleConfirmBooking}
         >
           OK
         </button>

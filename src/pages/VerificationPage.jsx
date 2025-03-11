@@ -3,9 +3,12 @@ import axios from 'axios';
 import { useState,useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
+import { X } from 'lucide-react'; // Import Lucide for the cross icon
 
-function VerificationPage() {
+function VerificationPage(){
+    const [isOpen, setIsOpen] = useState(true);
+
  const [email, setEmail] = useState("");
     const [otpSent, setOtpSent] = useState(false);
     const [mobileOtpSent, setMobileOtpSent] = useState(false);
@@ -13,7 +16,13 @@ function VerificationPage() {
     const [token, setToken] = useState(null);
     const [isOtpVerified, setIsOtpVerified] = useState(false);
     const [isMobileOtpVerified, setIsMobileOtpVerified] = useState(false);
-
+   
+   
+    const navigate = useNavigate();
+    const handleClose = () => {
+        setIsOpen(false);
+        navigate(-1); // ✅ Go back to the previous page
+      };
       const {
             register: registerSignup,
             formState: { errors: signupErrors },
@@ -76,6 +85,7 @@ function VerificationPage() {
                         setToken(response.data.token);
                         toast.success("OTP verified successfully!", { position: "top-center" });
                         setIsOtpVerified(true);
+                        navigate("/landing");
                     }
                 } catch (error) {
                     toast.error(
@@ -127,7 +137,7 @@ function VerificationPage() {
                         toast.success("OTP verified successfully!", { position: "top-center" });
                         setIsMobileOtpVerified(true)
 
-                        navigate("/landing");
+                       
                     }
                 } catch (error) {
                     console.error(error.response?.data);
@@ -136,140 +146,148 @@ function VerificationPage() {
             };
     
   return (
+    isOpen && (
    <>
    
-   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+  
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-20">
+      <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative">
+        {/* Close Button */}
+        <button 
+          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+          onClick={handleClose} // Close the modal
+        >
+          <X size={24} />
+        </button>
+
+
         <h2 className="text-xl font-semibold mb-4 text-center">Verify Your Account</h2>
+
         <div className="space-y-4">
           {/* Email Input */}
           <div className="mb-4">
-          <input
-                                type="email"
-                                placeholder="Email"
-                                className="w-full mb-3 p-2 border border-slate-400 rounded"
-                                {...registerSignup("email", {
-                                    required: "Email is required",
-                                    pattern: {
-                                        value: /^\S+@\S+\.\S+$/,
-                                        message: "Invalid email address",
-                                    },
-                                    onChange: (e) => setEmail(e.target.value),
-                                })}
-                            />
-                            {signupErrors.email && (
-                                <p className="text-red-500 text-sm">{signupErrors.email.message}</p>
-                            )}
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full mb-3 p-2 border border-slate-400 rounded"
+              {...registerSignup("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Invalid email address",
+                },
+                onChange: (e) => setEmail(e.target.value),
+              })}
+            />
+            {signupErrors.email && (
+              <p className="text-red-500 text-sm">{signupErrors.email.message}</p>
+            )}
           </div>
-         
-                        </div>
-<div>
-                        {/* OTP Section - Show only if not verified */}
-                        {!isOtpVerified && otpSent ? (
-                            <div className="mb-4">
-                                <input
-                                    type="text"
-                                    placeholder="Enter OTP"
-                                    className="w-full mb-3 p-2 border border-slate-400 rounded"
-                                    {...registerSignup("otp", { required: "OTP is required" })}
-                                />
-                                {signupErrors.otp && (
-                                    <p className="text-red-500 text-sm">{signupErrors.otp.message}</p>
-                                )}
-                                <button
-                                    type="button"
-                                    className="bg-blue-500 text-white px-4 py-2 rounded"
-                                    onClick={() => handleVerifyOtp(getValues("otp"))}
-                                >
-                                    Verify OTP
-                                </button>
-                            </div>
-                        ) : null}
 
-                        {/* Send OTP Button - Hide after verification */}
-                        {!isOtpVerified && !otpSent && (
-                            <button
-                                type="button"
-                                className="bg-blue-500 mb-4 text-white px-4 py-2 rounded"
-                                onClick={handleSendOtp}
-                            >
-                                Send OTP
-                            </button>
-                        )}
+          {/* OTP Section for Email */}
+          {!isOtpVerified && otpSent ? (
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                className="w-full mb-3 p-2 border border-slate-400 rounded"
+                {...registerSignup("otp", { required: "OTP is required" })}
+              />
+              {signupErrors.otp && (
+                <p className="text-red-500 text-sm">{signupErrors.otp.message}</p>
+              )}
+              <button
+                type="button"
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+                onClick={() => handleVerifyOtp(getValues("otp"))}
+              >
+                Verify OTP
+              </button>
+            </div>
+          ) : null}
 
-                        {/* Show success message when verified */}
-                        {isOtpVerified && (
-                            <div className="text-green-500 mb-2 text-sm font-semibold">
-                                OTP successfully verified!
-                            </div>
-                        )}
-<div className="mb-">
-                          <input
-                                        type="number"
-                                        placeholder="Phone Number"
-                                        className="w-full mb-3 p-2 border border-slate-400 rounded"
-                                        //value={phoneNumber}
-                                        //onChange={(e) => setPhoneNumber(e.target.value)}
-                                        {...registerSignup("phoneNumber", {
-                                            required: "Phone Number is required",
-                                            pattern: {
-                                                value: /^\d{10}$/,
-                                                message: "Invalid phone number",
-                                            },
-                                        })}
-                                    />
-                                    {signupErrors.phoneNumber && (
-                                        <p className="text-red-500 text-sm">{signupErrors.phoneNumber.message}</p>
-                                    )}
+          {/* Send OTP Button for Email */}
+          {!isOtpVerified && !otpSent && (
+            <button
+              type="button"
+              className="bg-blue-500 mb-4 text-white px-4 py-2 rounded"
+              onClick={handleSendOtp}
+            >
+              Send OTP
+            </button>
+          )}
 
-                        </div>
+          {/* Success Message for Email */}
+          {isOtpVerified && (
+            <div className="text-green-500 mb-2 text-sm font-semibold">
+              OTP successfully verified!
+            </div>
+          )}
 
-                        {/* OTP Section - Show only if not verified */}
-                        {!isMobileOtpVerified && mobileOtpSent ? (
-                            <div className="mb-4">
-                                <input
-                                    type="text"
-                                    placeholder="Enter OTP"
-                                    className="w-full mb-3 p-2 border border-slate-400 rounded"
-                                    {...registerSignup("mobileOtp", { required: "Mobile OTP is required" })}
-                                />
-                                {signupErrors.mobileOtp && (
-                                    <p className="text-red-500 text-sm">{signupErrors.mobileOtp.message}</p>
-                                )}
-                                <button
-                                    type="button"
-                                    className="bg-blue-500 text-white px-4 py-2 rounded"
-                                    onClick={ handleVerifyMobileOtp}
-                                >
-                                    Verify Mobile OTP
-                                </button>
-                            </div>
-                        ) : null}
+          {/* Phone Number Input */}
+          <div className="mb-4">
+            <input
+              type="number"
+              placeholder="Phone Number"
+              className="w-full mb-3 p-2 border border-slate-400 rounded"
+              {...registerSignup("phoneNumber", {
+                required: "Phone Number is required",
+                pattern: {
+                  value: /^\d{10}$/,
+                  message: "Invalid phone number",
+                },
+              })}
+            />
+            {signupErrors.phoneNumber && (
+              <p className="text-red-500 text-sm">{signupErrors.phoneNumber.message}</p>
+            )}
+          </div>
 
-                        {/* Send OTP Button - Hide after verification */}
-                        {!isMobileOtpVerified && !mobileOtpSent && (
-                            <button
-                                type="button"
-                                className="bg-blue-500 mb-4 text-white px-4 py-2 rounded"
-                                onClick={handleSendMobileOtp}
-                            >
-                                Send Mobile OTP
-                            </button>
-                        )}
+          {/* OTP Section for Phone */}
+          {!isMobileOtpVerified && mobileOtpSent ? (
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                className="w-full mb-3 p-2 border border-slate-400 rounded"
+                {...registerSignup("mobileOtp", { required: "Mobile OTP is required" })}
+              />
+              {signupErrors.mobileOtp && (
+                <p className="text-red-500 text-sm">{signupErrors.mobileOtp.message}</p>
+              )}
+              <button
+                type="button"
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+                onClick={handleVerifyMobileOtp}
+              >
+                Verify Mobile OTP
+              </button>
+            </div>
+          ) : null}
 
-                        {/* Show success message when verified */}
-                        {isMobileOtpVerified && (
-                            <div className="text-green-500 mb-2 text-sm font-semibold">
-                               Mobile OTP successfully verified!
-                            </div>
-                        )}
+          {/* Send OTP Button for Phone */}
+          {!isMobileOtpVerified && !mobileOtpSent && (
+            <button
+              type="button"
+              className="bg-blue-500 mb-4 text-white px-4 py-2 rounded"
+              onClick={handleSendMobileOtp}
+            >
+              Send Mobile OTP
+            </button>
+          )}
 
-
+          {/* Success Message for Phone */}
+          {isMobileOtpVerified && (
+            <div className="text-green-500 mb-2 text-sm font-semibold">
+              Mobile OTP successfully verified!
+            </div>
+          )}
         </div>
       </div>
     </div>
-   </>
-  )
-}
 
-export default VerificationPage
+    </>
+       )
+ ) 
+}
+export default VerificationPage;
