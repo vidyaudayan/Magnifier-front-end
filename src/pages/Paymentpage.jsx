@@ -8,7 +8,7 @@ export default function PaymentPage() {
   const navigate = useNavigate();
 
   // Get slot details from previous page
-  const { duration, startHour, endHour, postId } = location.state || {};
+  const { duration, startHour, endHour, amount } = location.state || {};
 
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
@@ -31,7 +31,7 @@ export default function PaymentPage() {
     try {
       // Send payment request (Replace with actual Stripe API call)
       await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/process-payment`, {
-        postId,
+       
         duration,
         startHour,
         endHour,
@@ -60,6 +60,8 @@ export default function PaymentPage() {
           <p className="text-gray-700 font-semibold">
             Time Slot: <span className="text-blue-600">{startHour}:00 - {endHour}:00</span>
           </p>
+
+          <p><strong>Total Amount:</strong> ₹{amount}</p>
         </div>
 
         {/* Card Details Form */}

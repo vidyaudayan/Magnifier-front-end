@@ -22,7 +22,7 @@ export default function PricingPage() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   
 
-  useEffect(() => {
+  {/*useEffect(() => {
     socket.on("updateSlots", () => {
       fetchPendingPosts();  // Refresh the posts when a slot is booked
     });
@@ -30,7 +30,7 @@ export default function PricingPage() {
     return () => {
       socket.off("updateSlots");
     };
-  }, []);
+  }, []);*/}
 
   useEffect(() => {
 
@@ -130,12 +130,19 @@ export default function PricingPage() {
 
   const handleConfirmBooking = async () => {
     try {
-     
+      const pricing = {
+        1: 30,
+        3: 90,
+        6: 180,
+        12: 360,
+      };
+  
+      const amount = pricing[selectedDuration] || 0;
       navigate("/payment", {
         state: {
           duration: selectedDuration,
           startHour: confirmedSlot.startHour,
-          endHour: confirmedSlot.endHour,
+          endHour: confirmedSlot.endHour, amount
         },
       });
     } catch (error) {
@@ -166,6 +173,43 @@ export default function PricingPage() {
           </p>
         </div>
       </div>
+
+      <div className="container mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+  <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+    Pricing Details for Pinned Posts
+  </h3>
+
+  {/* Price Table */}
+  <div className="overflow-x-auto">
+    <table className="w-full md:w-1/2 mx-auto border-collapse border border-gray-300">
+      <thead>
+        <tr className="bg-gray-200 text-gray-700">
+          <th className="border border-gray-300 px-4 py-2 text-left">Duration</th>
+          <th className="border border-gray-300 px-4 py-2 text-left">Price (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr className="bg-gray-100">
+          <td className="border border-gray-300 px-4 py-2">1 Hour</td>
+          <td className="border border-gray-300 px-4 py-2">₹30</td>
+        </tr>
+        <tr className="bg-white">
+          <td className="border border-gray-300 px-4 py-2">3 Hours</td>
+          <td className="border border-gray-300 px-4 py-2">₹90</td>
+        </tr>
+        <tr className="bg-gray-100">
+          <td className="border border-gray-300 px-4 py-2">6 Hours</td>
+          <td className="border border-gray-300 px-4 py-2">₹180</td>
+        </tr>
+        <tr className="bg-white">
+          <td className="border border-gray-300 px-4 py-2">12 Hours</td>
+          <td className="border border-gray-300 px-4 py-2">₹360</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
       {/* Pricing Table & Slot Selection */}
       <div className="container mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
@@ -232,6 +276,9 @@ export default function PricingPage() {
       <p className="text-gray-700">
         You've selected a slot from <strong>{confirmedSlot.startHour}:00</strong> 
         to <strong>{confirmedSlot.endHour}:00</strong> for <strong>{selectedDuration} hours</strong>.
+      </p>
+      <p className="mt-3 text-md font-semibold text-gray-800">
+        Total Amount: ₹{selectedDuration * 30}
       </p>
       <p className="mt-2 text-gray-500">Do you want to proceed to payment?</p>
       <div className="mt-4 flex justify-end">
