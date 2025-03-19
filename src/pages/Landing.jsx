@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext,useRef } from "react";
 import Navbar from "../componenets/Navbar.jsx";
 import NavbarLanding from "../componenets/NavbarLanding.jsx";
 import { formatDate } from "../utils/dateUtils.js";
@@ -24,11 +24,13 @@ import { setProfilePicture } from "../features/user/userSlice.js";
 import { updatePostReaction } from "../features/user/userSlice.js";
 import UserSearch from "../componenets/UserSearch.jsx";
 import { FaThumbtack } from "react-icons/fa";
+import { useParams } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
 
 //import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
 export const LandingPage = () => {
-
-
+    const postRefs = useRef([]);
+    const [pos, setPos] = useState(null);
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
   // const { user } = useSelector((state) => state.user);
@@ -41,6 +43,47 @@ export const LandingPage = () => {
         (state) => state.user
     );
 
+    
+      const trackPostImpression = async (postId) => {
+        try {
+            console.log(`Tracking impression for postId: ${postId}`);
+          await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${postId}`);
+          console.log('Post impression recorded for:', postId);
+        } catch (error) {
+          console.error('Error tracking impression:', error);
+        }
+      };
+
+      useEffect(() => {
+        postRefs.current = postRefs.current.slice(0, posts.length);
+    
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const postId = entry.target.getAttribute("data-post-id");
+                if (postId) {
+                  trackPostImpression(postId);
+                  observer.unobserve(entry.target); // Track only once
+                }
+              }
+            });
+          },
+          { threshold: 0.5 } // 50% of post is visible
+        );
+    
+        postRefs.current.forEach((ref) => {
+          if (ref) observer.observe(ref);
+        });
+    
+        return () => {
+          postRefs.current.forEach((ref) => {
+            if (ref) observer.unobserve(ref);
+          });
+        };
+      }, [posts]);
+    
+    
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, "0");
@@ -53,6 +96,8 @@ export const LandingPage = () => {
     console.log("user header", user)
     const dispatch = useDispatch();
     const context = useContext(Context)
+    const { postId } = useParams(); // Extracting postId from URL
+
     const [submitting, setSubmitting] = useState(false);
     const [stickyDuration, setStickyDuration] = useState("3600000");
     const [showPopup, setShowPopup] = useState(false);
@@ -93,6 +138,7 @@ export const LandingPage = () => {
     });
 
     const [expandedPosts, setExpandedPosts] = useState({});
+    const [impressions, setImpressions] = useState(post.impressions);
 
 
     const handleDurationClick = (durationText) => {
@@ -351,6 +397,43 @@ export const LandingPage = () => {
         }
     };
 
+
+    // Track impression when component mounts
+  {/*useEffect(() => {
+    const trackImpression = async () => {
+        if (!pos?._id) {
+            console.error('Post ID is undefined');
+            return;
+          }
+      try {
+        const response =  await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${post._id}`);
+        setImpressions(response.data.impressions);
+      } catch (error) {
+        console.error('Error tracking impression:', error);
+      }
+    };
+    trackImpression();
+  }, [pos]);*/}
+  
+
+    useEffect(() => {
+        console.log("postId:", postId)
+        const fetchPost = async () => {
+          try {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post/${postId}`);
+            setPos(response.data);
+            console.log("post impression",response.data)
+          } catch (error) {
+            console.error('Error fetching post:', error);
+          }
+        };
+      
+        if (postId) {
+          fetchPost();
+        }
+      }, [postId]);
+      
+
     const fetchUserPosts = async () => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/userPosts`, {
@@ -544,6 +627,7 @@ const handleOkClick = () => {
       setStickyDuration(savedPost.stickyDuration || ""); // Now it includes the selected duration
     }
   }, []);
+
   
 
     return (
@@ -551,12 +635,12 @@ const handleOkClick = () => {
             <NavbarLanding />
       
             {/* Left Section */}
-            <div className="lg:w-1/4 w-full max-h-[600px] bg-white border border-gray-300 rounded-lg lg:ml-32 ml-6 p-4  space-y-6 shadow-sm">
+            <div className="lg:w-1/4 w-full max-h-[600px] bg-white border border-gray-300 rounded-lg lg:ml-32 ml-6 pl-4 p-4 space-y-4 shadow-sm ">
              {/* User Info */}
-                <div className="text-center">
+                <div className="text-center ">
                     <div
                         onClick={() => document.getElementById('profilePic').click()}
-                        className="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-2 cursor-pointer flex justify-center items-center"
+                        className="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-2 cursor-pointer flex justify-center items-center "
                     >
                         {user?.profilePic ? (
                             <img
@@ -613,7 +697,7 @@ const handleOkClick = () => {
 
                 {/* Wallet Box */}
 
-                <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
+                <div className="bg-gray-50 border border-gray-300 rounded-md p-4 ">
 
                     <p className="text-sm font-medium">Wallet Balance</p>
                     {/*<p className="text-lg font-bold text-green-600">{walletAmount}</p>*/}
@@ -626,7 +710,7 @@ const handleOkClick = () => {
                     <div className="flex items-center space-x-3 mt-2">
                         <span>👍 {metrics.totalLikes}</span>
                         <span>👎 {metrics.totalDislikes}</span>
-
+                      
 
                     </div>
                 </div>
@@ -638,18 +722,25 @@ const handleOkClick = () => {
 
                 </div>
 
+                {/* Posts Impressions */}
+                <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
+                <p  className="text-sm font-medium">Posts Impressions</p>
+                    <p className="text-lg font-bold text-blue-600">{metrics.totalImpressions}</p>
+
+                </div>
+
 
 
 
                 {/* Settings */}
-                <div className="flex items-center space-x-2 cursor-pointer">
+                <div className="flex items-center space-x-2 pb-4 mb-4 cursor-pointer ">
                     <IoSettings />
-                    <Link to="/settings"  className="text-sm font-medium cursor-pointer">Settings</Link>
+                    <Link to="/settings"  className="text-sm font-medium cursor-pointer ">Settings</Link>
                 </div>
             </div>
 
             {/* Right Section */}
-            <div className="lg:w-2/4 w-full bg-white border border-gray-300 rounded-lg ml-6 lg:ml-16 shadow-sm p-6">
+            <div className="lg:w-2/4 w-full bg-white border border-gray-300 rounded-lg ml-6 lg:ml-16 shadow-sm p-6 mt-6">
                 {/* Write a Post Section */}
 
 
@@ -684,7 +775,8 @@ const handleOkClick = () => {
                 {/* Posts Section */}
                 {posts.map((post,index) => (
                     <div
-                        key={post._id}
+                        key={post._id}  data-post-id={post._id}
+                        ref={(el) => (postRefs.current[index] = el)}
                         // className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4"
                        //className={`bg-white ${post._id === highlightPostId ? "bg-yellow-300" : ""
                             //} border border-gray-300 rounded-lg shadow-sm mb-6 p-4 ${selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""

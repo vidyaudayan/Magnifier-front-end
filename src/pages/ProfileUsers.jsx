@@ -30,7 +30,7 @@ const  ProfilePageUsers = () => {
     const [selectedPostId, setSelectedPostId] = useState(null);
     const [showOverlay, setShowOverlay] = useState(null); // Track which post's menu is open
 
-    const handleCoverPicUpload = async (event) => {
+    {/*const handleCoverPicUpload = async (event) => {
         const file = event.target.files[0];
         if (file) {
             const formData = new FormData();
@@ -53,7 +53,7 @@ const  ProfilePageUsers = () => {
                 console.error("Error uploading cover picture:", error);
             }
         }
-    };
+    };*/}
 
     const deletePost = async (postId) => {
         try {
@@ -176,12 +176,12 @@ const  ProfilePageUsers = () => {
                 {coverPic ? (
                     <img src={coverPic} alt="Cover" className="w-full h-full object-cover" />
                 ) : (
-                    <p className="w-full h-full flex items-center justify-center text-gray-500">Upload a cover photo</p>
+                    <p className="w-full h-full flex items-center justify-center text-gray-500"></p>
                 )}
-                <label htmlFor="coverPic" className="absolute top-4 right-4 bg-white px-4 py-2 rounded-md shadow-md cursor-pointer">
+                {/*<label htmlFor="coverPic" className="absolute top-4 right-4 bg-white px-4 py-2 rounded-md shadow-md cursor-pointer">
                     Change Cover Photo
-                    <input type="file" id="coverPic" accept="image/*" onChange={handleCoverPicUpload} className="hidden" />
-                </label>
+                    <input type="file" id="coverPic" accept="image/*"  className="hidden" />
+                </label>*/}
                 <div className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2">
                     <img src={user.profilePic || "/default-profile.png"} alt="Profile" className="w-[100px] h-[100px] rounded-full border-4 border-white shadow-lg" />
                 </div>

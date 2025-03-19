@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
+import {loadStripe} from '@stripe/stripe-js';
 
 export default function PaymentPage() {
   const location = useLocation();
@@ -28,18 +29,24 @@ export default function PaymentPage() {
   // Handle payment submission
   const handlePayment = async () => {
     setIsProcessing(true);
+    const token = localStorage.getItem('token');
+    const amountInPaise = amount * 100; 
+    const stripePromise = await loadStripe(`${import.meta.env.VITE_STRIPE_API_KEY}`)
     try {
       // Send payment request (Replace with actual Stripe API call)
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/process-payment`, {
-       
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/user/payment`, {
+        amount: amountInPaise, 
         duration,
         startHour,
         endHour,
         cardDetails,
-      });
+      },{
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true, // Ensure this matches your backend's CORS setup
+      },);
 
       toast.success("Payment successful! Your post is now pinned.");
-      navigate("/success"); // Redirect to a success page
+      navigate("/success"); 
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Payment failed. Please try again.");

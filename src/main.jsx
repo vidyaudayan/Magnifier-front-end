@@ -43,6 +43,7 @@ import LoginJob from './componenets/Loginjob.jsx';
 import PricingPage from './pages/Pricing.jsx';
 import PaymentPage from './pages/Paymentpage.jsx';
 import VerificationPage from './pages/VerificationPage.jsx';
+import PaymentSuccess from './pages/PaymentSuccess.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -174,7 +175,11 @@ const router = createBrowserRouter([
       {
         path:"/payment",
         element:<PaymentPage/>
-      }
+      },
+      {
+        path:"/success",
+        element:<PaymentSuccess/>
+      },
      
      
      
