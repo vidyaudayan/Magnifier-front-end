@@ -45,9 +45,14 @@ export const LandingPage = () => {
 
     
       const trackPostImpression = async (postId) => {
-        try {
+        
+        try
+        {
+            const token = localStorage.getItem('token');
+                console.log("profile token", token)
+                const headers = { Authorization: `Bearer ${token}` };
             console.log(`Tracking impression for postId: ${postId}`);
-          await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${postId}`);
+          await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${postId}`, {headers },{withCredentials:true});
           console.log('Post impression recorded for:', postId);
         } catch (error) {
           console.error('Error tracking impression:', error);
