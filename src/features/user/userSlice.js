@@ -89,13 +89,14 @@ export const userSlice = createSlice({
 
   // Filter sticky posts correctly
   const stickyPosts = action.payload.filter(post => 
+    post.status === 'approved' &&
       post.sticky && 
       post.stickyUntil && 
       new Date(post.stickyUntil) > now // Ensure it's still within the sticky time
   );
 
   // Filter normal posts (including expired sticky posts)
-  const normalPosts = action.payload.filter(post => 
+  const normalPosts = action.payload.filter(post =>  post.status === 'approved' && 
       !post.sticky || !post.stickyUntil || new Date(post.stickyUntil) <= now
   );
 

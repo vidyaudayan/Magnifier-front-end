@@ -1,4 +1,5 @@
 import { useState } from "react";
+import NavbarWelcome from "./NavbarWelcome";
 
 const faqs = [
   {
@@ -59,8 +60,9 @@ const FAQ = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white p-4">
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 md:p-10">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white ">
+     <NavbarWelcome/>
+      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-2 mt-20 md:p-10">
         <h1 className="text-3xl md:text-4xl font-bold text-blue-600 text-center mb-8">
           Frequently Asked Questions (FAQ)
         </h1>

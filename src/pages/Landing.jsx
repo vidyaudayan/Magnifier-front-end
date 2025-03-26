@@ -10,6 +10,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import axios from "axios";
 import { FaCamera } from 'react-icons/fa';
 import Context from "../context/context.jsx";
+import { FaUser } from "react-icons/fa6";
 import BreadCrumbs from "../componenets/Breadcrumbs.jsx";
 import { TbLoadBalancer } from "react-icons/tb";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -761,7 +762,7 @@ const handleOkClick = () => {
                             className="w-12 h-12 rounded-full"
                         />
                     ) : (
-                        <span className="text-3xl text-gray-500">U</span>
+                        <FaUser className="w-10 h-10 p-1 text-gray-400 bg-white rounded-full border-4 border-white shadow-lg" />
                     )}
 
 

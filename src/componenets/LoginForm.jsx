@@ -48,6 +48,7 @@ const LoginForm = () => {
       if (dataApi.success) {
        
         fetchUserDetails(); 
+
        
       } 
       if (response.data.token) {
@@ -75,7 +76,8 @@ const LoginForm = () => {
     //setWalletAmount(walletResponse.data.walletAmount); // Update wallet state
       //alert("Login successfull")
       toast.success("You are logged in")
-      navigate('/landing')
+        navigate("/landing")
+   
       resetLoginForm()
       
     

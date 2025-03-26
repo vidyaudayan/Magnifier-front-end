@@ -370,9 +370,9 @@ const AuthBengal = () => {
 
 
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Phone Number"
-                            className="w-full mb-3 p-2 border border-slate-400 rounded"
+                            className="w-full mb-3 p-2 border border-slate-400 rounded appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
                             {...registerSignup("phoneNumber", {
                                 required: "Phone Number is required",
                                 pattern: {

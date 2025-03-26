@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import LoginForm from "./LoginForm";
 import image from '../assets/Images/loginback.avif'
 import 'animate.css';
+import NavbarWelcome from "./NavbarWelcome";
 
 const DelhiSignup = () => {
   const location = useLocation();
@@ -253,7 +254,7 @@ const headers = { Authorization: `Bearer ${token}` };
 
   return (
     <div className="min-h-screen w-full bg-blue-200 flex   mt-20">
-      <Navbar />
+      <NavbarWelcome />
       <div className="w-full max-w-5xl flex flex-wrap lg:flex-nowrap gap-8 p-6">
         {/* Signup Form */}
         <div className="w-full lg:w-1/2 p-6 rounded-lg shadow-md bg-gradient-to-r from-slate-100 to-slate-100">

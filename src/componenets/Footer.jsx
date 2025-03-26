@@ -50,7 +50,7 @@ const Footer = () => {
           <div className="w-full sm:w-1/2 lg:w-1/4">
             <h3 className="text-white text-lg font-semibold ">Contact Us</h3>
             <p>Email:<a href="mailto:support@magnifier-platform.com" className="hover:text-white">support@magnifier-platform.com</a></p>
-            <p>Email:<a href="mailto:contactus@magnifier-platform.com" className="hover:text-white">contactus@magnifier-platform.com</a></p>
+            {/*<p>Email:<a href="mailto:contactus@magnifier-platform.com" className="hover:text-white">contactus@magnifier-platform.com</a></p>*/}
 
           </div>
 
@@ -60,8 +60,8 @@ const Footer = () => {
             <h3 className="text-white text-lg font-semibold mb-4">Follow Us</h3>
             <div className="flex space-x-4">
               <FaLinkedin className="hover:text-white text-2xl transition" />
-              <FaFacebook className="hover:text-white text-2xl transition" />
-              <FaSquareInstagram className="hover:text-white text-2xl transition" />
+              {/*<FaFacebook className="hover:text-white text-2xl transition" />
+              <FaSquareInstagram className="hover:text-white text-2xl transition" />*/}
               <FaYoutube className="hover:text-white text-2xl transition" />
             </div>
           </div>

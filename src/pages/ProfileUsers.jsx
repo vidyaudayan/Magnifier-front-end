@@ -9,11 +9,11 @@ import { IoMdClose } from "react-icons/io";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { FaUser } from "react-icons/fa6";
+import coverpicture from "../assets/Images/coverpic1.jpg"
 
 
-
-
-const  ProfilePageUsers = () => {
+const ProfilePageUsers = () => {
     const dispatch = useDispatch();
     const { userId } = useParams();
 
@@ -70,11 +70,11 @@ const  ProfilePageUsers = () => {
 
             const response = await axios.delete(
                 `${import.meta.env.VITE_BASE_URL}/post/delete/${postId}`,
-             
+
                 { headers, withCredentials: true }
             );
 
-            if (response.status===200) {
+            if (response.status === 200) {
                 toast.success("Your post is deleted.");
                 //alert("Your post is deleted.");
                 setPosts(posts.filter(post => post._id !== postId));
@@ -85,8 +85,8 @@ const  ProfilePageUsers = () => {
             }
         } catch (error) {
             console.error("Error deleting post:", error);
-           // alert("Server error");
-           toast.error("Server error");
+            // alert("Server error");
+            toast.error("Server error");
         }
     };
 
@@ -109,7 +109,7 @@ const  ProfilePageUsers = () => {
 
         const fetchUserPosts = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/posts/${userId}`, );
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/posts/${userId}`,);
                 setPosts(response.data.data);
             } catch (error) {
                 console.error("Error fetching user posts:", error);
@@ -176,20 +176,29 @@ const  ProfilePageUsers = () => {
                 {coverPic ? (
                     <img src={coverPic} alt="Cover" className="w-full h-full object-cover" />
                 ) : (
-                    <p className="w-full h-full flex items-center justify-center text-gray-500"></p>
+                  
+                    <img src={coverpicture} className="w-full h-full flex items-center justify-center text-gray-500" alt="" />
                 )}
                 {/*<label htmlFor="coverPic" className="absolute top-4 right-4 bg-white px-4 py-2 rounded-md shadow-md cursor-pointer">
                     Change Cover Photo
                     <input type="file" id="coverPic" accept="image/*"  className="hidden" />
                 </label>*/}
                 <div className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2">
-                    <img src={user.profilePic || "/default-profile.png"} alt="Profile" className="w-[100px] h-[100px] rounded-full border-4 border-white shadow-lg" />
+                    {user.profilePic ? (
+                        <img
+                            src={user.profilePic}
+                            alt="Profile"
+                            className="w-[100px] h-[100px] rounded-full border-4 border-white shadow-lg"
+                        />
+                    ) : (
+                        <FaUser className="w-[100px] h-[100px] p-2 text-gray-400 bg-white rounded-full border-4 border-white shadow-lg" />
+                    )}
                 </div>
             </div>
 
             <div className="mt-16 text-center">
                 <h1 className="text-xl font-bold">{user.username || "Username"}</h1>
-                <p className="text-gray-600">{user.email || "user@example.com"}</p>
+
             </div>
 
             <div className="w-full max-w-3xl mt-8 p-6 ">
@@ -202,16 +211,24 @@ const  ProfilePageUsers = () => {
                         posts.map((post) => (
                             <div key={post._id} className="bg-white p-4 rounded-lg mb-8 border border-blue-50 hover:border-blue-100 shadow-lg relative">
                                 <div className="flex items-center justify-between pb-4">
-                                    <img src={user.profilePic || "/default-profile.png"} alt="User" className="w-12 h-12 rounded-full mr-3" />
+                                    {user.profilePic ? (
+                                        <img
+                                            src={user.profilePic}
+                                            alt="Profile"
+                                            className="w-12 h-12  rounded-full border-4 border-white shadow-lg"
+                                        />
+                                    ) : (
+                                        <FaUser className="w-10 h-10 p-1  text-gray-400 bg-white rounded-full border-2 border-black shadow-lg" />
+                                    )}
                                     <div className="flex flex-col items-center mr-auto">
-                                        <h3 className="font-medium">{user.username}</h3>
+                                        <h3 className="font-medium pl-2">{user.username}</h3>
                                         <p className="text-gray-500 text-sm">{new Date(post.createdAt).toLocaleDateString()}</p>
                                     </div>
 
 
                                     {/* Three Dots Icon */}
                                     <div className="flex justify-between">
-                                    {/*<button  className="relative z-10" onClick={() => setShowOverlay(showOverlay === post._id ? null : post._id)}>
+                                        {/*<button  className="relative z-10" onClick={() => setShowOverlay(showOverlay === post._id ? null : post._id)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-6 h-6 text-gray-600" viewBox="0 0 16 16">
                                             <path d="M3 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm5 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm5 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
                                         </svg>
@@ -225,18 +242,18 @@ const  ProfilePageUsers = () => {
                                 {post.postType === "Photo" && <img src={post.mediaUrl} alt="Post" className="w-full h-80 object-cover rounded-lg mb-4" />}
                                 < p className="text-gray-800" > {post.content}</p>
 
- {/* Overlay for Delete Option */}
- {showOverlay === post._id && (
-      <div className="absolute  top-0 right-0 mt-10 mr-4 bg-white border shadow-lg p-3 rounded-md z-50">
-        <button className="text-red-500 hover:underline mb-2 mt-2 mr-4" onClick={() => deletePost(post._id)}>
-          Delete Post
-        </button>
-        <button className="text-gray-500  absolute top-1 right-1 hover:underline" onClick={() => setShowOverlay(null)}>
-      
-        <IoMdClose />
-        </button>
-      </div>
-    )}
+                                {/* Overlay for Delete Option */}
+                                {showOverlay === post._id && (
+                                    <div className="absolute  top-0 right-0 mt-10 mr-4 bg-white border shadow-lg p-3 rounded-md z-50">
+                                        <button className="text-red-500 hover:underline mb-2 mt-2 mr-4" onClick={() => deletePost(post._id)}>
+                                            Delete Post
+                                        </button>
+                                        <button className="text-gray-500  absolute top-1 right-1 hover:underline" onClick={() => setShowOverlay(null)}>
+
+                                            <IoMdClose />
+                                        </button>
+                                    </div>
+                                )}
 
 
 

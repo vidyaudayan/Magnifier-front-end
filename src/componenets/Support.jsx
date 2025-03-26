@@ -1,9 +1,11 @@
 import Navbar from "./Navbar";
-
+import { Link } from "react-router-dom";
+import { ChevronDown, ChevronUp, MessageCircleQuestion } from 'lucide-react';
+import NavbarWelcome from "./NavbarWelcome";
 const Support = () => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
-<Navbar/>
+<NavbarWelcome/>
       <div className="max-w-4xl w-full bg-white shadow-lg rounded-lg p-8 md:p-12 text-gray-800">
           {/* Heading */}
           <h1 className="text-3xl md:text-4xl font-bold text-blue-600 text-center mb-6">
@@ -18,21 +20,7 @@ const Support = () => {
           {/* Support Options */}
           <div className="space-y-8">
             {/* Phone Support */}
-            <div className="flex items-center space-x-4">
-              <div className="text-blue-500 text-3xl">
-                📞
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold">Phone Support</h3>
-                <p className="text-gray-600">
-                  Call us at 
-                  <a href="tel:+1234567890" className="text-blue-500 hover:underline ml-1">
-                    +1 234 567 890
-                  </a>{" "}
-                  for urgent issues.
-                </p>
-              </div>
-            </div>
+           
   
             {/* Email Support */}
             <div className="flex items-center space-x-4">
@@ -53,13 +41,29 @@ const Support = () => {
                 </p>
               </div>
             </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="text-blue-500 text-3xl">
+              <MessageCircleQuestion size={36} className="text-blue-500 mx-auto" />
+              </div>
+
+            
+              <div>
+                <h3 className="text-xl font-semibold">FAQ</h3>
+                <p className="text-gray-600">
+                 To know more about us please click
+                 
+               <Link to="/faq" className="text-blue-500 font-semibold hover:scale-105 hover:underline-offset-1">  Frequently asked questions</Link>
+                </p>
+              </div>
+            </div>
           </div>
   
           {/* Closing Statement */}
           <div className="mt-10 text-center">
             <p className="text-gray-700">
               We strive to respond quickly and make your experience with{" "}
-              <span className="font-semibold text-blue-600">Magnifier Platform</span> enjoyable!
+              <Link to="/" className="font-semibold text-blue-600">Magnifier Platform</Link> enjoyable!
             </p>
           </div>
         </div>
