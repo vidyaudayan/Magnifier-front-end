@@ -152,7 +152,7 @@ export default function PricingPage() {
   };
   
   
-
+  
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -241,7 +241,7 @@ export default function PricingPage() {
 
 {showSlotModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded shadow-lg w-1/2">
+          <div className="bg-white p-6 rounded shadow-lg w-1/2 overflow-auto max-h-[10vh]">
             <h3 className="text-lg font-semibold mb-4">Select a Slot</h3>
             {availableSlots.length === 0 ? (
               <p className="text-gray-500">No available slots.</p>
@@ -269,36 +269,37 @@ export default function PricingPage() {
       )}
 
 
-{showConfirmationModal && confirmedSlot && (
-  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-    <div className="bg-white p-6 rounded shadow-lg w-1/2">
-      <h3 className="text-lg font-semibold mb-4">Confirm Your Booking</h3>
-      <p className="text-gray-700">
-        You've selected a slot from <strong>{confirmedSlot.startHour}:00</strong> 
-        to <strong>{confirmedSlot.endHour}:00</strong> for <strong>{selectedDuration} hours</strong>.
-      </p>
-      <p className="mt-3 text-md font-semibold text-gray-800">
-        Total Amount: ₹{selectedDuration * 30}
-      </p>
-      <p className="mt-2 text-gray-500">Do you want to proceed to payment?</p>
-      <div className="mt-4 flex justify-end">
-        <button
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          onClick={() => setShowConfirmationModal(false)}
-        >
-          Cancel
-        </button>
-        <button
-          className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          //onClick={() => navigate("/payment")}
-          onClick={handleConfirmBooking}
-        >
-          OK
-        </button>
-      </div>
+{showSlotModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center ">
+    <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg">
+      <h3 className="text-lg font-semibold mb-4">Select a Slot</h3>
+      
+      {availableSlots.length === 0 ? (
+        <p className="text-gray-500">No available slots.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto max-h-80">
+          {availableSlots.map((slot, index) => (
+            <button
+              key={index}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm md:text-base"
+              onClick={() => handleSlotSelection(slot)}
+            >
+              {slot.startHour}:00 - {slot.endHour}:00
+            </button>
+          ))}
+        </div>
+      )}
+
+      <button
+        className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        onClick={() => setShowSlotModal(false)}
+      >
+        Close
+      </button>
     </div>
   </div>
 )}
+
 
 
       </div>

@@ -44,6 +44,7 @@ import PricingPage from './pages/Pricing.jsx';
 import PaymentPage from './pages/Paymentpage.jsx';
 import VerificationPage from './pages/VerificationPage.jsx';
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
+import SearchResults from './pages/SearchResults.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -179,6 +180,10 @@ const router = createBrowserRouter([
       {
         path:"/success",
         element:<PaymentSuccess/>
+      },
+      {
+        path:"/search-results",
+        element:<SearchResults/>
       },
      
      

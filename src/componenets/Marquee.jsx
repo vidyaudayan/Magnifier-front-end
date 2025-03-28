@@ -3,7 +3,10 @@ import React from 'react'
 const Marquee = () => {
   return (
     <div>
-        <div className="marquee h-12 p-3 text-white bg-black ">
+        <div className="bg-[url('./assets/Images/marquee5.avif')] w-full h-12">
+
+        </div>
+        <div className="marquee h-20 p-5 text-white bg-[url('./assets/Images/marquee7.avif')] ">
     <div className="slides">
         <div className="slide">
             <span className="text-lg font-bold">
@@ -17,7 +20,12 @@ const Marquee = () => {
             </span>
 
         </div>
+        
     </div>
+   
+</div>
+<div className="bg-[url('./assets/Images/marquee5.avif')] w-full h-12">
+
 </div>
 </div>
   )

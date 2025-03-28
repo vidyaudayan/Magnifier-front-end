@@ -9,6 +9,7 @@ import { updateMetrics } from "../features/user/userSlice";
 import { updatePostReaction } from "../features/user/userSlice";
 import { useLocation } from "react-router-dom";
 import { useDispatch } from 'react-redux';
+import image from "../assets/Images/no post.avif"
 const SearchUserPost = () => {
     const dispatch = useDispatch();
     const { userId } = useParams();
@@ -62,9 +63,9 @@ const SearchUserPost = () => {
                 const { post, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
                 // Dispatch to Redux store
     
-                {/*setPosts(prevPosts =>
+                setPosts(prevPosts =>
         prevPosts.map(p => p._id === postId ? { ...p, ...post } : p)
-    );*/}
+    );
                 dispatch(updatePostReaction({ postId, updatedPost: post }));
                 dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
     
@@ -128,13 +129,13 @@ const SearchUserPost = () => {
     }, [userId]);
 
     return (
-        <div className="lg:mt-44">
+        <div className="lg:mt-44 ">
   <NavbarLanding />
 
   {/* Post Section */}
   {posts.length > 0 ? (
     posts.map((post) => (
-      <div key={post._id} className="bg-white border border-gray-300 p-8 mt-24 lg:mt-20 lg:mx-20 mx-10 rounded-lg">
+      <div key={post._id} className="bg-white border border-gray-300 p-8 mt-32 lg:mt-20 lg:mx-20 mx-10 rounded-lg">
         {/* Header: User Image, Name, and Date */}
         <div className="flex items-center space-x-4 mb-4">
           {post.userId?.profilePic ? (
@@ -272,7 +273,14 @@ const SearchUserPost = () => {
       </div>
     ))
   ) : user ? (
-    <p className="text-center text-gray-500 mt-10">No posts created by this user</p>
+    <div className="flex flex-col items-center mt-10">
+    <img 
+      src={image}
+      alt="No Posts" 
+      className="w-40 h-40 object-cover mt-32 mb-4"
+    />
+    <p className="text-center font-semibold text-lg text-gray-700">No posts created by this user</p>
+  </div>
   ) : (
     <p className="text-center text-gray-500 mt-10">Loading user data...</p>
   )}

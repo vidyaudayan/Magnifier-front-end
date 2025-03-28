@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+{/*import { useState, useEffect } from "react";
 import axios from "axios";
 
 const UserSearch = ({ onUserSelect }) => {
@@ -45,7 +45,7 @@ const UserSearch = ({ onUserSelect }) => {
 
   return (
     <div className="relative ml-12 w-[600px] lg:w-[625px]">
-      {/* Search Input */}
+     
       <input
         type="text"
         value={searchQuery}
@@ -54,7 +54,7 @@ const UserSearch = ({ onUserSelect }) => {
         className="border p-2 pl-4 w-full rounded-full"
       />
 
-      {/* Search Results */}
+ 
       {!selectedUser && searchResults.length > 0 && (
         <div className="absolute bg-white border border-gray-300 mt-1 w-full max-h-48 overflow-y-auto rounded-md shadow-lg z-10">
           {searchResults.map((user) => (
@@ -73,7 +73,7 @@ const UserSearch = ({ onUserSelect }) => {
           ))}
         </div>
       )}
-      {/* Handle No User Found */} 
+    
 {!selectedUser && searchQuery && searchResults.length === 0 && (
   <p className="mt-2 text-gray-500">No user available</p>
 )}
@@ -81,4 +81,37 @@ const UserSearch = ({ onUserSelect }) => {
   );
 };
 
+export default UserSearch;*/}
+
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+const UserSearch = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  return (
+    <div className="relative ml-12 w-[600px] lg:w-[625px]">
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search users..."
+        className="border p-2 pl-4 w-full rounded-full"
+      />
+      <button onClick={handleSearch} className="ml-2 p-2 bg-blue-500 text-white rounded-full">
+        Search
+      </button>
+    </div>
+  );
+};
+
 export default UserSearch;
+

@@ -339,15 +339,10 @@ export const LandingPage = () => {
                     // dispatch(setProfilePicture(updatedProfilePic));
                     //setProfilePic(data.user?.profilePic || ""); // Assuming API returns updated user
 
-
-                    const updatedProfilePic = response.data.user?.profilePic;
-
-                    // Update Redux state immediately after successful upload
-                    dispatch(setUserDetails({ ...response.data.user }));
-
-                    // Optionally, update the local state (if you're using one)
+                    const updatedProfilePic = `${response.data.user?.profilePic}?t=${Date.now()}`;
                     setProfilePic(updatedProfilePic);
-
+                    dispatch(setUserDetails({ ...response.data.user, profilePic: updatedProfilePic }));
+                  
                 } else {
                     console.error(response.data.error);
                 }
@@ -537,6 +532,9 @@ export const LandingPage = () => {
                         postCount, userName, profilePicture,
                     })
                 )
+                const updatedProfilePic = `${response.data.user?.profilePic}?t=${Date.now()}`;
+                setProfilePic(updatedProfilePic);
+                dispatch(setUserDetails({ ...response.data.user, profilePic: updatedProfilePic }));
 
             } catch (error) {
                 console.error("Error fetching metrics", error);
@@ -634,6 +632,13 @@ const handleOkClick = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      dispatch(setUserDetails(user)); // Reset to logged-in user on landing page
+    }
+  }, [dispatch, user]);
+  
+
   
 
     return (
@@ -641,21 +646,21 @@ const handleOkClick = () => {
             <NavbarLanding />
       
             {/* Left Section */}
-            <div className="lg:w-1/4 w-full max-h-[600px] bg-white border border-gray-300 rounded-lg lg:ml-32 ml-6 pl-4 p-4 space-y-4 shadow-sm ">
+            <div className="lg:w-1/4 w-full max-h-[600px] bg-white border border-gray-300 rounded-lg lg:ml-32 ml-6 pl-4 p-4 space-y-4 pt-4 mt-8 shadow-sm ">
              {/* User Info */}
                 <div className="text-center ">
                     <div
                         onClick={() => document.getElementById('profilePic').click()}
                         className="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-2 cursor-pointer flex justify-center items-center "
                     >
-                        {user?.profilePic ? (
+                        {metrics?.profilePicture ? (
                             <img
                                 src={
-                                    user.profilePic
-                                        ? `${user.profilePic}?t=${new Date().getTime()}`
+                                    metrics.profilePicture
+                                        ? `${metrics.profilePicture}?t=${new Date().getTime()}`
                                         : "/default-avatar.png"
                                 }
-                                //src={user.profilePic}
+                            
 
                                 alt="User"
                                 className="w-20 h-20 rounded-full"
@@ -663,6 +668,7 @@ const handleOkClick = () => {
                         ) : (
                             <span className="text-3xl text-gray-500">+</span>
                         )}
+                        {/*<img src={metrics.profilePicture}  className="w-20 h-20 rounded-full" alt="" />*/}
                     </div>
 
                     {/* {
@@ -677,7 +683,7 @@ const handleOkClick = () => {
                             className="text-lg font-semibold cursor-pointer"
                           
                         >
-                            {user?.username}
+                            {metrics?.userName}
                         </Link>
 
                         {isOverlayOpen && (
@@ -746,7 +752,7 @@ const handleOkClick = () => {
             </div>
 
             {/* Right Section */}
-            <div className="lg:w-2/4 w-full bg-white border border-gray-300 rounded-lg ml-6 lg:ml-16 shadow-sm p-6 mt-6">
+            <div className="lg:w-2/4 w-full bg-white border border-gray-300 rounded-lg ml-6 lg:ml-16 shadow-sm p-2 mt-8 ">
                 {/* Write a Post Section */}
 
 
@@ -755,9 +761,9 @@ const handleOkClick = () => {
                 <div className="flex items-center mb-6">
 
 
-                    {user?.profilePic ? (
+                    {metrics?.profilePicture ? (
                         <img
-                            src={user.profilePic}
+                            src={metrics.profilePicture}
                             alt="User"
                             className="w-12 h-12 rounded-full"
                         />
@@ -1010,9 +1016,9 @@ const handleOkClick = () => {
                                 </button>
 
                                 <div className="flex items-center mb-4">
-                                    {user?.profilePic ? (
+                                    {metrics?.profilePicture ? (
                                         <img
-                                            src={user.profilePic}
+                                            src={metrics.profilePicture}
                                             alt="User"
                                             className="w-6 h-6 rounded-full"
                                         />
@@ -1021,8 +1027,8 @@ const handleOkClick = () => {
                                     )}
 
                                     {
-                                        user?.username ? (
-                                            <p className="text-lg ml-4 font-semibold">{user?.username}</p>
+                                        metrics?.userName ? (
+                                            <p className="text-lg ml-4 font-semibold">{metrics?.userName}</p>
                                         ) : ("")
                                     }
                                 </div>

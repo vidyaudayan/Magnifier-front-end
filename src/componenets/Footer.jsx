@@ -8,7 +8,7 @@ import { FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
 const Footer = () => {
   return (
-    <footer className="bg-blue-600 lg:h-[300px] mt-10 text-black text-md font-medium py-2">
+    <footer className="bg-cyan-700 lg:h-[300px] mt-10 text-black text-md font-medium py-2">
       <div className="max-w-7xl mr-6 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap justify-between ">
           {/* Logo and About Section */}

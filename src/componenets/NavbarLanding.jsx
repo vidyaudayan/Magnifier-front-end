@@ -13,6 +13,8 @@ const NavbarLanding = ({ onUserSelect }) => {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -57,10 +59,15 @@ console.log("searchuser",response)
   };
 
   const handleInputChange = (e) => {
-    setSearchQuery(e.target.value);
+    const value = e.target.value;
+    setSearchQuery(value);
     setSelectedUser(null);
+  
+    if (value.trim()) {
+      navigate(`/search-results?query=${encodeURIComponent(value)}`);
+    }
   };
-
+  
   const handleLogout = async () => {
     try {
       await axios.post(
@@ -164,7 +171,7 @@ console.log("searchuser",response)
 
     {isOpen && (
       <div className="md:hidden bg-blue-700 px-4 pt-4 pb-6">
-      {/* Search Bar */}
+
       <input
         type="text"
         placeholder="Search for users..."
@@ -172,7 +179,7 @@ console.log("searchuser",response)
         value={searchQuery}
         onChange={handleInputChange}
       />
-      {/* Search Results */}
+     
       {!selectedUser && searchResults.length > 0 && (
         <div className="bg-slate-200 shadow-md rounded-md w-full z-10">
           {searchResults.map((user) => (

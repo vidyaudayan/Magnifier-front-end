@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { FaUser } from "react-icons/fa6";
 import coverpicture from "../assets/Images/coverpic1.jpg"
-
+import { setPosts } from "../features/user/userSlice";
 
 const ProfilePageUsers = () => {
     const dispatch = useDispatch();
@@ -141,15 +141,27 @@ const ProfilePageUsers = () => {
                     : `${import.meta.env.VITE_BASE_URL}/post/${postId}/dislike`;
 
             const response = await axios.patch(url, {}, {
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            });
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            }, { withCredentials: true });
 
-            dispatch(updatePostReaction({ postId, updatedPost: response.data.post }));
-            dispatch(updateMetrics(response.data));
+            const { post, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
+            // Dispatch to Redux store
+
+            setPosts(prevPosts =>
+                prevPosts.map(p => p._id === postId ? { ...p, ...post } : p)
+            );
+            dispatch(updatePostReaction({ postId, updatedPost: post }));
+            dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
+
+
+            //setPosts(prevPosts =>prevPosts.map(p => (p._id === postId ? { ...p, ...post } : p)));
         } catch (error) {
             console.error("Error updating reactions:", error);
         }
     };
+
+
+
 
     const handleAddComment = async (postId) => {
         if (!newComment.trim()) return;
@@ -176,7 +188,7 @@ const ProfilePageUsers = () => {
                 {coverPic ? (
                     <img src={coverPic} alt="Cover" className="w-full h-full object-cover" />
                 ) : (
-                  
+
                     <img src={coverpicture} className="w-full h-full flex items-center justify-center text-gray-500" alt="" />
                 )}
                 {/*<label htmlFor="coverPic" className="absolute top-4 right-4 bg-white px-4 py-2 rounded-md shadow-md cursor-pointer">
@@ -258,19 +270,37 @@ const ProfilePageUsers = () => {
 
 
                                 <div className="flex justify-between items-center mt-4">
-                                    <div className="flex gap-4">
-                                        <button className="text-blue-500 hover:scale-105" onClick={() => handleReaction(post._id, "like")}>
-                                            {post.likes || 0} Likes
-                                        </button>
-                                        <button className="text-red-500 hover:scale-105" onClick={() => handleReaction(post._id, "dislike")}>
-                                            {post.likes || 0} Dislikes
-                                        </button>
-                                    </div >
+                                <div className="flex gap-4">
+    <button className="text-blue-500 hover:scale-105">
+        {post.likes || 0} Likes
+    </button>
+    <button className="text-red-500 hover:scale-105">
+        {post.dislikes || 0} Dislikes {/* Changed to post.dislikes */}
+    </button>
+</div>
                                     <div className="p-1 mb-2">
                                         <p onClick={() => setCommentsVisible((prev) => !prev)} className="text-md text-slate-500  hover:scale-105 ">{post.comments?.length || 0} Comments</p>
                                     </div>
 
+
+
+
                                 </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex gap-4 text-md text-gray-700 mb-4">
+                                    <button onClick={() => handleReaction(post._id, 'like')} className="hover:text-blue-500">
+                                        👍 Like
+                                    </button>
+                                    <button onClick={() => handleReaction(post._id, 'dislike')} className="hover:text-red-500">
+                                        👎 Dislike
+                                    </button>
+                                    <button onClick={() => handleShare(post)} className="hover:text-green-500 text-md">
+                                        📤 Share
+                                    </button>
+                                </div>
+
+
                                 <div>
 
 
