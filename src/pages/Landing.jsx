@@ -27,6 +27,7 @@ import UserSearch from "../componenets/UserSearch.jsx";
 import { FaThumbtack } from "react-icons/fa";
 import { useParams } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
+import { Sidebar } from "lucide-react";
 
 //import { fetchMetrics, fetchPosts, updatePostReaction } from '../features/user/userSlice.js';
 export const LandingPage = () => {
@@ -644,7 +645,7 @@ const handleOkClick = () => {
     return (
         <div className="min-h-screen  bg-slate-50 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-28 mt-20">
             <NavbarLanding />
-      
+
             {/* Left Section */}
             <div className="lg:w-1/4 w-full max-h-[600px] bg-white border border-gray-300 rounded-lg lg:ml-32 ml-6 pl-4 p-4 space-y-4 pt-4 mt-8 shadow-sm ">
              {/* User Info */}
@@ -720,8 +721,8 @@ const handleOkClick = () => {
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                     <p className="text-sm font-medium">Reactions</p>
                     <div className="flex items-center space-x-3 mt-2">
-                        <span>👍 {metrics.totalLikes}</span>
-                        <span>👎 {metrics.totalDislikes}</span>
+                        <span>👍 {metrics.totalLikesReceived}</span>
+                        <span>👎 {metrics.totalDislikesReceived}</span>
                       
 
                     </div>

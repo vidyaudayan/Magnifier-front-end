@@ -60,8 +60,7 @@ const WelcomeNew = () => {
         ))}
       </div>
      
-      <Testimonials/>
-      <Marquee/>
+     
       <Footer/>
     </div>
   );

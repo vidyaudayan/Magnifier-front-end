@@ -44,7 +44,7 @@ const LoginForm = () => {
         navigate(postId ? `/posts?highlightPost=${postId}` : "/posts");
       }
     
-  
+      setLoading(false);
       if (dataApi.success) {
        
         fetchUserDetails(); 
@@ -84,6 +84,7 @@ const LoginForm = () => {
       
       
     } catch (error) {
+      setLoading(false);
       console.error('Error signing in:', error);
       toast.error('An error occurred during sign-in.');
     }
@@ -120,12 +121,19 @@ If you are a registered user, Please <span className="text-blue-600 ">login here
 
    {/* Submit Button */}
    <button
-     type="submit"
-     className="w-full bg-blue-600 hover:bg-blue-800 text-white py-2 rounded"
-   >
-     Log In
-   </button>
+  type="submit"
+  className={`w-full py-2 rounded ${
+    loading
+      ? "bg-blue-300 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-800 text-white"
+  }`}
+  disabled={loading}
+>
+  {loading ? "Logging in..." : "Log In"}
+</button>
+  
  </form>
+ 
 
  <div className="w-full text-left mt-2">
 <button
