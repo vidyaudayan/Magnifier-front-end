@@ -54,7 +54,14 @@ export const LandingPage = () => {
                 console.log("profile token", token)
                 const headers = { Authorization: `Bearer ${token}` };
             console.log(`Tracking impression for postId: ${postId}`);
-          await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${postId}`, {headers },{withCredentials:true});
+          await axios.post( `${import.meta.env.VITE_BASE_URL}/post/impression/${postId}`,
+            {}, 
+            { 
+              headers: { 
+                Authorization: `Bearer ${token}` 
+              },
+              withCredentials: true
+            });
           console.log('Post impression recorded for:', postId);
         } catch (error) {
           console.error('Error tracking impression:', error);
@@ -408,7 +415,12 @@ export const LandingPage = () => {
             return;
           }
       try {
-        const response =  await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${post._id}`);
+       const token = localStorage.getItem("token");
+        const response =  await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${post._id}`,{}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
         setImpressions(response.data.impressions);
       } catch (error) {
         console.error('Error tracking impression:', error);

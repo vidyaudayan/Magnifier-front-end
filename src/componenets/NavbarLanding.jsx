@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import BreadCrumbs from "./Breadcrumbs";
 import BreadCrumbsNew from "./BreadcrumbsNew";
 import { setSearchQuery } from "../features/search/searchSlice";
+import { SearchBar } from "./Searchbar";
 
 const NavbarLanding = ({ onUserSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -100,7 +101,7 @@ const NavbarLanding = ({ onUserSelect }) => {
   };
 
   // Responsive Search Component
-  const SearchBar = ({ isMobile = false }) => (
+  {/*const SearchBar = ({ isMobile = false }) => (
     <form 
       onSubmit={handleSearchSubmit}
       className={`flex ${isMobile ? 'w-full mb-4' : 'flex-grow max-w-2xl mx-4'}`}
@@ -124,7 +125,7 @@ const NavbarLanding = ({ onUserSelect }) => {
         Search
       </button>
     </form>
-  );
+  );*/}
 
   return (
     <header className="z-50 fixed top-0 w-full bg-blue-600 text-white shadow-lg">
@@ -141,7 +142,13 @@ const NavbarLanding = ({ onUserSelect }) => {
         {/* Desktop Navigation */}
         <div className="flex items-center gap-4">
         <div className="hidden md:flex items-center space-x-4 flex-grow justify-center">
-          <SearchBar />
+        <SearchBar 
+    isMobile={false} 
+    searchQuery={searchQuery}
+    handleInputChange={handleInputChange}
+    handleSearchSubmit={handleSearchSubmit}
+  />
+
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
@@ -190,7 +197,12 @@ const NavbarLanding = ({ onUserSelect }) => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-blue-700 px-4 pt-4 pb-6">
-          <SearchBar isMobile />
+          <SearchBar 
+    isMobile={true}
+    searchQuery={searchQuery}
+    handleInputChange={handleInputChange}
+    handleSearchSubmit={handleSearchSubmit}
+  />
           
           {user && (
             <button
