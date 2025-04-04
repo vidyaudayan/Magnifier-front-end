@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import {loadStripe} from '@stripe/stripe-js';
+
 
 export default function PaymentPage() {
   const location = useLocation();
@@ -17,41 +17,220 @@ export default function PaymentPage() {
     expiryDate: "",
     cvv: "",
   });
-
+  const [pendingPost, setPendingPost] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  
+  const loadScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        console.log('Razorpay SDK loaded successfully');
+        resolve(true);
+      };
+      script.onerror = () => {
+        console.error('Failed to load Razorpay SDK');
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
   // Handle input changes
   const handleChange = (e) => {
     setCardDetails({ ...cardDetails, [e.target.name]: e.target.value });
   };
 
+  useEffect(() => {
+    // Get pending post from localStorage
+    const postData = localStorage.getItem("pendingPost");
+    if (postData) {
+      setPendingPost(JSON.parse(postData));
+    }
+  }, []);
+
   // Handle payment submission
+  {/*const handlePayment = async () => {
+    setIsProcessing(true);
+    const token = localStorage.getItem('token');
+    
+    try {
+      // 1. First create payment intent on your backend
+      const paymentIntentResponse = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/create-payment-intent`,
+        {
+          amount: amount * 100, // in paise
+          postId: pendingPost?.draftId,
+          duration,
+          startHour,
+          endHour
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      const { order, paymentId } = paymentIntentResponse.data;
+  
+      // 2. Initialize Razorpay
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.id,
+        handler: async function (response) {
+          try {
+            // 3. Verify payment
+            const verificationResponse = await axios.post(
+              `${import.meta.env.VITE_BASE_URL}/user/verifypayment`,
+              {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                postId: pendingPost?.draftId,
+                duration,
+                startHour,
+                endHour,
+                amount: amount * 100, // CRITICAL: Pass amount in paise
+                paymentId // Pass the paymentId from first step
+              },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+  
+            if (verificationResponse.data.success) {
+              toast.success("Payment successful! Post pinned.");
+              navigate("/success");
+            } else {
+              toast.error("Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Verification error:", error);
+            toast.error("Payment processing failed");
+          }
+        }
+      };
+  
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+  
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Payment initialization failed");
+    } finally {
+      setIsProcessing(false);
+    }
+  };*/}
   const handlePayment = async () => {
     setIsProcessing(true);
     const token = localStorage.getItem('token');
-    const amountInPaise = amount * 100; 
-    const stripePromise = await loadStripe(`${import.meta.env.VITE_STRIPE_API_KEY}`)
+  
     try {
-      // Send payment request (Replace with actual Stripe API call)
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/user/payment`, {
-        amount: amountInPaise, 
-        duration,
-        startHour,
-        endHour,
-        cardDetails,
-      },{
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true, // Ensure this matches your backend's CORS setup
-      },);
-
-      toast.success("Payment successful! Your post is now pinned.");
-      navigate("/success"); 
+      // 1. First load Razorpay SDK
+      const razorpayLoaded = await loadRazorpayScript();
+      if (!razorpayLoaded) {
+        throw new Error('Failed to load payment gateway');
+      }
+  
+      // 2. Check if Razorpay is available
+      if (!window.Razorpay) {
+        throw new Error('Payment processor not available');
+      }
+  
+      // 3. Create payment intent
+      const intentResponse = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/create-payment-intent`,
+        {
+          amount: Math.round(amount * 100),
+          postId: pendingPost?.draftId,
+          duration,
+          startHour,
+          endHour
+        },
+        { 
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+  
+      const { order, paymentId } = intentResponse.data;
+  
+      // 4. Initialize Razorpay
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: "INR",
+        order_id: order.id,
+        name: "Your Service Name",
+        description: `Pinning post for ${duration} hours`,
+        handler: async (response) => {
+          await verifyPayment(response, paymentId, amount);
+        },
+        theme: {
+          color: "#3399cc"
+        }
+      };
+  
+      // 5. Create Razorpay instance
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+  
     } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Payment failed. Please try again.");
+      console.error("Payment error details:", {
+        message: error.message,
+        razorpayAvailable: !!window.Razorpay,
+        error
+      });
+      toast.error(error.message || "Payment initialization failed");
+    } finally {
+      setIsProcessing(false);
     }
-    setIsProcessing(false);
+  };
+ 
+  const verifyPayment = async (razorpayResponse, paymentId, amount) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/verifypayment`,
+        {
+          razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+          razorpay_order_id: razorpayResponse.razorpay_order_id,
+          razorpay_signature: razorpayResponse.razorpay_signature,
+          postId: pendingPost.draftId,
+          paymentId,
+          amount: Math.round(amount * 100),
+          duration,
+          startHour,
+          endHour
+        },
+        {
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+  
+      if (response.data.success) {
+        toast.success("Payment verified successfully!");
+        navigate("/success");
+      } else {
+        throw new Error(response.data.error || "Verification failed");
+      }
+    } catch (error) {
+      console.error("Verification failed:", error);
+      toast.error("Payment verification failed");
+      // Consider implementing retry logic here
+    }
   };
 
   return (

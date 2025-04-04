@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext,useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import Navbar from "../componenets/Navbar.jsx";
 import NavbarLanding from "../componenets/NavbarLanding.jsx";
 import { formatDate } from "../utils/dateUtils.js";
@@ -35,77 +35,78 @@ export const LandingPage = () => {
     const [pos, setPos] = useState(null);
     const navigate = useNavigate();
     const user = useSelector(state => state?.user?.user)
-  // const { user } = useSelector((state) => state.user);
-   
+    // const { user } = useSelector((state) => state.user);
+
     //const { walletAmount,  postCount } = useSelector((state) => state.user);
     //const totalLikes = useSelector(state => state?.user?.totalLikes);
     // totalDislikes = useSelector(state => state?.user?.totalDislikes);
     // Access Redux state
-    const {posts, walletAmount, totalLikes, totalDislikes, postCount, } = useSelector(
+    const { posts, walletAmount, totalLikes, totalDislikes, postCount, } = useSelector(
         (state) => state.user
     );
 
-    
-      const trackPostImpression = async (postId) => {
-        
-        try
-        {
-            const token = localStorage.getItem('token');
-                console.log("profile token", token)
-                const headers = { Authorization: `Bearer ${token}` };
-            console.log(`Tracking impression for postId: ${postId}`);
-          await axios.post( `${import.meta.env.VITE_BASE_URL}/post/impression/${postId}`,
-            {}, 
-            { 
-              headers: { 
-                Authorization: `Bearer ${token}` 
-              },
-              withCredentials: true
-            });
-          console.log('Post impression recorded for:', postId);
-        } catch (error) {
-          console.error('Error tracking impression:', error);
-        }
-      };
+    const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
-      useEffect(() => {
+
+    const trackPostImpression = async (postId) => {
+
+        try {
+            const token = localStorage.getItem('token');
+            console.log("profile token", token)
+            const headers = { Authorization: `Bearer ${token}` };
+            console.log(`Tracking impression for postId: ${postId}`);
+            await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${postId}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    withCredentials: true
+                });
+            console.log('Post impression recorded for:', postId);
+        } catch (error) {
+            console.error('Error tracking impression:', error);
+        }
+    };
+
+    useEffect(() => {
         postRefs.current = postRefs.current.slice(0, posts.length);
-    
+
         const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                const postId = entry.target.getAttribute("data-post-id");
-                if (postId) {
-                  trackPostImpression(postId);
-                  observer.unobserve(entry.target); // Track only once
-                }
-              }
-            });
-          },
-          { threshold: 0.5 } // 50% of post is visible
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const postId = entry.target.getAttribute("data-post-id");
+                        if (postId) {
+                            trackPostImpression(postId);
+                            observer.unobserve(entry.target); // Track only once
+                        }
+                    }
+                });
+            },
+            { threshold: 0.5 } // 50% of post is visible
         );
-    
+
         postRefs.current.forEach((ref) => {
-          if (ref) observer.observe(ref);
+            if (ref) observer.observe(ref);
         });
-    
+
         return () => {
-          postRefs.current.forEach((ref) => {
-            if (ref) observer.unobserve(ref);
-          });
+            postRefs.current.forEach((ref) => {
+                if (ref) observer.unobserve(ref);
+            });
         };
-      }, [posts]);
-    
-    
+    }, [posts]);
+
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, "0");
         const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
-      };
-      
+    };
+
     //const posts = useSelector(state => state.posts?.posts|| []);
     console.log("user header", user)
     const dispatch = useDispatch();
@@ -116,7 +117,7 @@ export const LandingPage = () => {
     const [stickyDuration, setStickyDuration] = useState("3600000");
     const [showPopup, setShowPopup] = useState(false);
     const [selectedDuration, setSelectedDuration] = useState(null);
-    
+
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [postOverlayOpen, setPostOverlayOpen] = useState(false);
@@ -158,14 +159,14 @@ export const LandingPage = () => {
     const handleDurationClick = (durationText) => {
         setSelectedDuration(durationText);
         setShowPopup(true);
-      };
+    };
 
     const handleViewMore = (postId) => {
         setExpandedPosts((prev) => ({
-          ...prev,
-          [postId]: !prev[postId], // Toggle the expanded state
+            ...prev,
+            [postId]: !prev[postId], // Toggle the expanded state
         }));
-      };
+    };
 
     const handleAddComment = async (postId) => {
         if (!newComment.trim()) return;
@@ -191,8 +192,8 @@ export const LandingPage = () => {
             dispatch(setPosts(posts.map((post) =>
                 post._id === postId ? { ...post, comments: updatedPost.comments } : post
             )));
-    
-            
+
+
             setNewComment("");
         } catch (error) {
             console.error("Error adding comment:", error);
@@ -228,7 +229,7 @@ export const LandingPage = () => {
                     userId: posts.find(p => p._id === postId)?.userId || post.userId, // Keep existing userId data
                 }
             }));
-            
+
             dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
 
 
@@ -269,7 +270,7 @@ export const LandingPage = () => {
         };
 
         //setPosts((prevPosts) => [tempPost, ...prevPosts]);
-           setLoading(true)
+        setLoading(true)
         try {
             const formData = new FormData();
 
@@ -282,8 +283,8 @@ export const LandingPage = () => {
             formData.append('content', postContent || '');
             if (photo) formData.append("media", photo);
             if (VoiceNote) formData.append("media", VoiceNote);
-            //formData.append("stickyDuration", stickyDuration);
-           
+            formData.append("stickyDuration", stickyDuration);
+
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
 
@@ -350,7 +351,7 @@ export const LandingPage = () => {
                     const updatedProfilePic = `${response.data.user?.profilePic}?t=${Date.now()}`;
                     setProfilePic(updatedProfilePic);
                     dispatch(setUserDetails({ ...response.data.user, profilePic: updatedProfilePic }));
-                  
+
                 } else {
                     console.error(response.data.error);
                 }
@@ -366,24 +367,24 @@ export const LandingPage = () => {
 
     const handleShare = (post) => {
         const postId = post._id; // Use the actual post's ID
-       // const isLoggedIn = !!localStorage.getItem("token"); // Check login status
-       const isLoggedIn = localStorage.getItem("token") !== null; 
-       const shareUrl = isLoggedIn
+        // const isLoggedIn = !!localStorage.getItem("token"); // Check login status
+        const isLoggedIn = localStorage.getItem("token") !== null;
+        const shareUrl = isLoggedIn
             ? `${window.location.origin}/displaypost?postId=${postId}`
             : `${window.location.origin}/signup?postId=${postId}`;
-            if (navigator.share) {
-                navigator.share({
-                    title: "Check out this post!",
-                    text: "Here's a great post for you to read!",
-                    url: shareUrl,
-                })
+        if (navigator.share) {
+            navigator.share({
+                title: "Check out this post!",
+                text: "Here's a great post for you to read!",
+                url: shareUrl,
+            })
                 .then(() => console.log("Successfully shared!"))
                 .catch((error) => console.error("Error sharing:", error));
-            } else {
-                navigator.clipboard.writeText(shareUrl)
-                    .then(() => alert("Link copied to clipboard!"))
-                    .catch((error) => console.error("Failed to copy:", error));
-            }
+        } else {
+            navigator.clipboard.writeText(shareUrl)
+                .then(() => alert("Link copied to clipboard!"))
+                .catch((error) => console.error("Failed to copy:", error));
+        }
     };
 
     const location = useLocation();
@@ -407,46 +408,26 @@ export const LandingPage = () => {
     };
 
 
-    // Track impression when component mounts
-  {/*useEffect(() => {
-    const trackImpression = async () => {
-        if (!pos?._id) {
-            console.error('Post ID is undefined');
-            return;
-          }
-      try {
-       const token = localStorage.getItem("token");
-        const response =  await axios.post(`${import.meta.env.VITE_BASE_URL}/post/impression/${post._id}`,{}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-        setImpressions(response.data.impressions);
-      } catch (error) {
-        console.error('Error tracking impression:', error);
-      }
-    };
-    trackImpression();
-  }, [pos]);*/}
-  
+
+
 
     useEffect(() => {
         console.log("postId:", postId)
         const fetchPost = async () => {
-          try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post/${postId}`);
-            setPos(response.data);
-            console.log("post impression",response.data)
-          } catch (error) {
-            console.error('Error fetching post:', error);
-          }
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post/${postId}`);
+                setPos(response.data);
+                console.log("post impression", response.data)
+            } catch (error) {
+                console.error('Error fetching post:', error);
+            }
         };
-      
+
         if (postId) {
-          fetchPost();
+            fetchPost();
         }
-      }, [postId]);
-      
+    }, [postId]);
+
 
     const fetchUserPosts = async () => {
         try {
@@ -535,7 +516,7 @@ export const LandingPage = () => {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 }, { withCredentials: true });
                 setMetrics(response.data);
-                const {  userName, profilePicture,walletAmount, totalLikes, totalDislikes, postCount } = response.data;
+                const { userName, profilePicture, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
 
                 // Dispatch fetched metrics to Redux store
                 dispatch(
@@ -610,21 +591,21 @@ export const LandingPage = () => {
         setSelectedUser(null); // Clear selected user if query changes
     }
 
-    
-useEffect(() => {
-    const interval = setInterval(async () => {
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, ); 
-            dispatch(setPosts(response.data)); // Update Redux store
-        } catch (error) {
-            console.error("Error fetching posts:", error.response ? error.response.data : error.message);
-        }
-    }, 300000); 
 
-    return () => clearInterval(interval);
-}, [dispatch]);
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`,);
+                dispatch(setPosts(response.data)); // Update Redux store
+            } catch (error) {
+                console.error("Error fetching posts:", error.response ? error.response.data : error.message);
+            }
+        }, 300000);
 
-const handleOkClick = () => {
+        return () => clearInterval(interval);
+    }, [dispatch]);
+
+    {/*const handleOkClick = () => {
     const postData = {
       content: postContent,
       media: photoPreview,
@@ -633,26 +614,70 @@ const handleOkClick = () => {
   
     localStorage.setItem("pendingPost", JSON.stringify(postData));
     navigate("/pricing"); // Redirect to pricing page
-  };
-  
-  useEffect(() => {
-    const savedPost = JSON.parse(localStorage.getItem("pendingPost"));
-    if (savedPost) {
-      setPostContent(savedPost.content || "");
-      setPhotoPreview(savedPost.media || null);
-      setVoiceNote(savedPost.voiceNote || null);
-      setStickyDuration(savedPost.stickyDuration || ""); // Now it includes the selected duration
-    }
-  }, []);
+  };*/}
+    const handleOkClick = async () => {
+        try {
+            // 1. Show loading state
+            setLoading(true);
 
-  useEffect(() => {
-    if (user) {
-      dispatch(setUserDetails(user)); // Reset to logged-in user on landing page
-    }
-  }, [dispatch, user]);
-  
+            // 2. First save to backend as draft
+            const formData = new FormData();
+            formData.append('content', postContent);
+            formData.append('status', 'draft');
+            formData.append('stickyDuration', selectedDuration);
+            if (photo) formData.append('media', photo);
+            if (VoiceNote) formData.append('voiceNote', VoiceNote);
 
-  
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}/post/createdraftpost`,
+                formData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+            const postId = response.data.post._id;
+            if (!postId) {
+                toast.error("Failed to get draft ID from server");
+                return;
+            }
+            // 3. Store minimal data in localStorage
+            localStorage.setItem("pendingPost", JSON.stringify({
+                draftId: postId, // ID from backend
+                stickyDuration: stickyDuration // Include selected duration
+            }));
+
+            // 4. Navigate to pricing
+            navigate("/pricing");
+
+        } catch (error) {
+            console.error("Error saving draft:", error);
+            toast.error("Failed to save post draft");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const savedPost = JSON.parse(localStorage.getItem("pendingPost"));
+        if (savedPost) {
+            setPostContent(savedPost.content || "");
+            setPhotoPreview(savedPost.media || null);
+            setVoiceNote(savedPost.voiceNote || null);
+            setStickyDuration(savedPost.stickyDuration || ""); // Now it includes the selected duration
+        }
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            dispatch(setUserDetails(user)); // Reset to logged-in user on landing page
+        }
+    }, [dispatch, user]);
+
+
+
 
     return (
         <div className="min-h-screen  bg-slate-50 flex flex-col lg:flex-row gap-4 pr-8 py-4 lg:mt-28 mt-20">
@@ -660,7 +685,7 @@ const handleOkClick = () => {
 
             {/* Left Section */}
             <div className="lg:w-1/4 w-full max-h-[600px] bg-white border border-gray-300 rounded-lg lg:ml-32 ml-6 pl-4 p-4 space-y-4 pt-4 mt-8 shadow-sm ">
-             {/* User Info */}
+                {/* User Info */}
                 <div className="text-center ">
                     <div
                         onClick={() => document.getElementById('profilePic').click()}
@@ -673,7 +698,7 @@ const handleOkClick = () => {
                                         ? `${metrics.profilePicture}?t=${new Date().getTime()}`
                                         : "/default-avatar.png"
                                 }
-                            
+
 
                                 alt="User"
                                 className="w-20 h-20 rounded-full"
@@ -694,7 +719,7 @@ const handleOkClick = () => {
                     <div className="relative inline-block">
                         <Link to="/profile"
                             className="text-lg font-semibold cursor-pointer"
-                          
+
                         >
                             {metrics?.userName}
                         </Link>
@@ -735,7 +760,7 @@ const handleOkClick = () => {
                     <div className="flex items-center space-x-3 mt-2">
                         <span>👍 {metrics.totalLikesReceived}</span>
                         <span>👎 {metrics.totalDislikesReceived}</span>
-                      
+
 
                     </div>
                 </div>
@@ -749,7 +774,7 @@ const handleOkClick = () => {
 
                 {/* Posts Impressions */}
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
-                <p  className="text-sm font-medium">Posts Impressions</p>
+                    <p className="text-sm font-medium">Posts Impressions</p>
                     <p className="text-lg font-bold text-blue-600">{metrics.totalImpressions}</p>
 
                 </div>
@@ -760,7 +785,7 @@ const handleOkClick = () => {
                 {/* Settings */}
                 <div className="flex items-center space-x-2 pb-4 mb-4 cursor-pointer ">
                     <IoSettings />
-                    <Link to="/settings"  className="text-sm font-medium cursor-pointer ">Settings</Link>
+                    <Link to="/settings" className="text-sm font-medium cursor-pointer ">Settings</Link>
                 </div>
             </div>
 
@@ -769,7 +794,7 @@ const handleOkClick = () => {
                 {/* Write a Post Section */}
 
 
-                
+
 
                 <div className="flex items-center mb-6">
 
@@ -790,7 +815,7 @@ const handleOkClick = () => {
                     <div
                         className="ml-4 bg-gray-50 border border-gray-300 rounded-md p-2 w-full cursor-pointer"
                         onClick={() => setPostOverlayOpen(true)}
-                    
+
                     >
                         Write a post...
                     </div>
@@ -798,26 +823,26 @@ const handleOkClick = () => {
                 </div>
 
                 {/* Posts Section */}
-                {posts.map((post,index) => (
+                {posts.map((post, index) => (
                     <div
-                        key={post._id}  data-post-id={post._id}
+                        key={post._id} data-post-id={post._id}
                         ref={(el) => (postRefs.current[index] = el)}
                         // className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4"
-                       //className={`bg-white ${post._id === highlightPostId ? "bg-yellow-300" : ""
-                            //} border border-gray-300 rounded-lg shadow-sm mb-6 p-4 ${selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""
-                           // }`}
-                           className={`relative bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4 
+                        //className={`bg-white ${post._id === highlightPostId ? "bg-yellow-300" : ""
+                        //} border border-gray-300 rounded-lg shadow-sm mb-6 p-4 ${selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""
+                        // }`}
+                        className={`relative bg-white border border-gray-300 rounded-lg shadow-sm mb-6 p-4 
                             ${post._id === highlightPostId ? "bg-yellow-300" : ""} 
                             ${selectedUser && post.userId === selectedUser._id ? "bg-blue-500" : ""}`}
-                           
+
                     >
 
-                          {/* 📌 Pin Icon for Pinned Posts */}
-        {post.sticky && (
-            <div className="absolute top-2 right-2 text-yellow-500">
-                <FaThumbtack size={20} />
-            </div>
-        )}
+                        {/* 📌 Pin Icon for Pinned Posts */}
+                        {post.sticky && (
+                            <div className="absolute top-2 right-2 text-yellow-500">
+                                <FaThumbtack size={20} />
+                            </div>
+                        )}
 
                         {/* Header: User Image, Name, and Date */}
                         <div className="flex items-center space-x-4 mb-4">
@@ -855,7 +880,7 @@ const handleOkClick = () => {
                         {/* Post Content */}
                         <div className="mb-4">
                             <p className="text-sm text-gray-800">
-                                {post.content && post.content.split(" ").length > 8 && !expandedPosts[post._id]  ? (
+                                {post.content && post.content.split(" ").length > 8 && !expandedPosts[post._id] ? (
                                     <>
                                         {post.content.split(" ").slice(0, 8).join(" ")}...{" "}
                                         <button
@@ -867,16 +892,16 @@ const handleOkClick = () => {
                                     </>
                                 ) : (
                                     <>
-        {post.content || "No content available"}
-        {post.content.split(" ").length > 8 && (
-          <button
-            className="text-blue-500 hover:underline text-xs ml-2"
-            onClick={() => handleViewMore(post._id)}
-          >
-             Less
-          </button>
-        )}
-      </>
+                                        {post.content || "No content available"}
+                                        {post.content.split(" ").length > 8 && (
+                                            <button
+                                                className="text-blue-500 hover:underline text-xs ml-2"
+                                                onClick={() => handleViewMore(post._id)}
+                                            >
+                                                Less
+                                            </button>
+                                        )}
+                                    </>
                                 )}
                             </p>
                             {post.postType === "Photo" && (
@@ -901,11 +926,11 @@ const handleOkClick = () => {
                                 <p className="hover:text-green-500">{post.likes || 0} Likes</p>
                                 <p className="hover:text-red-500">{post.dislikes || 0} Dislikes</p>
                             </div>
-                           
+
                             <div className="px-1">
                                 <p onClick={() => setCommentsVisible((prev) => !prev)} className="hover:text-blue-500 ">{post.comments?.length || 0} Comments</p>
                             </div>
-                         
+
                         </div>
 
                         {/* Action Buttons */}
@@ -1014,12 +1039,12 @@ const handleOkClick = () => {
                 }
 
                 {/* Post Overlay */}
-                {
+                {/*{
                     postOverlayOpen && (
                         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
                             <div className="bg-white relative rounded-lg shadow-lg w-3/4 lg:w-1/2 p-6">
 
-                                {/* Close Button */}
+                                
                                 <button
                                     onClick={() => setPostOverlayOpen(false)}
                                     className="absolute top-4 right-4 text-black text-2xl"
@@ -1054,50 +1079,50 @@ const handleOkClick = () => {
                                 />
 
 
-                            {/* Sticky Duration Dropdown */}
-            <div className="mb-6">
-              <label className="block  text-gray-700 mb-2">
-                Display your  post on Top For:
-              </label>
-              <select
-                value={stickyDuration}
-                onChange={(e) => {
-                    setStickyDuration(e.target.value);
-                    handleDurationClick(e.target.options[e.target.selectedIndex].text);
-                  }}
-                
-                className="w-full p-2 border border-gray-300 rounded  focus:outline-none focus:ring-2 focus:ring-blue-200"
-              >
-             
-                <option value="3600000">1 Hour</option>
-                <option value="10800000">3 Hours</option>
-                <option value="21600000">6 Hours</option>
-                <option value="43200000">12 Hours</option>
-              </select>
-              {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white w-72 h-54 p-5 rounded shadow-lg">
-            <p className="mb-4">
-              Hi {user.username}, Pin Posts are a premium service on the Web Magnifier platform. To view pricing and available time slots, please click on Ok
-            </p>
-            <button
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 hover:scale-105 text-white rounded"
-              onClick={() => setShowPopup(false)}
-            >
-              Close
-            </button>
-            <button
-                className="px-4 py-2 ml-2 w-16 bg-blue-500 hover:bg-blue-600 hover:scale-105 text-white rounded"
-                onClick={handleOkClick} 
-              >
-                OK
-              </button>
-          </div>
-        </div>
-      )}
-            </div>
+                                
+                                <div className="mb-6">
+                                    <label className="block  text-gray-700 mb-2">
+                                        Display your  post on Top For:
+                                    </label>
+                                    <select
+                                        value={stickyDuration}
+                                        onChange={(e) => {
+                                            setStickyDuration(e.target.value);
+                                            handleDurationClick(e.target.options[e.target.selectedIndex].text);
+                                        }}
 
-            
+                                        className="w-full p-2 border border-gray-300 rounded  focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    >
+                                        <option value="0">Please select time durarion</option>
+                                        <option value="3600000">1 Hour</option>
+                                        <option value="10800000">3 Hours</option>
+                                        <option value="21600000">6 Hours</option>
+                                        <option value="43200000">12 Hours</option>
+                                    </select>
+                                    {showPopup && (
+                                        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                                            <div className="bg-white w-72 h-54 p-5 rounded shadow-lg">
+                                                <p className="mb-4">
+                                                    Hi {user.username}, Pin Posts are a premium service on the Web Magnifier platform. To view pricing and available time slots, please click on Ok
+                                                </p>
+                                                <button
+                                                    className="px-4 py-2 bg-red-500 hover:bg-red-600 hover:scale-105 text-white rounded"
+                                                    onClick={() => setShowPopup(false)}
+                                                >
+                                                    Close
+                                                </button>
+                                                <button
+                                                    className="px-4 py-2 ml-2 w-16 bg-blue-500 hover:bg-blue-600 hover:scale-105 text-white rounded"
+                                                    onClick={handleOkClick}
+                                                >
+                                                    OK
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+
 
 
                                 <div className="flex items-center justify-between">
@@ -1150,7 +1175,141 @@ const handleOkClick = () => {
                             </div>
                         </div>
                     )
-                }
+                }*/}
+
+
+                {postOverlayOpen && (
+                    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white relative rounded-lg shadow-lg w-3/4 lg:w-1/2 p-6">
+                            {/* Close Button */}
+                            <button
+                                onClick={() => setPostOverlayOpen(false)}
+                                className="absolute top-4 right-4 text-black text-2xl"
+                                aria-label="Close"
+                            >
+                                <IoCloseSharp />
+                            </button>
+
+                            {/* User Info */}
+                            <div className="flex items-center mb-4">
+                                {metrics?.profilePicture ? (
+                                    <img
+                                        src={metrics.profilePicture}
+                                        alt="User"
+                                        className="w-8 h-8 rounded-full"
+                                    />
+                                ) : (
+                                    <span className="text-3xl text-gray-500">U</span>
+                                )}
+                                {metrics?.userName && (
+                                    <p className="text-lg ml-4 font-semibold">{metrics.userName}</p>
+                                )}
+                            </div>
+
+                            {/* Post Content */}
+                            <textarea
+                                value={postContent}
+                                onChange={(e) => setPostContent(e.target.value)}
+                                placeholder="What's on your mind?"
+                                className="w-full border border-gray-300 rounded-md p-3 mb-4 text-sm focus:outline-none focus:ring focus:ring-blue-200 resize-none"
+                            />
+
+                            {/* Upload Photo */}
+                            <div className="mb-4">
+                                <label className="block font-medium text-gray-700">Add Photo</label>
+                                <label className="bg-gray-100 p-2 rounded-md hover:bg-gray-200 cursor-pointer block w-full text-center">
+                                    📷 Choose a Photo
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        name="media"
+                                        className="hidden"
+                                        onChange={handlePhotoUpload}
+                                    />
+                                </label>
+                                {photoPreview && (
+                                    <img
+                                        src={photoPreview}
+                                        alt="Selected"
+                                        className="w-full max-h-64 object-contain rounded-md border border-gray-300 mt-2"
+                                    />
+                                )}
+                            </div>
+
+                            {/* Upload Voice Note */}
+                            <div className="mb-4">
+                                <label className="block font-medium text-gray-700">Add Voice Note</label>
+                                <label className="bg-gray-100 p-2 rounded-md hover:bg-gray-200 cursor-pointer block w-full text-center">
+                                    🎤 Choose a Voice Note
+                                    <input
+                                        type="file"
+                                        accept="audio/*"
+                                        className="hidden"
+                                        name="media"
+                                        onChange={handleVoiceNoteUpload}
+                                    />
+                                </label>
+                                {VoiceNote && (
+                                    <p className="text-gray-600 mt-2">{VoiceNote.name}</p>
+                                )}
+                            </div>
+
+                            {/* Sticky Duration */}
+                            <div className="mb-4">
+                                <label className="block p-2 font-medium text-gray-700">
+                                    Display your post on Top For
+                                </label>
+                                <select
+                                    value={stickyDuration}
+                                    onChange={(e) => {
+                                        setStickyDuration(e.target.value);
+                                        handleDurationClick(e.target.options[e.target.selectedIndex].text);
+                                    }}
+                                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                >
+                                    <option value="0">Please select time duration</option>
+                                    <option value="3600000">1 Hour</option>
+                                    <option value="10800000">3 Hours</option>
+                                    <option value="21600000">6 Hours</option>
+                                    <option value="43200000">12 Hours</option>
+                                </select>
+                                {showPopup && (
+                                    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                                        <div className="bg-white w-72 h-54 p-5 rounded shadow-lg">
+                                            <p className="mb-4">
+                                                Hi {user.username}, Pin Posts are a premium service on the Web Magnifier platform. To view pricing and available time slots, please click on Ok
+                                            </p>
+                                            <button
+                                                className="px-4 py-2 bg-red-500 hover:bg-red-600 hover:scale-105 text-white rounded"
+                                                onClick={() => setShowPopup(false)}
+                                            >
+                                                Close
+                                            </button>
+                                            <button
+                                                className="px-4 py-2 ml-2 w-16 bg-blue-500 hover:bg-blue-600 hover:scale-105 text-white rounded"
+                                                onClick={handleOkClick}
+                                            >
+                                                OK
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Post Button */}
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={handleCreatePost}
+                                    disabled={loading}
+                                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                                >
+                                    {loading ? "Posting..." : "Post"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
             </div >
 
         </div >

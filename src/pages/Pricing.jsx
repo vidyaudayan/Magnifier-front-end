@@ -48,20 +48,26 @@ export default function PricingPage() {
       socket.off("slotBooked");
     };
   }, []);
-
   const fetchAvailableSlots = async (duration) => {
-    if (!duration) {
-      console.error("Invalid duration:", duration);
-      return;
-    }
-
     try {
-      console.log("Fetching slots for duration:", duration);
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/admin/available-slots?duration=${duration}`);
-      setAvailableSlots(response.data);
-      console.log("Slots received:", response.data);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
+        {
+          params: { duration: Number(duration) },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+  
+      // Validate slots before setting state
+      const validSlots = response.data.filter(slot => 
+        Number(slot.startHour) < Number(slot.endHour)
+      );
+  
+      setAvailableSlots(validSlots);
     } catch (error) {
-      console.error("Error fetching slots:", error);
+      console.error("Error fetching slots:", error.response?.data || error.message);
     }
   };
 
@@ -82,21 +88,47 @@ export default function PricingPage() {
   const handleSlotSelection = async (slot) => {
     try {
 
+       // Convert to numbers explicitly
+    const startHour = Number(slot.startHour);
+    const endHour = Number(slot.endHour);
+    const duration = Number(selectedDuration)
+   // Get the correct post ID from localStorage
+   const pendingPost = JSON.parse(localStorage.getItem('pendingPost'));
+   const postId = pendingPost?.draftId;
+
+   if (!postId) {
+     toast.error("No draft post found");
+     return;
+   }
+
+
+    // Client-side validation
+    if (startHour >= endHour) {
+      toast.error("End time must be after start time");
+      return;
+    }
+
+
       const token = localStorage.getItem('token');
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slot`,{
+const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slot`,{
     
-        startHour: slot.startHour,
-        endHour: slot.endHour
+        startHour,
+        endHour,duration,postId
       },{
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true, // Ensure this matches your backend's CORS setup
       }, );
 
-      toast.success("Slot booked successfully!");
-      setShowSlotModal(false);
-      setConfirmedSlot(slot);  
-  setShowConfirmationModal(true);
-      socket.emit("slotBooked");
+      if (response.data.success) {
+        toast.success("Slot booked successfully!");
+        setShowSlotModal(false);
+        //setConfirmedSlot(slot);
+        setConfirmedSlot({ startHour, endHour,duration })
+        setShowConfirmationModal(true);
+        socket.emit("slotBooked");
+      } else {
+        toast.error(response.data.error || "Failed to book slot");
+      }
     } catch (error) {
       console.error("Error booking slot:", error);
       toast.error("Failed to book slot.");
@@ -130,6 +162,7 @@ export default function PricingPage() {
 
   const handleConfirmBooking = async () => {
     try {
+      const duration = Number(selectedDuration);
       const pricing = {
         1: 30,
         3: 90,
@@ -137,14 +170,15 @@ export default function PricingPage() {
         12: 360,
       };
   
-      const amount = pricing[selectedDuration] || 0;
+      const amount = pricing[duration] || 0;
       navigate("/payment", {
         state: {
-          duration: selectedDuration,
+          duration,
           startHour: confirmedSlot.startHour,
-          endHour: confirmedSlot.endHour, amount
+          endHour: confirmedSlot.endHour, amount, currency: "INR"
         },
       });
+      setShowConfirmationModal(false);
     } catch (error) {
       console.error("Error confirming booking:", error);
       toast.error("Failed to proceed to payment.");
@@ -299,7 +333,36 @@ export default function PricingPage() {
     </div>
   </div>
 )}
-
+{showConfirmationModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+      <h3 className="text-lg font-semibold mb-4">Slot Booked Successfully!</h3>
+      <p className="mb-4">
+        Your slot from {confirmedSlot.startHour}:00 to {confirmedSlot.endHour}:00 has been reserved.
+      </p>
+      <p className="mb-4 font-bold">
+        Total Amount: ₹{selectedDuration === 1 ? 30 : 
+                        selectedDuration === 3? 90 : 
+                        selectedDuration === 6 ? 180 : 
+                        selectedDuration == 12 ? 360 : 0}
+      </p>
+      <div className="flex justify-end space-x-4">
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          onClick={() => setShowConfirmationModal(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          onClick={handleConfirmBooking}
+        >
+          Proceed to Payment
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 
       </div>
