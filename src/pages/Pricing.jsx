@@ -44,6 +44,25 @@ export default function PricingPage() {
 
     });
 
+   
+
+    return () => {
+      socket.off("slotBooked");
+    };
+  }, []);
+
+
+  useEffect(() => {
+    socket.on("slotBooked", (bookedSlot) => {
+      // Remove the booked slot from available slots
+      setAvailableSlots(prevSlots => 
+        prevSlots.filter(s => 
+          !(s.startHour === bookedSlot.startHour && 
+            s.endHour === bookedSlot.endHour)
+        )
+      );
+    });
+  
     return () => {
       socket.off("slotBooked");
     };
@@ -71,6 +90,31 @@ export default function PricingPage() {
     }
   };
 
+  
+useEffect(() => {
+  const handleSlotBooked = (bookedSlot) => {
+      setAvailableSlots(prev => 
+          prev.filter(s => 
+              !(s.startHour === bookedSlot.startHour && 
+                s.endHour === bookedSlot.endHour)
+          )
+      );
+  };
+
+  const handleSlotReleased = (releasedSlot) => {
+      if (releasedSlot.duration === selectedDuration) {
+          setAvailableSlots(prev => [...prev, releasedSlot]);
+      }
+  };
+
+  socket.on("slotBooked", handleSlotBooked);
+  socket.on("slotReleased", handleSlotReleased);
+
+  return () => {
+      socket.off("slotBooked", handleSlotBooked);
+      socket.off("slotReleased", handleSlotReleased);
+  };
+}, [selectedDuration]);
 
 
   const handleDurationChange = (event) => {
@@ -85,7 +129,7 @@ export default function PricingPage() {
 
 
 
-  const handleSlotSelection = async (slot) => {
+  {/*const handleSlotSelection = async (slot) => {
     try {
 
        // Convert to numbers explicitly
@@ -133,7 +177,7 @@ const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slo
       console.error("Error booking slot:", error);
       toast.error("Failed to book slot.");
     }
-  };
+  };*/}
 
   {/*const handleConfirmBooking = async () => {
     try {
@@ -159,6 +203,41 @@ const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slo
       toast.error("Failed to book slot.");
     }
   };*/}
+
+  const handleSlotSelection = async (slot) => {
+    try {
+      const token = localStorage.getItem('token');
+      const pendingPost = JSON.parse(localStorage.getItem('pendingPost'));
+      
+      if (!pendingPost?.draftId) {
+        toast.error("No draft post found");
+        return;
+      }
+  
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/admin/book-slot`,
+        {
+          startHour: slot.startHour,
+          endHour: slot.endHour,
+          duration: selectedDuration,
+          postId: pendingPost.draftId
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+  
+      if (response.data.success) {
+        toast.success("Slot reserved!");
+        setConfirmedSlot(slot);
+        setShowConfirmationModal(true);
+        socket.emit("slotBooked"); // Notify other clients
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      toast.error(error.response?.data?.error || "Booking failed");
+    }
+  };
 
   const handleConfirmBooking = async () => {
     try {
@@ -273,34 +352,7 @@ const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slo
     
         
 
-{showSlotModal && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded shadow-lg w-1/2 overflow-auto max-h-[10vh]">
-            <h3 className="text-lg font-semibold mb-4">Select a Slot</h3>
-            {availableSlots.length === 0 ? (
-              <p className="text-gray-500">No available slots.</p>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {availableSlots.map((slot, index) => (
-                  <button
-                    key={index}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                    onClick={() => handleSlotSelection(slot)}
-                  >
-                    {slot.startHour}:00 - {slot.endHour}:00
-                  </button>
-                ))}
-              </div>
-            )}
-            <button
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              onClick={() => setShowSlotModal(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+
 
 
 {showSlotModal && (
