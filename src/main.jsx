@@ -46,6 +46,7 @@ import VerificationPage from './pages/VerificationPage.jsx';
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import SearchResults from './pages/SearchResults.jsx';
 import { Sidebar } from 'lucide-react';
+import RetryPaymentPage from './pages/RetryPayment.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -181,6 +182,10 @@ const router = createBrowserRouter([
       {
         path:"/success",
         element:<PaymentSuccess/>
+      },
+      {
+        path:"/retry-payment",
+        element:<RetryPaymentPage/>
       },
       {
         path:"/search",

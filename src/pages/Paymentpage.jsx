@@ -9,7 +9,8 @@ export default function PaymentPage() {
   const navigate = useNavigate();
 
   // Get slot details from previous page
-  const { duration, startHour, endHour, amount } = location.state || {};
+  const { duration, startHour, endHour, amount,stickyStartUTC,
+    stickyEndUTC } = location.state || {};
 
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
@@ -152,7 +153,8 @@ export default function PaymentPage() {
           postId: pendingPost?.draftId,
           duration,
           startHour,
-          endHour
+          endHour,stickyStartUTC,
+          stickyEndUTC
         },
         { 
           headers: { 
@@ -170,10 +172,17 @@ export default function PaymentPage() {
         amount: order.amount,
         currency: "INR",
         order_id: order.id,
-        name: "Your Service Name",
+        name: "Magnifier",
         description: `Pinning post for ${duration} hours`,
         handler: async (response) => {
           await verifyPayment(response, paymentId, amount);
+        },
+        modal: {
+          ondismiss: async function () {
+            // User closed Razorpay modal
+            toast.warn("Payment was cancelled by user");
+            await notifyBackendOnFailure(paymentId, "User cancelled payment");
+          }
         },
         theme: {
           color: "#3399cc"
@@ -182,6 +191,21 @@ export default function PaymentPage() {
   
       // 5. Create Razorpay instance
       const rzp = new window.Razorpay(options);
+
+      rzp.on("payment.failed", async function (response) {
+        console.log("Payment failed:", response.error);
+        toast.error("Payment failed: " + response.error.description);
+        await notifyBackendOnFailure(paymentId, response.error.description || "Payment failed");
+        navigate("/retry-payment");
+      });
+
+      rzp.on("payment.failed", function () {
+        setTimeout(() => {
+          navigate("/retry-payment");
+        }, 3000);
+      });
+      
+      
       rzp.open();
   
     } catch (error) {
@@ -195,6 +219,28 @@ export default function PaymentPage() {
       setIsProcessing(false);
     }
   };
+
+  const notifyBackendOnFailure = async (paymentId, reason) => {
+    const token = localStorage.getItem('token');
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/payment-failed`,
+        {
+          postId: pendingPost?.draftId,
+          paymentId,
+          reason
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Failed to notify backend:", error);
+    }
+  };
+  
  
   const verifyPayment = async (razorpayResponse, paymentId, amount) => {
     try {
@@ -210,7 +256,8 @@ export default function PaymentPage() {
           amount: Math.round(amount * 100),
           duration,
           startHour,
-          endHour
+          endHour,stickyStartUTC,
+          stickyEndUTC
         },
         {
           headers: { 

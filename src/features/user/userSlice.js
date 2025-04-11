@@ -72,18 +72,7 @@ export const userSlice = createSlice({
     console.log('Posts fetched:', state.posts);
     
     },*/
-    setPosts: (state, action) => {
-     
-  
-      {/*const newPosts = action.payload;
-  
-      // Separate sticky and non-sticky posts
-      const stickyPosts = newPosts.filter(post => post.sticky && new Date(post.stickyUntil) > new Date());
-      const normalPosts = newPosts.filter(post => !post.sticky || new Date(post.stickyUntil) <= new Date());
-  
-      // Sort sticky posts by `stickyUntil` (most recent ones first)
-      stickyPosts.sort((a, b) => new Date(b.stickyUntil) - new Date(a.stickyUntil));*/}
-  
+    setPostss: (state, action) => {
 
       const now = new Date();
 
@@ -92,17 +81,26 @@ export const userSlice = createSlice({
     post.status === 'approved' &&
       post.sticky && 
       post.stickyUntil && 
-      new Date(post.stickyUntil) > now // Ensure it's still within the sticky time
+      post.stickyStartUTC && 
+      new Date(post.stickyStartUTC) <= now &&
+      new Date(post.stickyUntil) >= now,
+
+
+      {/*new Date(post.stickyUntil) > now &&
+     now >= new Date(post.stickyStartUTC)*/}
   );
 
   // Filter normal posts (including expired sticky posts)
   const normalPosts = action.payload.filter(post =>  post.status === 'approved' && 
-      !post.sticky || !post.stickyUntil || new Date(post.stickyUntil) <= now
+      !post.sticky || !post.stickyUntil || new Date(post.stickyUntil) <= now ||
+      (post.stickyStartUTC && now < new Date(post.stickyStartUTC))
   );
 
   // Sort sticky posts by `createdAt` (newer sticky posts first)
-  stickyPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
+  //stickyPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  stickyPosts.sort((a, b) => (
+    new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC)
+  ));
   // Merge sticky posts first, followed by normal posts
   state.posts = [...stickyPosts, ...normalPosts];
 
@@ -111,7 +109,320 @@ export const userSlice = createSlice({
   },
 
  
+  setPosts: (state, action) => {
+    const now = new Date();
+  
+    // Filter sticky posts correctly - must meet ALL conditions
+    const stickyPosts = action.payload.filter(post => 
+      post.status === 'approved' &&
+      post.sticky && 
+      post.stickyUntil && 
+      post.stickyStartUTC &&
+      new Date(post.stickyStartUTC) <= now &&  // Current time is after start time
+      new Date(post.stickyUntil) > now        // Current time is before end time
+    );
+  
+    // Filter normal posts (non-sticky or not currently in pinned window)
+    const normalPosts = action.payload.filter(post => 
+      post.status === 'approved' && (
+        !post.sticky || 
+        !post.stickyUntil || 
+        !post.stickyStartUTC ||
+        new Date(post.stickyUntil) <= now ||      // Pinning period ended
+        new Date(post.stickyStartUTC) > now       // Pinning hasn't started
+      )
+    );
+  
+    // Sort sticky posts by pinning start time (earlier pinned posts first)
+    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
+  
+    // For debugging
+    console.log("Current time:", now);
+    console.log("Sticky Posts:", stickyPosts.map(p => ({
+      id: p._id,
+      content: p.content,
+      stickyWindow: `${new Date(p.stickyStartUTC)} - ${new Date(p.stickyUntil)}`,
+      isActive: new Date(p.stickyStartUTC) <= now && new Date(p.stickyUntil) > now
+    })));
+  
+    state.posts = [...stickyPosts, ...normalPosts];
+  },
 
+  setPostssss: (state, action) => {
+    const now = new Date();
+    
+    // Filter posts that should be visible now
+    const visiblePosts = action.payload.filter(post => {
+      // Post must be approved
+      if (post.status !== 'approved') return false;
+      
+      // If post is scheduled for future, don't show yet
+      if (post.postStatus === 'scheduled' && post.stickyStartUTC && new Date(post.stickyStartUTC) > now) {
+        return false;
+      }
+      
+      // If post has a sticky period, only show during that window
+      if (post.stickyStartUTC && post.stickyUntil) {
+        const isInStickyWindow = new Date(post.stickyStartUTC) <= now && new Date(post.stickyUntil) > now;
+        return isInStickyWindow || post.postStatus === 'published';
+      }
+      
+      // Regular published posts
+      return post.postStatus === 'published';
+    });
+  
+    // Separate sticky and normal posts
+    const stickyPosts = visiblePosts.filter(post => 
+      post.sticky && 
+      post.stickyStartUTC && 
+      post.stickyUntil &&
+      new Date(post.stickyStartUTC) <= now &&
+      new Date(post.stickyUntil) > now
+    );
+  
+    const normalPosts = visiblePosts.filter(post => !stickyPosts.includes(post));
+  
+    // Sort sticky posts by pinning start time
+    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
+    
+    state.posts = [...stickyPosts, ...normalPosts];
+  },
+
+
+
+  setPosts: (state, action) => {
+    const now = new Date();
+    
+    // Filter posts that should be visible now
+    const visiblePosts = action.payload.filter(post => {
+      // Post must be approved
+      if (post.status !== 'approved') return false;
+      
+      // If post is scheduled, only show if current time is within window
+      if (post.postStatus === 'scheduled') {
+        return post.stickyStartUTC && post.stickyUntil && 
+               new Date(post.stickyStartUTC) <= now && 
+               new Date(post.stickyUntil) > now;
+      }
+      
+      // Published posts without scheduling
+      if (post.postStatus === 'published') {
+        // If it has sticky timing, only show during that window
+        if (post.stickyStartUTC && post.stickyUntil) {
+          return new Date(post.stickyStartUTC) <= now && 
+                 new Date(post.stickyUntil) > now;
+        }
+        return true;
+      }
+      
+      return false;
+    });
+  
+    // Separate sticky and normal posts
+    const stickyPosts = visiblePosts.filter(post => 
+      post.sticky && 
+      post.stickyStartUTC && 
+      post.stickyUntil &&
+      new Date(post.stickyStartUTC) <= now &&
+      new Date(post.stickyUntil) > now
+    );
+  
+    const normalPosts = visiblePosts.filter(post => !stickyPosts.includes(post));
+  
+    // Sort sticky posts by pinning start time
+    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
+    
+    // Debug logging
+    console.log("Current posts:", {
+      time: now,
+      stickyPosts: stickyPosts.map(p => ({
+        id: p._id,
+        stickyWindow: `${new Date(p.stickyStartUTC)} - ${new Date(p.stickyUntil)}`,
+        content: p.content
+      })),
+      normalPosts: normalPosts.length
+    });
+    
+    state.posts = [...stickyPosts, ...normalPosts];
+  },
+
+  setPosts1: (state, action) => {
+    const now = new Date();
+  
+    const visiblePosts = action.payload.filter(post => {
+      const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+      const end = post.stickyUntil ? new Date(post.stickyUntil) : null;
+  
+      // Only approved posts are shown
+      if (post.postStatus !== 'approved' && post.postStatus !== 'scheduled' && post.postStatus !== 'published') return false;
+  
+      // Scheduled post: show only if now is within the sticky window
+      if (post.postStatus === 'scheduled') {
+        return start && end && now >= start && now < end;
+      }
+  
+      // Published post: always show unless it's outside sticky window
+      if (post.postStatus === 'published') {
+        if (start && end) {
+          return now >= start && now < end;
+        }
+        return true; // No sticky window, always show
+      }
+  
+      return false;
+    });
+  
+    const stickyPosts = visiblePosts.filter(post => post.sticky);
+    const normalPosts = visiblePosts.filter(post => !post.sticky);
+  
+    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
+  
+    console.log("Current posts:", {
+      time: now,
+      stickyPosts: stickyPosts.map(p => ({
+        id: p._id,
+        stickyWindow: `${new Date(p.stickyStartUTC)} - ${new Date(p.stickyUntil)}`,
+        content: p.content
+      })),
+      normalPosts: normalPosts.length
+    });
+  
+    state.posts = [...stickyPosts, ...normalPosts];
+  },
+  
+  setPosts2: (state, action) => {
+    const now = new Date();
+  
+    const visiblePosts = action.payload.filter(post => {
+      const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+      const end = post.stickyUntil ? new Date(post.stickyUntil) : null;
+  
+      // Must be approved
+      if (post.status !== 'approved') return false;
+  
+      // If there's a sticky time window, enforce it
+      const isInStickyWindow = start && end && now >= start && now < end;
+  
+      if (post.postStatus === 'scheduled') {
+        return isInStickyWindow;
+      }
+  
+      if (post.postStatus === 'published') {
+        // If sticky is true and sticky window exists, enforce time restriction
+        if (post.sticky && start && end) {
+          return isInStickyWindow;
+        }
+        // Otherwise show it
+        return true;
+      }
+  
+      return false;
+    });
+  
+    // Separate sticky and normal posts
+    const stickyPosts = visiblePosts.filter(post => post.sticky);
+    const normalPosts = visiblePosts.filter(post => !post.sticky);
+  
+    // Sort sticky posts by start time
+    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
+  
+    console.log("Current posts:", {
+      time: now.toISOString(),
+      stickyPosts: stickyPosts.map(p => ({
+        id: p._id,
+        stickyWindow: `${new Date(p.stickyStartUTC).toISOString()} - ${new Date(p.stickyUntil).toISOString()}`,
+        content: p.content
+      })),
+      normalPosts: normalPosts.length
+    });
+  
+    state.posts = [...stickyPosts, ...normalPosts];
+  },
+  
+  setPostssuccess: (state, action) => {
+    const now = new Date();
+  
+    const visiblePosts = action.payload.filter(post => {
+      const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+      const end = post.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
+  
+      if (post.status !== 'approved') return false;
+  
+      const isInStickyWindow = start && end && now >= start && now < end;
+  
+      if (post.postStatus === 'scheduled') {
+        return isInStickyWindow;
+      }
+  
+      if (post.postStatus === 'published') {
+        if (post.sticky && isInStickyWindow) {
+          return true;
+        }
+        if (post.sticky && !isInStickyWindow) {
+          return false;
+        }
+        return true;
+      }
+  
+      return false;
+    });
+  
+    const stickyPosts = visiblePosts.filter(post => post.sticky);
+    const normalPosts = visiblePosts.filter(post => !post.sticky);
+  
+    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
+  
+    state.posts = [...stickyPosts, ...normalPosts];
+  },
+  
+  setPosts: (state, action) => {
+    const now = new Date();
+  
+    const visiblePosts = action.payload.filter(post => {
+      const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+      const end = post.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
+  
+      if (post.status !== 'approved') return false;
+  
+      // Always show published posts
+      if (post.postStatus === 'published') {
+        return true;
+      }
+  
+      // Show scheduled posts only in their sticky window
+      if (post.postStatus === 'scheduled') {
+        return start && end && now >= start && now < end;
+      }
+  
+      return false;
+    });
+  
+    // Separate posts that are sticky AND currently in slot (should be pinned at top)
+    const stickyPosts = visiblePosts.filter(post => {
+      if (!post.sticky) return false;
+  
+      const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+      const end = post.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
+  
+      return start && end && now >= start && now < end;
+    });
+  
+    // Remaining posts — either non-sticky or sticky but out of slot
+    const normalPosts = visiblePosts.filter(post => {
+      const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+      const end = post.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
+  
+      const isInStickyWindow = start && end && now >= start && now < end;
+  
+      return !post.sticky || !isInStickyWindow;
+    });
+  
+    // Optional: sort sticky posts by start time
+    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
+  
+    state.posts = [...stickyPosts, ...normalPosts];
+  },
+  
 
     clearUserDetails: (state) => {
       state.user = null;

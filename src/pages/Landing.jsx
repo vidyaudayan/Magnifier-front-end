@@ -285,6 +285,10 @@ export const LandingPage = () => {
             if (VoiceNote) formData.append("media", VoiceNote);
             formData.append("stickyDuration", stickyDuration);
 
+
+            // Detect user's time zone and add to FormData
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            formData.append("timezone", userTimezone);
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
 
@@ -627,6 +631,8 @@ export const LandingPage = () => {
             formData.append('stickyDuration', selectedDuration);
             if (photo) formData.append('media', photo);
             if (VoiceNote) formData.append('voiceNote', VoiceNote);
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            formData.append("timezone", userTimezone);
 
             const response = await axios.post(
                 `${import.meta.env.VITE_BASE_URL}/post/createdraftpost`,
@@ -839,8 +845,15 @@ export const LandingPage = () => {
 
                         {/* 📌 Pin Icon for Pinned Posts */}
                         {post.sticky && (
-                            <div className="absolute top-2 right-2 text-yellow-500">
+                            <div className="absolute top-2 right-1 text-yellow-500">
                                 <FaThumbtack size={20} />
+                                <span className="pinned-time text-yellow-500">
+                                    Pinned until: {new Date(post.stickyUntil).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                                    })}
+                                </span>
                             </div>
                         )}
 

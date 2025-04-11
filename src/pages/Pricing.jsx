@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
+import { DateTime } from "luxon";
 import image from "../assets/Images/pricing.avif";
 import NavbarLanding from "../componenets/NavbarLanding.jsx";
 
@@ -67,7 +68,7 @@ export default function PricingPage() {
       socket.off("slotBooked");
     };
   }, []);
-  const fetchAvailableSlots = async (duration) => {
+ {/*const fetchAvailableSlots = async (duration) => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
@@ -88,7 +89,110 @@ export default function PricingPage() {
     } catch (error) {
       console.error("Error fetching slots:", error.response?.data || error.message);
     }
+  };*/}
+
+  {/*const fetchAvailableSlots = async (duration) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
+        { params: { duration } }
+      );
+      
+      // Format and sort slots
+      const formattedSlots = response.data
+        .map(slot => ({
+          ...slot,
+          displayTime: `${slot.startHour.toString().padStart(2, '0')}:00 - ${slot.endHour.toString().padStart(2, '0')}:00`
+        }))
+        .sort((a, b) => a.startHour - b.startHour);
+      
+      setAvailableSlots(formattedSlots);
+    } catch (error) {
+      console.error("Error fetching slots:", error);
+    }
+  };*/}
+
+  {/*const fetchAvailableSlots = async (duration) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
+        { params: { duration } }
+      );
+      
+      // Format and sort slots with AM/PM
+      const formattedSlots = response.data
+        .map(slot => {
+          const startHour = slot.startHour % 12 || 12; // Convert to 12-hour format (1-12)
+          const endHour = slot.endHour % 12 || 12;
+          const startAmPm = slot.startHour < 12 ? 'AM' : 'PM';
+          const endAmPm = slot.endHour < 12 ? 'AM' : 'PM';
+          
+          return {
+            ...slot,
+            displayTime: `${startHour}:00 ${startAmPm} - ${endHour}:00 ${endAmPm}`
+          };
+        })
+        .sort((a, b) => a.startHour - b.startHour);
+      
+      setAvailableSlots(formattedSlots);
+    } catch (error) {
+      console.error("Error fetching slots:", error);
+    }
+  };*/}
+  
+  // In your PricingPage component
+
+// More robust socket handling
+useEffect(() => {
+  const handleSlotUpdate = () => {
+    // Always refetch instead of trying to manually update
+    if (selectedDuration) {
+      fetchAvailableSlots(selectedDuration);
+    }
   };
+
+  socket.on("slotBooked", handleSlotUpdate);
+  socket.on("slotsReleased", handleSlotUpdate);
+
+  return () => {
+    socket.off("slotBooked", handleSlotUpdate);
+    socket.off("slotsReleased", handleSlotUpdate);
+  };
+}, [selectedDuration]);
+
+// Improved fetch with cache busting
+const fetchAvailableSlots = async (duration) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
+      {
+        params: { 
+          duration,
+          _: Date.now() // Cache buster
+        }
+      }
+    );
+    
+    const formattedSlots = response.data.map(slot => ({
+      ...slot,
+      displayTime: formatSlotTime(slot.startHour, slot.endHour)
+    })).sort((a, b) => a.startHour - b.startHour);
+    
+    setAvailableSlots(formattedSlots);
+  } catch (error) {
+    console.error("Slot fetch error:", error);
+    toast.error("Failed to load available slots");
+  }
+};
+
+// Helper function
+const formatSlotTime = (start, end) => {
+  const startHour = start % 12 || 12;
+  const endHour = end % 12 || 12;
+  const startAmPm = start < 12 ? 'AM' : 'PM';
+  const endAmPm = end < 12 ? 'AM' : 'PM';
+  return `${startHour}:00 ${startAmPm} - ${endHour}:00 ${endAmPm}`;
+};
 
   
 useEffect(() => {
@@ -232,6 +336,43 @@ const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slo
         setConfirmedSlot(slot);
         setShowConfirmationModal(true);
         socket.emit("slotBooked"); // Notify other clients
+     
+
+const istZone = 'Asia/Kolkata';
+
+const now = DateTime.now().setZone(istZone);
+
+// Construct start and end time in IST and convert to UTC
+let startIST = now.set({ hour: slot.startHour, minute: 0, second: 0, millisecond: 0 });
+let endIST = now.set({ hour: slot.endHour, minute: 0, second: 0, millisecond: 0 });
+
+// If the time has passed today, shift to next day
+if (startIST < now) {
+  startIST = startIST.plus({ days: 1 });
+  endIST = endIST.plus({ days: 1 });
+}
+
+const stickyStartUTC = startIST.toUTC().toISO();
+const stickyEndUTC = endIST.toUTC().toISO();
+
+
+
+
+
+
+        await axios.put(
+          `${import.meta.env.VITE_BASE_URL}/post/updatestickytime`,
+          {
+            postId: pendingPost.draftId,
+            stickyStartUTC, stickyEndUTC
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+     
       }
     } catch (error) {
       console.error("Booking error:", error);
@@ -248,13 +389,31 @@ const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slo
         6: 180,
         12: 360,
       };
+
+      const istZone = 'Asia/Kolkata';
+
+const now = DateTime.now().setZone(istZone);
+let startIST = now.set({ hour: confirmedSlot.startHour, minute: 0, second: 0, millisecond: 0 });
+let endIST = now.set({ hour: confirmedSlot.endHour, minute: 0, second: 0, millisecond: 0 });
+
+
+// If the time has passed today, shift to next day
+if (startIST < now) {
+  startIST = startIST.plus({ days: 1 });
+  endIST = endIST.plus({ days: 1 });
+}
+
+const stickyStartUTC = startIST.toUTC().toISO();
+const stickyEndUTC = endIST.toUTC().toISO();
+
   
       const amount = pricing[duration] || 0;
       navigate("/payment", {
         state: {
           duration,
           startHour: confirmedSlot.startHour,
-          endHour: confirmedSlot.endHour, amount, currency: "INR"
+          endHour: confirmedSlot.endHour, amount, currency: "INR",stickyStartUTC,
+          stickyEndUTC
         },
       });
       setShowConfirmationModal(false);
@@ -355,7 +514,7 @@ const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slo
 
 
 
-{showSlotModal && (
+{/*{showSlotModal && (
   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center ">
     <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg">
       <h3 className="text-lg font-semibold mb-4">Select a Slot</h3>
@@ -384,14 +543,51 @@ const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/book-slo
       </button>
     </div>
   </div>
+)}*/}
+
+
+{showSlotModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded shadow-lg w-full max-w-2xl">
+      <h3 className="text-lg font-semibold mb-4">
+        Available {selectedDuration}-hour Slots
+      </h3>
+      
+      {availableSlots.length === 0 ? (
+        <p className="text-gray-500">No available slots.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+          {availableSlots.map((slot, index) => (
+            <button
+              key={index}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+              onClick={() => handleSlotSelection(slot)}
+            >
+              {slot.displayTime}
+            </button>
+          ))}
+        </div>
+      )}
+      
+      <button
+        className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        onClick={() => setShowSlotModal(false)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
 )}
 {showConfirmationModal && (
   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
     <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
       <h3 className="text-lg font-semibold mb-4">Slot Booked Successfully!</h3>
-      <p className="mb-4">
+      {/*<p className="mb-4">
         Your slot from {confirmedSlot.startHour}:00 to {confirmedSlot.endHour}:00 has been reserved.
-      </p>
+      </p>*/}
+      <p className="mb-4">
+  Your slot from {confirmedSlot.startHour % 12 || 12}:00 {confirmedSlot.startHour < 12 ? 'AM' : 'PM'} to {confirmedSlot.endHour % 12 || 12}:00 {confirmedSlot.endHour < 12 ? 'AM' : 'PM'} has been reserved.
+</p>
       <p className="mb-4 font-bold">
         Total Amount: ₹{selectedDuration === 1 ? 30 : 
                         selectedDuration === 3? 90 : 
