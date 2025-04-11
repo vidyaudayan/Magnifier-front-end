@@ -397,7 +397,7 @@ let startIST = now.set({ hour: confirmedSlot.startHour, minute: 0, second: 0, mi
 let endIST = now.set({ hour: confirmedSlot.endHour, minute: 0, second: 0, millisecond: 0 });
 
 
-// If the time has passed today, shift to next day
+
 if (startIST < now) {
   startIST = startIST.plus({ days: 1 });
   endIST = endIST.plus({ days: 1 });

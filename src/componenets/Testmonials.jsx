@@ -56,6 +56,7 @@ const Testimonials = () => {
               <div className="ml-4">
                 <h3 className="text-xl font-semibold text-blue-700">{name}</h3>
                 <p className="text-white">{location}</p>
+              <p>role</p>
               </div>
             </div>
             <p className="text-white mb-4">"{feedback}"</p>
