@@ -375,7 +375,7 @@ export const userSlice = createSlice({
     state.posts = [...stickyPosts, ...normalPosts];
   },
   
-  setPosts: (state, action) => {
+  setPosts: (state, action) => { 
     const now = new Date();
   
     const visiblePosts = action.payload.filter(post => {
@@ -384,12 +384,15 @@ export const userSlice = createSlice({
   
       if (post.status !== 'approved') return false;
   
-      // Always show published posts
+      // Non-sticky published posts show immediately
       if (post.postStatus === 'published') {
-        return true;
+        if (!post.sticky) return true;
+  
+        // Sticky published posts should only show within their sticky window
+        return start && end && now >= start && now < end;
       }
   
-      // Show scheduled posts only in their sticky window
+      // Scheduled posts show only during their sticky window
       if (post.postStatus === 'scheduled') {
         return start && end && now >= start && now < end;
       }
@@ -397,7 +400,7 @@ export const userSlice = createSlice({
       return false;
     });
   
-    // Separate posts that are sticky AND currently in slot (should be pinned at top)
+    // Sticky posts that are in their sticky time window (to be pinned at top)
     const stickyPosts = visiblePosts.filter(post => {
       if (!post.sticky) return false;
   
@@ -407,7 +410,7 @@ export const userSlice = createSlice({
       return start && end && now >= start && now < end;
     });
   
-    // Remaining posts — either non-sticky or sticky but out of slot
+    // Normal posts are either non-sticky or sticky but not currently in their slot
     const normalPosts = visiblePosts.filter(post => {
       const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
       const end = post.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
@@ -420,6 +423,7 @@ export const userSlice = createSlice({
     // Optional: sort sticky posts by start time
     stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
   
+    // Final post list: sticky posts first, then the rest
     state.posts = [...stickyPosts, ...normalPosts];
   },
   
