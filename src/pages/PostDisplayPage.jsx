@@ -64,6 +64,21 @@ const PostDisplayPage = () => {
     setPost(updatedPost);
   };
 
+  const handleShare = () => {
+    const shareUrl = `${window.location.origin}/displaypost?postId=${post._id}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: "Check out this post on Magnifier!",
+        text: post.content?.substring(0, 100) || "Interesting post",
+        url: shareUrl,
+      }).catch(() => copyToClipboard(shareUrl));
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+
   if (!post) {
     return <p className="text-center mt-10">Loading post...</p>;
   }
@@ -106,6 +121,17 @@ const PostDisplayPage = () => {
           className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
         >
           Add
+        </button>
+      </div>
+      <div className="flex gap-4 text-md text-gray-700 mb-4">
+        <button onClick={() => handleReaction("like")} className="hover:text-blue-500">
+          👍 Like
+        </button>
+        <button onClick={() => handleReaction("dislike")} className="hover:text-red-500">
+          👎 Dislike
+        </button>
+        <button onClick={handleShare} className="hover:text-green-500">
+          🔗 Share
         </button>
       </div>
     </div>

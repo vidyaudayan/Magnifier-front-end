@@ -369,7 +369,7 @@ export const LandingPage = () => {
     const displayProfilePic = profilePic || `https://via.placeholder.com/80`;
 
 
-    const handleShare = (post) => {
+    {/*const handleShare = (post) => {
         const postId = post._id; // Use the actual post's ID
         // const isLoggedIn = !!localStorage.getItem("token"); // Check login status
         const isLoggedIn = localStorage.getItem("token") !== null;
@@ -389,6 +389,46 @@ export const LandingPage = () => {
                 .then(() => alert("Link copied to clipboard!"))
                 .catch((error) => console.error("Failed to copy:", error));
         }
+    };*/}
+
+    const handleShare = (post) => {
+        const postId = post._id;
+        const isLoggedIn = localStorage.getItem("token") !== null;
+        
+        // Create different URLs based on login status
+        const shareUrl = isLoggedIn
+            ? `${window.location.origin}/displaypost?postId=${postId}`
+            : `${window.location.origin}/login?postId=${postId}`;
+        
+        // Try Web Share API first (mobile devices)
+        if (navigator.share) {
+            navigator.share({
+                title: "Check out this post on Magnifier!",
+                text: post.content?.substring(0, 100) || "Interesting post",
+                url: shareUrl,
+            }).catch((error) => {
+                // Fallback to clipboard if Web Share fails
+                copyToClipboard(shareUrl);
+            });
+        } else {
+            // Fallback for desktop browsers
+            copyToClipboard(shareUrl);
+        }
+    };
+    
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text)
+            .then(() => toast.success("Link copied to clipboard!"))
+            .catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                toast.success("Link copied to clipboard!");
+            });
     };
 
     const location = useLocation();
