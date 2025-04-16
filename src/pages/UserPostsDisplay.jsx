@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+{/*import React, { useState, useEffect } from "react";
 import axios from "axios";
 import NavbarLanding from "../componenets/NavbarLanding.jsx";
 import { useDispatch } from "react-redux";
@@ -63,7 +63,7 @@ const UserPostDisplay = () => {
       </div>*/}
 
       {/* Posts Section */}
-      <div className="container mx-auto mt-24 pl-12">
+      {/*<div className="container mx-auto mt-24 pl-12">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4 pt-4"> Posts</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.length > 0 ? (
@@ -104,4 +104,4 @@ const UserPostDisplay = () => {
   );
 };
 
-export default UserPostDisplay;
+export default UserPostDisplay;*/}

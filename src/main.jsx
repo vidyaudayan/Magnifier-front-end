@@ -160,14 +160,14 @@ const router = createBrowserRouter([
         element:<SearchUserPost/>,
       },
      
-      {
+      {/*{
         path: "/userposts",
         element: (
           <PrivateRoute>
             <UserPostDisplay/>  
           </PrivateRoute>
         ),
-      },
+      },*/},
       {
         path: "/termsandconditions",
         element:<TermsAndConditions/>,
