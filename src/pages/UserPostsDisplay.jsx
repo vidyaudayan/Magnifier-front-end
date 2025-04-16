@@ -4,7 +4,7 @@ import NavbarLanding from "../componenets/NavbarLanding.jsx";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../features/user/userSlice.js";
 
-export const UserPostDisplay = () => {
+const UserPostDisplay = () => {
   const dispatch = useDispatch();
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
@@ -103,3 +103,4 @@ export const UserPostDisplay = () => {
 };
 
 
+export default UserPostDisplay;
