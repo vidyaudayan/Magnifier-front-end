@@ -145,9 +145,10 @@ const PostDisplayPage = () => {
 export default PostDisplayPage;*/}
 
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import NavbarLanding from "../componenets/NavbarLanding";
 
 const PostDisplayPage = () => {
   const location = useLocation();
@@ -305,10 +306,11 @@ useEffect(() => {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
+      <NavbarLanding/>
     {/* Post Content */}
     <div className="bg-white rounded-lg shadow p-6 mb-4">
       {/* User Info */}
-      <div className="flex items-center space-x-4 mb-4">
+      <div className="flex items-center space-x-4 mb-4 mt-16">
         {post.userId?.profilePic ? (
           <img
             src={post.userId.profilePic} 
