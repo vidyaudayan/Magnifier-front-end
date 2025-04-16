@@ -32,7 +32,7 @@ import FAQ from './componenets/FAQ.jsx';
 import UserGuidelines from './componenets/UserGuidelines.jsx';
 import TermsAndConditions from './componenets/TermsandConditions.jsx';
 import ProfilePage from './pages/profile.jsx';
-import PostDisplayPage from './pages/PostsDisplay.jsx';
+import PostDisplayPage from './pages/UserPostsDisplay.jsx';
 import LoginForm from './componenets/LoginForm.jsx';
 import LoginFormShare from './componenets/LoginShare.jsx';
 import SearchUserPost from './componenets/SearchUserPost.jsx';
@@ -48,6 +48,7 @@ import SearchResults from './pages/SearchResults.jsx';
 import { Sidebar } from 'lucide-react';
 import RetryPaymentPage from './pages/RetryPayment.jsx';
 import SharedPostRedirect from './componenets/SharedPostRedirect.jsx';
+import UserPostDisplay from './pages/UserPostsDisplay.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -154,7 +155,7 @@ const router = createBrowserRouter([
      
       {
         path: "/userposts",
-        element:<PostDisplayPage/>,
+        element:<UserPostDisplay/>,
       },
       {
         path: "/termsandconditions",

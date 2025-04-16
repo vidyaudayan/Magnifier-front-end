@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import NavbarLanding from "../componenets/NavbarLanding.jsx";
 import { useDispatch } from "react-redux";
-import { setUserDetails } from "../features/user/userSlice";
+import { setUserDetails } from "../features/user/userSlice.js";
 
-const PostDisplayPage = () => {
+const UserPostDisplay = () => {
   const dispatch = useDispatch();
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
@@ -104,4 +104,4 @@ const PostDisplayPage = () => {
   );
 };
 
-export default PostDisplayPage;
+export default UserPostDisplay;
