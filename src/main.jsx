@@ -48,7 +48,7 @@ import SearchResults from './pages/SearchResults.jsx';
 import { Sidebar } from 'lucide-react';
 import RetryPaymentPage from './pages/RetryPayment.jsx';
 import SharedPostRedirect from './componenets/SharedPostRedirect.jsx';
-//import {UserPostDisplay} from './pages/UserPostsDisplay.jsx';
+import {UserPostDisplay} from './pages/UserPostsDisplay.jsx';
 import AllPostsPage from './componenets/AllPostsPage.jsx';
 const router = createBrowserRouter([
   {
@@ -160,14 +160,14 @@ const router = createBrowserRouter([
         element:<SearchUserPost/>,
       },
      
-      {/*{
+      {
         path: "/userposts",
         element: (
           <PrivateRoute>
             <UserPostDisplay/>  
           </PrivateRoute>
         ),
-      },*/},
+      },
       {
         path: "/termsandconditions",
         element:<TermsAndConditions/>,
