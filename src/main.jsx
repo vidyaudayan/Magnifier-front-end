@@ -47,7 +47,7 @@ import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import SearchResults from './pages/SearchResults.jsx';
 import { Sidebar } from 'lucide-react';
 import RetryPaymentPage from './pages/RetryPayment.jsx';
-import SharedPostRedirect from './componenets/SharedPostRedirect.js';
+import SharedPostRedirect from './componenets/SharedPostRedirect.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
