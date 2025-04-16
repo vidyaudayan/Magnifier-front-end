@@ -106,7 +106,9 @@ const router = createBrowserRouter([
       },
       {
         path: "/displaypost",
-        element:<PostDisplayPage/>,
+        element: <PrivateRoute>
+        <PostDisplayPage />
+      </PrivateRoute>,
       },
       {
         path: "/posts",
