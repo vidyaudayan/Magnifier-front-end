@@ -96,7 +96,6 @@ const LoginFormShare= () => {
     }
   };*/}
 
-  
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
@@ -109,32 +108,26 @@ const LoginFormShare= () => {
         localStorage.setItem("token", response.data.token);
       }
       
-      dispatch(setUserDetails(response.data.user));
-      fetchUserDetails();
-      
-      // Get postId from URL parameters
       const queryParams = new URLSearchParams(location.search);
       const postId = queryParams.get("postId");
       
+      // Store in both localStorage and sessionStorage for redundancy
       if (postId) {
-        // Store postId in localStorage as a backup
         localStorage.setItem("sharedPostId", postId);
-        // Redirect to displaypost with the postId
-        navigate(`/displaypost?postId=${postId}`, { 
-          replace: true,
-          state: { sharedPost: true } // Add state to identify shared post
-        });
+        sessionStorage.setItem("sharedPostId", postId);
+        
+        // Force reload to ensure clean state with the new token
+        window.location.href = `/displaypost?postId=${postId}`;
       } else {
-        navigate("/landing"); // Default redirect if no postId
+        navigate("/landing");
       }
       
-      toast.success("Login successful");
-      resetLoginForm();
     } catch (error) {
       console.error("Error signing in:", error);
-      toast.error(error.response?.data?.message || "An error occurred during sign-in.");
+      toast.error(error.response?.data?.message || "Login failed");
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-slate-50">

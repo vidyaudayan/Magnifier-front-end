@@ -49,6 +49,7 @@ import { Sidebar } from 'lucide-react';
 import RetryPaymentPage from './pages/RetryPayment.jsx';
 import SharedPostRedirect from './componenets/SharedPostRedirect.jsx';
 import UserPostDisplay from './pages/UserPostsDisplay.jsx';
+import AllPostsPage from './componenets/AllPostsPage.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -106,6 +107,10 @@ const router = createBrowserRouter([
       {
         path: "/displaypost",
         element:<PostDisplayPage/>,
+      },
+      {
+        path: "/posts",
+        element: <AllPostsPage />, 
       },
       {
         path: "/post/:postId",  

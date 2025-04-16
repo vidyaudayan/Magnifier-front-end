@@ -6,16 +6,23 @@ const SharedPostRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem('token')) {
-      // User is logged in - redirect directly to displaypost with the postId
+    if (!postId) {
+      navigate("/posts");
+      return;
+    }
+
+    if (localStorage.getItem("token")) {
+      // Already logged in - go directly to the post
       navigate(`/displaypost?postId=${postId}`, { replace: true });
     } else {
-      // User needs to login first - redirect to loginshare with the postId
-      navigate(`/loginshare?postId=${postId}`, { replace: true });
+      // Need to login first - store postId and redirect to login
+      localStorage.setItem("sharedPostId", postId);
+      sessionStorage.setItem("sharedPostId", postId);
+      navigate("/loginshare", { replace: true });
     }
   }, [postId, navigate]);
 
-  return <div>Redirecting to post...</div>;
+  return <div>Redirecting...</div>;
 };
 
 export default SharedPostRedirect;
