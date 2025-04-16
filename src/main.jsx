@@ -164,7 +164,7 @@ const router = createBrowserRouter([
         path: "/userposts",
         element: (
           <PrivateRoute>
-            <UserPostsPage />  
+            <UserPostDisplay/>  
           </PrivateRoute>
         ),
       },
