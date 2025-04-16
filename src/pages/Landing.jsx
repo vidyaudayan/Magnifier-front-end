@@ -394,7 +394,7 @@ export const LandingPage = () => {
     const handleShare = (post) => {
         const postId = post._id;
         // Always generate login link for sharing
-        const shareUrl = `${window.location.origin}/login?postId=${postId}`;
+        const shareUrl = `${window.location.origin}/loginshare?postId=${postId}`;
         
         if (navigator.share) {
             navigator.share({

@@ -79,10 +79,7 @@ const router = createBrowserRouter([
         path: "/joblogin",
         element:<LoginJob/>,
       },
-      {
-        path: "/post/:postId",  
-        element: <SharedPostRedirect />,
-      },
+     
       {
         path: "/loginshare",
         element:<LoginFormShare/>,
@@ -108,6 +105,10 @@ const router = createBrowserRouter([
       {
         path: "/displaypost",
         element:<PostDisplayPage/>,
+      },
+      {
+        path: "/post/:postId",  
+        element: <SharedPostRedirect />,
       },
       {
         path: "/aboutus",

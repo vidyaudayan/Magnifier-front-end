@@ -16,13 +16,23 @@ const PostDisplayPage = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const postId = queryParams.get("postId");
+    // If no postId in URL but we have one in state (from login)
+    if (!postId && location.state?.fromLogin) {
+      // Try to get from localStorage as fallback
+      const storedPostId = localStorage.getItem("sharedPostId");
+      if (storedPostId) {
+        navigate(`/displaypost?postId=${storedPostId}`, { replace: true });
+        return;
+      }
+    }
+
 
     // If no postId, redirect to posts listing
     if (!postId) {
       navigate("/posts");
       return;
     }
-
+    localStorage.setItem("sharedPostId", postId);
     fetchPostById(postId);
   }, [location.search]);
 

@@ -118,7 +118,7 @@ const LoginFormShare= () => {
         
         // Redirect to the shared post after login
         if (postId) {
-          navigate(`/displaypost?postId=${postId}`, { replace: true });
+          navigate(`/displaypost?postId=${postId}`, { replace: true,state: { fromLogin: true }  });
         } else {
           navigate("/landing"); // Default redirect if no postId
         }
