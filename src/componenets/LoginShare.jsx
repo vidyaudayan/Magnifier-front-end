@@ -96,6 +96,7 @@ const LoginFormShare= () => {
     }
   };*/}
 
+  
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
@@ -104,31 +105,32 @@ const LoginFormShare= () => {
         { withCredentials: true }
       );
       
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
+      if (response.data.success) {
+        const queryParams = new URLSearchParams(location.search);
+        const postId = queryParams.get("postId");
+
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+        }
+        
+        dispatch(setUserDetails(response.data.user));
+        fetchUserDetails();
+        
+        // Redirect to the shared post after login
+        if (postId) {
+          navigate(`/displaypost?postId=${postId}`, { replace: true });
+        } else {
+          navigate("/landing"); // Default redirect if no postId
+        }
+        
+        toast.success("Login successful");
+        resetLoginForm();
       }
-      
-      dispatch(setUserDetails(response.data.user));
-      fetchUserDetails();
-      
-      // Handle postId redirect more reliably
-      const queryParams = new URLSearchParams(location.search);
-      const postId = queryParams.get("postId");
-      
-      if (postId) {
-        // Clear the postId from URL after storing it
-        navigate(`/displaypost?postId=${postId}`, { replace: true });
-      } else {
-        navigate("/landing"); // Or your default post-login page
-      }
-      
-      toast.success("Login successful");
-      resetLoginForm();
     } catch (error) {
       console.error("Error signing in:", error);
       toast.error(error.response?.data?.message || "An error occurred during sign-in.");
     }
-  };
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-slate-50">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const PostDisplayPage = () => {
@@ -10,36 +10,37 @@ const PostDisplayPage = () => {
   const [displayCount, setDisplayCount] = useState(5);
 
   
+  const navigate = useNavigate();
 
+  const [error, setError] = useState(null);
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    let postId = queryParams.get("postId") || sessionStorage.getItem("postId");
+    const postId = queryParams.get("postId");
 
-    console.log("Extracted postId:", postId); // Debugging step
-
-    if (postId) {
-        localStorage.setItem("postId", postId);
-        fetchPostById(postId);
+    // If no postId, redirect to posts listing
+    if (!postId) {
+      navigate("/posts");
+      return;
     }
-}, [location.search, localStorage.getItem("postId")]);
 
+    fetchPostById(postId);
+  }, [location.search]);
 
   const fetchPostById = async (postId) => {
-    if (!postId) {
-      console.error("No postId provided");
-      return;
-  }
-
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/post/${postId}`
       );
-      console.log("postbyId",response.data)
       setPost(response.data.data);
     } catch (error) {
       console.error("Error fetching post:", error);
+      setError("Post not found or no longer available");
+      navigate("/posts"); // Redirect if post doesn't exist
     }
   };
+
+
+
 
   const handleAddComment = async () => {
     if (newComment.trim() === "") return;
