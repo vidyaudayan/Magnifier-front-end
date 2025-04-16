@@ -47,7 +47,7 @@ const UserPostDisplay = () => {
   return (
     <div className="min-h-screen  bg-gray-50">
       {/* Header */}
-      <NavbarLanding />
+ 
 
       {/* User Info Section */}
      {/* <div className="bg-white shadow-md py-8">
