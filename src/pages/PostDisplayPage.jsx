@@ -306,43 +306,53 @@ useEffect(() => {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <NavbarLanding/>
+    
     {/* Post Content */}
     <div className="bg-white rounded-lg shadow p-6 mb-4">
       {/* User Info */}
       <div className="flex items-center space-x-4 mb-4 mt-16">
-        {post.userId?.profilePic ? (
-          <img
-            src={post.userId.profilePic} 
-            alt={`${post.userId.username || 'User'}'s Profile`}
-            className="h-10 w-10 rounded-full object-cover"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = '';
-              e.target.parentNode.innerHTML = `
-                <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-                  ${post?.userId?.username?.charAt(0).toUpperCase() || 'U'}
-                </div>`;
-            }}
-          />
-        ) : (
-          <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-            {post?.userId?.username?.charAt(0).toUpperCase() || "U"}
-          </div>
-        )}
-
-        <div>
-          <Link 
-            to={`/profile/${post.userId?._id}`} 
-            className="text-sm font-semibold hover:text-blue-600"
-          >
-            {post?.userId?.username || "Unknown User"}
-          </Link>
-          <p className="text-xs text-gray-500">
-            {post.createdAt ? formatDate(post.createdAt) : "Loading..."}
-          </p>
+  {post.userId && post.userId._id ? (
+    <>
+      {post.userId.profilePic ? (
+        <img
+          src={post.userId.profilePic} 
+          alt={`${post.userId.username}'s Profile`}
+          className="h-10 w-10 rounded-full object-cover"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '';
+            e.target.parentNode.innerHTML = `
+              <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                ${post.userId.username?.charAt(0).toUpperCase() || 'U'}
+              </div>`;
+          }}
+        />
+      ) : (
+        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+          {post.userId.username?.charAt(0).toUpperCase() || 'U'}
         </div>
+      )}
+      <div>
+        <Link 
+          to={`/profile/${post.userId._id}`} 
+          className="text-sm font-semibold hover:text-blue-600"
+        >
+          {post.userId.username || "Unknown User"}
+        </Link>
+        <p className="text-xs text-gray-500">
+          {post.createdAt ? formatDate(post.createdAt) : "Loading..."}
+        </p>
       </div>
+    </>
+  ) : (
+    <div className="flex items-center space-x-4">
+      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold">
+        ?
+      </div>
+      <span className="text-sm text-gray-500">Loading user...</span>
+    </div>
+  )}
+</div>
 
       {/* Post Content */}
       <p className="text-gray-800 mb-4 break-words">{post.content}</p>
