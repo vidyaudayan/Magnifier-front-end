@@ -105,32 +105,36 @@ const LoginFormShare= () => {
         { withCredentials: true }
       );
       
-      if (response.data.success) {
-        const queryParams = new URLSearchParams(location.search);
-        const postId = queryParams.get("postId");
-
-        if (response.data.token) {
-          localStorage.setItem("token", response.data.token);
-        }
-        
-        dispatch(setUserDetails(response.data.user));
-        fetchUserDetails();
-        
-        // Redirect to the shared post after login
-        if (postId) {
-          navigate(`/displaypost?postId=${postId}`, { replace: true,state: { fromLogin: true }  });
-        } else {
-          navigate("/landing"); // Default redirect if no postId
-        }
-        
-        toast.success("Login successful");
-        resetLoginForm();
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
       }
+      
+      dispatch(setUserDetails(response.data.user));
+      fetchUserDetails();
+      
+      // Get postId from URL parameters
+      const queryParams = new URLSearchParams(location.search);
+      const postId = queryParams.get("postId");
+      
+      if (postId) {
+        // Store postId in localStorage as a backup
+        localStorage.setItem("sharedPostId", postId);
+        // Redirect to displaypost with the postId
+        navigate(`/displaypost?postId=${postId}`, { 
+          replace: true,
+          state: { sharedPost: true } // Add state to identify shared post
+        });
+      } else {
+        navigate("/landing"); // Default redirect if no postId
+      }
+      
+      toast.success("Login successful");
+      resetLoginForm();
     } catch (error) {
       console.error("Error signing in:", error);
       toast.error(error.response?.data?.message || "An error occurred during sign-in.");
     }
-  }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-slate-50">

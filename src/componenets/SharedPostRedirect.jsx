@@ -1,24 +1,21 @@
-
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const SharedPostRedirect = () => {
-  const { pathname } = useLocation();
+  const { postId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const postId = pathname.split('/post/')[1];
-    
     if (localStorage.getItem('token')) {
-      // Already logged in - go directly to displaypost
+      // User is logged in - redirect directly to displaypost with the postId
       navigate(`/displaypost?postId=${postId}`, { replace: true });
     } else {
-      // Need to login first - go to loginshare
+      // User needs to login first - redirect to loginshare with the postId
       navigate(`/loginshare?postId=${postId}`, { replace: true });
     }
-  }, [pathname, navigate]);
+  }, [postId, navigate]);
 
-  return <div>Redirecting...</div>;
+  return <div>Redirecting to post...</div>;
 };
 
 export default SharedPostRedirect;
