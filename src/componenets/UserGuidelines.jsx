@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 const UserGuidelines = () => {
   return (
     <div className="min-h-screen min-w-full bg-gray-100 ">
-<Navbar/>
-<div className="max-w-4xl mx-auto mt-24 bg-white shadow-lg rounded-lg overflow-hidden">
 
-        <div className="p-6">
+<div className="max-w-4xl mx-auto p-4 bg-white shadow-lg rounded-lg overflow-hidden">
+
+        <div className="p-6 ">
           <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
             Web Magnifier: User Guidelines
           </h1>

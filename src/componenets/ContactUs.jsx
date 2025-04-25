@@ -186,7 +186,7 @@ const ContactForm = () => {
         </div>
       </div>
       {/* Modal */}
-      <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
+      {/*<Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
         <div className="p-6 mt-14 bg-white rounded-lg shadow-lg">
           <h2 className=" text-xl font-bold mb-4">Thank You!</h2>
           <p className="">✅ Confirmation: You will receive an email confirming that we have received your inquiry.</p>
@@ -196,7 +196,7 @@ const ContactForm = () => {
          <p>Privacy Note: All information submitted is strictly confidential and used only for verification and communication purposes.</p>
          <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded" onClick={() => setModalIsOpen(false)}>Close</button>
         </div>
-      </Modal>
+      </Modal>*/}
     </div>
   );
 };

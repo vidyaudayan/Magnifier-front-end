@@ -188,7 +188,13 @@ export const userSlice = createSlice({
     state.posts = [...stickyPosts, ...normalPosts];
   },
 
-
+  updatePostComments: (state, action) => {
+    const { postId, comments } = action.payload;
+    const postIndex = state.posts.findIndex(post => post._id === postId);
+    if (postIndex !== -1) {
+      state.posts[postIndex].comments = comments;
+    }
+  },
 
   setPosts: (state, action) => {
     const now = new Date();
@@ -377,8 +383,9 @@ export const userSlice = createSlice({
   
   setPosts: (state, action) => { 
     const now = new Date();
-  
-    const visiblePosts = action.payload.filter(post => {
+    const posts = Array.isArray(action.payload) ? action.payload : [];
+
+    const visiblePosts = posts.filter(post => {
       const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
       const end = post.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
   
@@ -443,7 +450,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture } = userSlice.actions;
+export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments } = userSlice.actions;
 
 export default userSlice.reducer;
 

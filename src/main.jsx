@@ -29,8 +29,8 @@ import ResetPassword from './pages/resetPassword.jsx';
 import ContactForm from './componenets/ContactUs.jsx';
 import Support from './componenets/Support.jsx';
 import FAQ from './componenets/FAQ.jsx';
-import UserGuidelines from './componenets/UserGuidelines.jsx';
-import TermsAndConditions from './componenets/TermsandConditions.jsx';
+import UserGuidelines from '../src/pages/BackgroundCopyOf/Terms&Condition/UserGuidelines.jsx';
+import TermsAndConditions from '../src/pages/BackgroundCopyOf/Terms&Condition/Terms-condition.jsx';
 import ProfilePage from './pages/profile.jsx';
 import PostDisplayPage from './pages/PostDisplayPage.jsx';
 import LoginForm from './componenets/LoginForm.jsx';
@@ -45,11 +45,27 @@ import PaymentPage from './pages/Paymentpage.jsx';
 import VerificationPage from './pages/VerificationPage.jsx';
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import SearchResults from './pages/SearchResults.jsx';
-import { Sidebar } from 'lucide-react';
+
 import RetryPaymentPage from './pages/RetryPayment.jsx';
 import SharedPostRedirect from './componenets/SharedPostRedirect.jsx';
 import UserPostDisplay from './pages/UserPostsDisplay.jsx';
 import AllPostsPage from './componenets/AllPostsPage.jsx';
+import Livefeed from './LivefeedPages/Livefeed.jsx';
+import Notifications from './LivefeedPages/Notifications.jsx';
+import Profile from './LivefeedPages/Profile.jsx';
+import ElectoAI from './LivefeedPages/ElectoAI.jsx';
+import ProfileNew from './LivefeedPages/ProfileNew.jsx';
+import SearchPage from './LivefeedPages/SearchPage.jsx';
+import { BackgroundCopyOf } from './pages/BackgroundCopyOf/sections/BackgroundCopyOf.jsx';
+import { DelhiSignUpPage } from './pages/SignUpPage/DelhiSignupPage.jsx';
+import { BiharSignUpPage } from './pages/SignUpPage/BiharSignUpPage.jsx';
+import { BengalSignUpPage } from './pages/SignUpPage/BengalSignUpPage.jsx';
+import { LoginPage } from './pages/LoginPage/LoginPage.jsx';
+import { VerifyPage } from './pages/VerifyPage/VerifyPage.jsx';
+import { MainContentSection } from './pages/BackgroundCopyOf/sections/MainContentSection/MainContentSection.jsx';
+import { InfoSection } from './pages/BackgroundCopyOf/sections/InfoSection/InfoSection.jsx';
+import { FeatureSection } from './pages/BackgroundCopyOf/sections/FeatureSection/FeatureSection.jsx';
+import { DashboardSection } from './pages/BackgroundCopyOf/sections/DashboardSection/DashboardSection.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -58,25 +74,47 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element:<BackgroundCopyOf/>,
+      },
+      {
+        path: "/welcome",
         element:<WelcomeNew/>,
       },
-      
       {
         path: "/signup/delhi",
-        element:<AuthDelhi/>,
+        element:<DelhiSignUpPage/>,
       },
       {
         path: "/signup/bihar",
-        element:<AuthBihar/>,
+        element: <BiharSignUpPage />,
       },
       {
-        path: "/signup/west bengal",
-        element:<AuthBengal/>,
+        path: "/signup/west-bengal", 
+        element: <BengalSignUpPage />,
       },
       {
         path: "/login",
-        element:<LoginForm/>,
+        element:<LoginPage/>,
       },
+      {
+        path: "/verify",
+        element:<VerifyPage/>,
+      },
+      
+      
+      {
+        path: "/signup/olddelhi",
+        element:<AuthDelhi/>,
+      },
+      {
+        path: "/signup/oldbihar",
+        element:<AuthBihar/>,
+      },
+      {
+        path: "/signup/oldwest bengal",
+        element:<AuthBengal/>,
+      },
+      
       {
         path: "/joblogin",
         element:<LoginJob/>,
@@ -126,10 +164,7 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element:<Dashboard/>,
       },
-      {
-        path: "/contact",
-        element:<ContactForm/>,
-      },
+      
       
       {
         path: "/support",
@@ -140,12 +175,12 @@ const router = createBrowserRouter([
         element:<FAQ/>,
       },
       {
-        path: "/userguidelines",
+        path: "/user-guidelines",
         element:<UserGuidelines/>,
       },
       {
-        path: "/profile",
-        element:<ProfilePageNew/>,
+        path: "/pro",
+        element:<ProfileNew/>,
 
       },
       {
@@ -169,9 +204,31 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/termsandconditions",
+        path: "/terms-condition",
         element:<TermsAndConditions/>,
       },
+
+      {
+        path: "/features",
+        element:<MainContentSection/>,
+      },
+      {
+        path: "/contact",
+        element:<InfoSection/>,
+      },
+      {
+        path: "/faq",
+        element:<FeatureSection/>,
+      },
+      {
+        path: "/service",
+        element:<DashboardSection/>,
+      },
+     
+     
+     
+
+
      
       {
         path: "/forgot-password",
@@ -206,14 +263,43 @@ const router = createBrowserRouter([
         element:<RetryPaymentPage/>
       },
       {
-        path:"/search",
+        path:"/s",
         element:<SearchResults/>
       },
+      
       {
-        path:"/sidebar",
-        element:<Sidebar/>
-      }
-     
+        path:"/livefeed/*",
+        element:<Livefeed/>,
+
+        children:[
+
+          {
+            path:"notifications",
+            element:<Notifications/>
+          },
+          {
+            path:"electoai",
+            element:<ElectoAI/>
+          },
+          {
+            path:"search",
+            element:<SearchPage/>
+          },
+         
+         
+          {
+            path:"profile",
+            element:<ProfileNew/>
+          },
+          {
+            path:"settings",
+            element:<SettingsPage/>
+          },
+         
+         
+        ],
+      },
+      
      
      
      

@@ -308,9 +308,9 @@ useEffect(() => {
     <div className="max-w-2xl mx-auto p-4">
     
     {/* Post Content */}
-    <div className="bg-white rounded-lg shadow p-6 mb-4">
+    <div className="bg-white rounded-lg shadow p-4 mb-4">
       {/* User Info */}
-      <div className="flex items-center space-x-4 mb-4 mt-16">
+      <div className="flex items-center space-x-4 mb-4 mt-4">
   {post.userId && post.userId._id ? (
     <>
       {post.userId.profilePic ? (
@@ -416,7 +416,7 @@ useEffect(() => {
       {/* Add Comment Section */}
       <div className="flex items-center gap-3 mb-4">
         <textarea
-          className="flex-1 border border-gray-300 rounded-md p-2 resize-none text-sm h-20"
+          className="flex-1 border border-gray-300 rounded-md p-2 resize-none text-sm h-10 "
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Write a comment..."
@@ -426,7 +426,7 @@ useEffect(() => {
             handleAddComment(post._id);
             setNewComment("");
           }}
-          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 h-20"
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 h-10"
         >
           Add
         </button>

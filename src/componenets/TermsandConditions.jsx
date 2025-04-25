@@ -4,8 +4,8 @@ import Navbar from './Navbar';
 const TermsAndConditions = () => {
   return (
     <div className="bg-gray-100 min-h-screen ">
-      <Navbar/>
-      <div className="max-w-4xl mx-auto mt-24 bg-white shadow-lg rounded-lg p-6 md:p-10">
+      
+      <div className="max-w-4xl mx-auto  bg-white shadow-lg rounded-lg p-6 md:p-10">
         <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Web Magnifier: Terms and Conditions</h1>
         <p className="text-sm text-gray-500 text-center mb-8">
           Effective Date: [Insert Date] | Last Updated: [Insert Date]

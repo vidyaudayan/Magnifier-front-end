@@ -129,15 +129,14 @@ const SearchUserPost = () => {
     }, [userId]);
 
     return (
-        <div className="lg:mt-44 ">
-  <NavbarLanding />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 
   {/* Post Section */}
   {posts.length > 0 ? (
     posts.map((post) => (
-      <div key={post._id} className="bg-white border border-gray-300 p-8 mt-32 lg:mt-20 lg:mx-20 mx-10 rounded-lg">
+      <div key={post._id} className="bg-white border border-gray-300 p-8 mt-4 lg:mt-20 lg:mx-20 mx-10 rounded-lg">
         {/* Header: User Image, Name, and Date */}
-        <div className="flex items-center space-x-4 mb-4">
+        <div className="flex items-center space-x-4 mb-2">
           {post.userId?.profilePic ? (
             <img
               src={post.userId.profilePic}
@@ -181,10 +180,10 @@ const SearchUserPost = () => {
             )}
           </p>
           {post.postType === 'Photo' && (
-            <img src={post.mediaUrl} alt="Post Media" className="lg:w-1/2 rounded-md h-80 w-full object-cover mt-3 shadow-md" />
+            <img src={post.mediaUrl} alt="Post Media" className="lg:w-full rounded-md h-80 w-full object-cover mt-3 shadow-md" />
           )}
           {post.postType === 'VoiceNote' && (
-            <audio controls src={post.mediaUrl} className="lg:w-1/2 mt-3 rounded-md" />
+            <audio controls src={post.mediaUrl} className="lg:w-full mt-3 rounded-md" />
           )}
         </div>
 
