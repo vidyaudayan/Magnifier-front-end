@@ -1,190 +1,12 @@
-{/*import React, { useState } from 'react';
-import { 
-  ThumbsUp, 
-  ThumbsDown, 
-  MessageCircle, 
-  Share2, 
-  Bookmark,
-  Brain,
-  MoreHorizontal,
-  CheckCircle2,
-  ExternalLink
-} from 'lucide-react';
-
-const PostCard = ({ post }) => {
-  const [showAiSummary, setShowAiSummary] = useState(false);
-  const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
-
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200/50 dark:border-gray-700/50">
-  
-      <div className="flex items-start justify-between p-5 border-b border-gray-100 dark:border-gray-700/50">
-        <div className="flex items-center space-x-3.5">
-          <img 
-            src={post.author.avatar} 
-            alt={post.author.name}
-            className="w-11 h-11 rounded-full object-cover"
-          />
-          <div>
-            <div className="flex items-center space-x-1.5">
-              <span className="font-medium text-gray-900 dark:text-white">
-                {post.author.name}
-              </span>
-              {post.author.verified && (
-                <CheckCircle2 className="w-4 h-4 text-blue-500" />
-              )}
-            </div>
-            <div className="flex items-center space-x-2 text-[13px] text-gray-500 dark:text-gray-400">
-              <span>@{post.author.handle}</span>
-              <span>•</span>
-              <span>{post.timestamp}</span>
-              {post.source && (
-                <>
-                  <span>•</span>
-                  <div className="flex items-center space-x-1">
-                    <ExternalLink className="w-3 h-3" />
-                    <span>{post.source.name}</span>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 -mt-1">
-          <MoreHorizontal className="w-5 h-5" />
-        </button>
-      </div>
-
- 
-      <div className="p-5">
-        <p className="text-gray-900 dark:text-white text-[15px] leading-relaxed whitespace-pre-wrap">{post.content}</p>
-        
-     
-        {post.images && post.images.length > 0 && (
-          <div className={`grid gap-2 mt-4 ${
-            post.images.length === 1 ? 'grid-cols-1' :
-            post.images.length === 2 ? 'grid-cols-2' :
-            'grid-cols-2'
-          }`}>
-            {post.images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`Post image ${index + 1}`}
-                className="rounded-xl w-full h-48 object-cover"
-              />
-            ))}
-          </div>
-        )}
-
-        <div className="flex flex-wrap gap-2 mt-4">
-          {post.hashtags.map((tag) => (
-            <span
-              key={tag}
-              className="text-blue-600 dark:text-blue-400 text-[13px] hover:underline cursor-pointer font-medium"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-
-      
-        {post.aiLabels && post.aiLabels.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {post.aiLabels.map((label) => (
-              <span
-                key={label}
-                className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      
-      <div className="px-5">
-        <button
-          onClick={() => setShowAiSummary(!showAiSummary)}
-          className="flex items-center space-x-2 text-[13px] font-medium text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
-        >
-          <Brain className="w-4 h-4" />
-          <span>Analyze with ElectoAI</span>
-        </button>
-        
-        {showAiSummary && (
-          <div className="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-            <p className="text-[13px] text-gray-600 dark:text-gray-300">
-              AI analysis coming soon...
-            </p>
-          </div>
-        )}
-      </div>
-
-  
-      <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100 dark:border-gray-700/50 mt-4">
-        <div className="flex items-center space-x-6">
-          <button className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-            <ThumbsUp className="w-[18px] h-[18px]" />
-            <span className="text-[13px] font-medium">{post.engagement.likes}</span>
-          </button>
-          <button className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400">
-            <ThumbsDown className="w-[18px] h-[18px]" />
-            <span className="text-[13px] font-medium">{post.engagement.dislikes}</span>
-          </button>
-          <button 
-            onClick={() => setIsCommentsExpanded(!isCommentsExpanded)}
-            className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          >
-            <MessageCircle className="w-[18px] h-[18px]" />
-            <span className="text-[13px] font-medium">{post.engagement.comments}</span>
-          </button>
-          <button className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-            <Share2 className="w-[18px] h-[18px]" />
-            <span className="text-[13px] font-medium">{post.engagement.shares}</span>
-          </button>
-        </div>
-        <button className="text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-          <Bookmark className="w-[18px] h-[18px]" />
-        </button>
-      </div>
-
-      {isCommentsExpanded && post.topComments && (
-        <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-700/50">
-          {post.topComments.map((comment, index) => (
-            <div 
-              key={index}
-              className="mb-4 last:mb-0"
-            >
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="font-medium text-gray-900 dark:text-white text-[14px]">
-                  {comment.author}
-                </span>
-                <span className="text-[13px] text-gray-500 dark:text-gray-400">
-                  • {comment.likes} likes
-                </span>
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-[14px] leading-relaxed">
-                {comment.content}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default PostCard;*/}
 
 
-import React, { useState, useRef } from 'react';
-import { 
-  ThumbsUp, 
-  ThumbsDown, 
-  MessageCircle, 
-  Share2, 
+
+import React, { useState, useRef,useEffect } from 'react';
+import {
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircle,
+  Share2,
   Bookmark,
   MoreHorizontal,
   CheckCircle2,
@@ -195,12 +17,15 @@ import {
   ChevronUp
 } from 'lucide-react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { updateMetrics, updatePostReaction, setPosts,updatePostComments } from '../../features/user/userSlice';
+import { updateMetrics, updatePostReaction, setPosts, updatePostComments } from '../../features/user/userSlice';
+import { useSelector } from 'react-redux';
+import { Edit3, Trash2 } from 'lucide-react';
 
-const PostCard = ({ 
-  post, 
+const PostCard = ({
+  post,
   user,
   highlightPostId,
   selectedUser,
@@ -208,11 +33,17 @@ const PostCard = ({
   handleViewMore
 }) => {
   const dispatch = useDispatch();
-  const [newComment, setNewComment] = useState("");
+  const currentUser = useSelector((state) => state.user.user);
+  //const currentUser = useSelector(state => state.user.user);
+  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState(post.comments);
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [displayCount, setDisplayCount] = useState(6);
   const [loading, setLoading] = useState(false);
   const postRef = useRef(null);
+  console.log('Redux currentUser in component:', currentUser);
+  const currentPosts = useSelector(state => state.user.posts);
+  const posts = useSelector((state) => state.user.posts);
   PostCard.defaultProps = {
     post: {
       _id: '',
@@ -231,9 +62,12 @@ const PostCard = ({
     highlightPostId: null,
     selectedUser: null,
     expandedPosts: {},
-    handleViewMore: () => {}
+    handleViewMore: () => { }
   };
+  const [isUserLoaded, setIsUserLoaded] = useState(false);
 
+  
+ 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
@@ -280,27 +114,35 @@ const PostCard = ({
     };
   }, [post._id]);
 
-  
+  const fetchPopulatedPostById = async (postId) => {
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post/${postId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    return response.data.post; // Make sure backend returns `post` inside the response
+  };
+
+
+
   const handleAddComment = async (postId) => {
     if (!newComment.trim()) return;
     setLoading(true);
-  
+
     try {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
-  
+
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/post/${postId}/comment`,
         { comment: newComment },
         { headers }
       );
-  
+
       // Update only the specific post's comments
       dispatch(updatePostComments({
         postId,
         comments: response.data.comments
       }));
-  
+
       setNewComment("");
       toast.success("Comment added successfully!");
     } catch (error) {
@@ -311,56 +153,18 @@ const PostCard = ({
     }
   };
 
+  
+  // 9.44
   {/*const handleReaction = async (postId, reactionType) => {
     try {
-      const url = reactionType === "like"
-        ? `${import.meta.env.VITE_BASE_URL}/post/${postId}/like`
-        : `${import.meta.env.VITE_BASE_URL}/post/${postId}/dislike`;
-
-      const response = await axios.patch(url, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-
-      const { post: updatedPost, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
-
-      dispatch(updatePostReaction({
-        postId,
-        updatedPost: {
-          ...updatedPost,
-          userId: post.userId
-        }
-      }));
-
-      dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
-    } catch (error) {
-      if (error.response) {
-        // Handle 400 errors (like/dislike own post)
-        if (error.response.status === 400) {
-          toast.error(error.response.data.message || 
-            `You cannot ${reactionType} your own post`);
-        } 
-        // Handle other errors
-        else {
-          toast.error(`Failed to ${reactionType} post`);
-          console.error("Error updating reactions:", error);
-        }
-      } else {
-        console.error("Network error:", error);
-        toast.error("Network error - please try again");
-      }
-    }
-  };*/}
-
-  const handleReaction = async (postId, reactionType) => {
-    try {
       const url = `${import.meta.env.VITE_BASE_URL}/post/${postId}/${reactionType}`;
-      
+
       const response = await axios.patch(url, {}, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-  
+
       // Handle successful response
-      const { post: updatedPost, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
+      const {post:updatedPost,  walletAmount, totalLikes, totalDislikes, postCount } = response.data;
       
       dispatch(updatePostReaction({
         postId,
@@ -369,9 +173,9 @@ const PostCard = ({
           userId: post.userId
         }
       }));
-  
+
       dispatch(updateMetrics({ walletAmount, totalLikes, totalDislikes, postCount }));
-      
+
     } catch (error) {
       // Improved error handling
       if (error.response) {
@@ -388,12 +192,65 @@ const PostCard = ({
       }
       console.error(`${reactionType} error:`, error);
     }
-  };
+  };*/}
+  // new
 
+  const handleReaction = async (postId, reactionType) => {
+    try {
+      const url = `${import.meta.env.VITE_BASE_URL}/post/${postId}/${reactionType}`;
+
+      const response = await axios.patch(url, {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+
+      // Get current posts from Redux store
+
+
+      // Find the current post in state to preserve comment user data
+      const currentPost = currentPosts.find(p => p._id === postId);
+
+      if (!currentPost) {
+        throw new Error("Post not found in current state");
+      }
+
+      // Create updated post by merging existing data with new reaction counts
+      const updatedPost = {
+        ...currentPost, // preserve existing data including comments with user info
+        likes: response.data.post.likes,
+        dislikes: response.data.post.dislikes,
+        // preserve userId if it exists in current post
+        userId: currentPost.userId || response.data.post.userId
+      };
+
+      dispatch(updatePostReaction({
+        postId,
+        updatedPost
+      }));
+
+      dispatch(updateMetrics({
+        walletAmount: response.data.walletAmount,
+        totalLikes: response.data.totalLikes,
+        totalDislikes: response.data.totalDislikes,
+        postCount: response.data.postCount
+      }));
+
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 400) {
+          toast.error(error.response.data.message);
+          return;
+        }
+        toast.error(`Error ${reactionType}ing post: ${error.response.data.message}`);
+      } else {
+        toast.error(`Network error - failed to ${reactionType} post`);
+      }
+      console.error(`${reactionType} error:`, error);
+    }
+  };
   const handleShare = (post) => {
     const postId = post._id;
     const shareUrl = `${window.location.origin}/loginshare?postId=${postId}`;
-    
+
     if (navigator.share) {
       navigator.share({
         title: "Check out this post on Magnifier!",
@@ -409,8 +266,122 @@ const PostCard = ({
     }
   };
 
+  {/*const handleEditComment = async (postId, commentId, newCommentText) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}/post/${postId}/comment/${commentId}`,
+        { comment: newCommentText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Update the posts state with the edited comment
+      //setPosts(posts.map(post =>
+        //post._id === postId ? response.data : post
+      //));
+
+      const post = posts.find(p => p._id === postId);
+    if (!post) throw new Error('Post not found');
+    const updatedComments = post.comments.map(comment =>
+      comment._id === commentId ? { ...comment, text: newCommentText } : comment
+    );
+
+    // Dispatch the action to update the comments list for the post
+    dispatch(updatePostComments({ postId, comments: updatedComments }));
+    
+    const updatedPost = posts.find(p => p._id === postId);
+    setComments(updatedPost.comments);
+      toast.success("Comment updated successfully");
+    } catch (error) {
+      console.error("Error editing comment:", error);
+      toast.error(error.response?.data?.message || "Failed to edit comment");
+    }
+  };*/}
+  const handleEditComment = async (postId, commentId, newCommentText) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}/post/${postId}/comment/${commentId}`,
+        { comment: newCommentText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      // Find the post in Redux state
+      const updatedPosts = posts.map(post => {
+        if (post._id === postId) {
+          // Update the specific comment
+          const updatedComments = post.comments.map(comment => 
+            comment._id === commentId 
+              ? { ...comment, comment: newCommentText } 
+              : comment
+          );
+          return { ...post, comments: updatedComments };
+        }
+        return post;
+      });
+  
+      // Update both Redux and local state
+      dispatch(setPosts(updatedPosts));
+      setComments(updatedPosts.find(p => p._id === postId).comments);
+      
+      toast.success("Comment updated successfully");
+    } catch (error) {
+      console.error("Error editing comment:", error);
+      toast.error(error.response?.data?.message || "Failed to edit comment");
+    }
+  };
+
+  const handleDeleteComment = async (postId, commentId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(
+        `${import.meta.env.VITE_BASE_URL}/post/${postId}/comment/${commentId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      // Update both Redux and local state
+      const updatedPosts = posts.map(post => {
+        if (post._id === postId) {
+          // Filter out the deleted comment
+          const updatedComments = post.comments.filter(comment => 
+            comment._id !== commentId
+          );
+          return { ...post, comments: updatedComments };
+        }
+        return post;
+      });
+  
+      // Update Redux state
+      dispatch(setPosts(updatedPosts));
+      
+      // Update local comments state
+      setComments(updatedPosts.find(p => p._id === postId).comments);
+      
+      toast.success("Comment deleted successfully");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      toast.error(error.response?.data?.message || "Failed to delete comment");
+    }
+  };
+
+  useEffect(() => {
+    // Update local comments when Redux posts change
+    const updatedPost = posts.find(p => p._id === post._id);
+    if (updatedPost) {
+      setComments(updatedPost.comments);
+    }
+  }, [posts, post._id]);
+
+  useEffect(() => {
+    const currentPost = posts.find(p => p._id === post._id);
+    if (currentPost) {
+      setComments(currentPost.comments);
+    }
+  }, [posts, post._id]);
+  
+
   return (
-    <div 
+    <div
       ref={postRef}
       data-post-id={post._id}
       className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 mb-4
@@ -430,7 +401,7 @@ const PostCard = ({
           <Bookmark className="w-4 h-4" />
         </div>
       )}
-
+  
       {/* Post Header */}
       <div className="flex items-start justify-between p-5 border-b border-gray-100 dark:border-gray-700/50">
         <div className="flex items-center space-x-3.5">
@@ -453,12 +424,12 @@ const PostCard = ({
               {post?.userId?.username?.charAt(0).toUpperCase() || "U"}
             </div>
           )}
-          
+  
           <div>
             <div className="flex items-center space-x-1.5">
-              <span className="font-medium text-gray-900 dark:text-white">
+              <Link to={`/livefeed/userprofile/${post.userId?._id}`} className="font-medium text-gray-900 dark:text-white">
                 {post?.userId?.username || "Unknown User"}
-              </span>
+              </Link>
               {post.userId?.verified && (
                 <CheckCircle2 className="w-4 h-4 text-blue-500" />
               )}
@@ -472,7 +443,7 @@ const PostCard = ({
           <MoreHorizontal className="w-5 h-5" />
         </button>
       </div>
-
+  
       {/* Post Content */}
       <div className="p-5">
         <p className="text-gray-900 dark:text-white text-[15px] leading-relaxed whitespace-pre-wrap">
@@ -500,7 +471,7 @@ const PostCard = ({
             </>
           )}
         </p>
-
+  
         {/* Media */}
         {post.postType === "Photo" && post.mediaUrl && (
           <img
@@ -520,7 +491,7 @@ const PostCard = ({
           </div>
         )}
       </div>
-
+  
       {/* Engagement Stats */}
       <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-gray-700/50">
         <div className="flex items-center space-x-4">
@@ -530,7 +501,7 @@ const PostCard = ({
           <span className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 cursor-default">
             {post.dislikes || 0} Dislikes
           </span>
-          <button 
+          <button
             onClick={() => setCommentsVisible(!commentsVisible)}
             className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"
           >
@@ -538,7 +509,7 @@ const PostCard = ({
           </button>
         </div>
       </div>
-
+  
       {/* Action Buttons */}
       <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-gray-700/50">
         <div className="flex items-center space-x-6">
@@ -572,11 +543,12 @@ const PostCard = ({
           </button>
         </div>
       </div>
-
-      {/* Add Comment Section */}
+  
+      {/* Comment Section */}
       {commentsVisible && (
         <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-700/50">
-          <div className="flex items-center space-x-3">
+          {/* Add Comment Form */}
+          <div className="flex items-center space-x-3 mb-4">
             <textarea
               className="flex-1 border border-gray-300 dark:border-gray-600 rounded-xl p-3 resize-none text-sm bg-transparent text-gray-900 dark:text-white"
               value={newComment}
@@ -592,43 +564,90 @@ const PostCard = ({
               {loading ? "Posting..." : "Add"}
             </button>
           </div>
-
-          {/* Comments Section */}
+  
+          {/* Comments List */}
           {post.comments?.length > 0 && (
-            <div className="mt-4 space-y-3">
-              {post.comments
+            <div className="space-y-3">
+              {comments
                 .slice()
                 .reverse()
                 .slice(0, displayCount)
                 .map((comment, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl flex items-start space-x-3"
-                  >
-                    {comment.userId?.profilePic ? (
-                      <img
-                        src={comment.userId.profilePic}
-                        alt="User"
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                        {comment.userId?.username?.charAt(0).toUpperCase() || 'A'}
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  <div key={index} className="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl flex items-start gap-3">
+                  
+                    <div className="flex-shrink-0">
+                      {comment.userId?.profilePic ? (
+                        <img 
+                          src={comment.userId.profilePic} 
+                          alt="User" 
+                          className="w-8 h-8 rounded-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '';
+                            e.target.parentNode.innerHTML = `
+                              <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                                ${comment.userId?.username?.charAt(0).toUpperCase() || 'A'}
+                              </div>`;
+                          }}
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                          {comment.userId?.username?.charAt(0).toUpperCase() || 'A'}
+                        </div>
+                      )}
+                    </div>
+  
+                   
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
                           {comment.userId?.username || 'Anonymous'}
                         </span>
+                        
+                      
+                    {currentUser?._id?.toString() === comment.userId?._id?.toString() && (
+                    
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newCommentText = prompt("Edit your comment:", comment.comment);
+                                if (newCommentText && newCommentText !== comment.comment) {
+                                  handleEditComment(post._id, comment._id, newCommentText);
+                                }
+                              }}
+                              className="text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 p-1"
+                              title="Edit comment"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm("Are you sure you want to delete this comment?")) {
+                                  handleDeleteComment(post._id, comment._id);
+                                }
+                              }}
+                              className="text-gray-500 hover:text-red-500 dark:hover:text-red-400 p-1"
+                              title="Delete comment"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                       )}
                       </div>
-                      <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                      
+                      <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 break-words">
                         {comment.comment}
                       </p>
+                      
+                     
                     </div>
                   </div>
                 ))}
 
+                
+  
               {/* Load More / Close Comments Buttons */}
               <div className="flex justify-center mt-3">
                 {displayCount < post.comments.length ? (
@@ -639,15 +658,15 @@ const PostCard = ({
                     <ChevronDown className="w-4 h-4 mr-1" />
                     Load More Comments
                   </button>
-                ) : (
+                ) : post.comments.length > 6 ? (
                   <button
-                    onClick={() => setCommentsVisible(false)}
+                    onClick={() => setDisplayCount(6)}
                     className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     <ChevronUp className="w-4 h-4 mr-1" />
-                    Close Comments
+                    Show Less
                   </button>
-                )}
+                ) : null}
               </div>
             </div>
           )}

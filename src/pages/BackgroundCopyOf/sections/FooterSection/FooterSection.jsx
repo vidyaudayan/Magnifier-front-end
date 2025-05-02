@@ -3,16 +3,17 @@ import { Button } from "../../../../componenets/Welcome/button";
 import { Separator } from "../../../../componenets/Welcome/separator";
 import logo from "../../../../assets/Images/logo.jpg"
 export const FooterSection = () => {
-  // Footer links data
-  const quickLinks = [
-    { title: "Features", href: "/features" },
-    { title: "Services", href: "/service" },
-    { title: "Contact", href: "/contact" },
-    { title: "FAQs", href: "/faq" },
-    {title:"Terms&Conditions", href:"/terms-condition"},
-    {title:"UserGuidelines", href:"/user-guidelines"},
-  ];
 
+  const quickLinks = [
+
+    { title: "Features", href: "#features", type: "hash" },
+    { title: "Services", href: "#services", type: "hash" },
+    { title: "Contact", href: "#contact", type: "hash" },
+    { title: "FAQs", href: "#faq", type: "hash" },
+
+    { title: "Terms & Conditions", href: "/terms-condition", type: "page" },
+    { title: "User Guidelines", href: "/user-guidelines", type: "page" },
+  ];
   const serviceLinks = [
     { title: "Web Magnifier", href: "#" },
     { title: "ElectoAI", href: "#" },
@@ -23,6 +24,13 @@ export const FooterSection = () => {
     { title: "Youtube", href: "#" },
     { title: "Linkedin", href: "#" },
   ];
+
+  const scrollToFeatureSelection = () => {
+    const featureSection = document.getElementById("services");
+    if (featureSection) {
+      featureSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <footer className="w-full py-16 bg-transparent">
@@ -46,7 +54,7 @@ export const FooterSection = () => {
               powerful insights
             </p>
 
-            <Button className="bg-blue-600 text-white rounded-full h-11 px-4 flex items-center">
+            <Button onClick={scrollToFeatureSelection} className="bg-blue-600 text-white rounded-full h-11 px-4 flex items-center">
               <span className="mr-2">Get started</span>
               <div className="w-[34px] h-[34px] bg-white rounded-full flex items-center justify-center">
                 <img
@@ -66,7 +74,12 @@ export const FooterSection = () => {
             <ul className="space-y-4">
               {quickLinks.map((link, index) => (
                 <li key={index}>
-                  <a
+                  <a onClick={(e) => {
+                    if (link.type === "hash") {
+                      e.preventDefault();
+                      document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
                     href={link.href}
                     className="text-lg text-[#636363] tracking-[-0.36px] leading-7 hover:text-blue-700 transition-colors"
                   >
@@ -110,9 +123,13 @@ export const FooterSection = () => {
                   >
                     {link.title}
                   </a>
+
+
                 </li>
               ))}
+
             </ul>
+
           </div>
         </div>
 

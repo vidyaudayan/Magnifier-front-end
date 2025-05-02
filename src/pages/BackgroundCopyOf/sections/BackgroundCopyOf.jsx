@@ -23,16 +23,19 @@ export const BackgroundCopyOf = () => {
         {/* State Selection Section */}
         <StateSelectionSection />
 
-        {/* Features Section */}
-        <section id="features" className="scroll-mt-[100px] md:scroll-mt-[84px]">
-          <MainContentSection />
-        </section>
 
         {/* Services Section */}
         <section id="services" className="scroll-mt-[100px] md:scroll-mt-[84px]">
           <DashboardSection />
           <CallToActionSection />
         </section>
+
+        {/* Features Section */}
+        <section id="features" className="scroll-mt-[100px] md:scroll-mt-[84px]">
+          <MainContentSection />
+        </section>
+
+        
 
         {/* Contact Section */}
         <section id="contact" className="scroll-mt-[100px] md:scroll-mt-[84px]">

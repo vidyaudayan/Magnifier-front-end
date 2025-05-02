@@ -6,6 +6,7 @@ import Notifications from '../../LivefeedPages/Notifications';
 import Settings from '../../LivefeedPages/Settings';
 import ProfileNew from '../../LivefeedPages/ProfileNew';
 import SearchPage from '../../LivefeedPages/SearchPage';
+import UsersProfilePage from '../../LivefeedPages/UsersProfilePage';
 
 const MainContent = ({ isSidebarCollapsed }) => {
   return (
@@ -17,6 +18,7 @@ const MainContent = ({ isSidebarCollapsed }) => {
       <div className="min-h-screen pt-[120px] md:pt-0">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/userprofile/:userId" element={<UsersProfilePage/>} />
           <Route path="/profile" element={<ProfileNew />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/electoai" element={<ElectoAI />} />

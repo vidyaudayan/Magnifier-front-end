@@ -9,7 +9,7 @@ export const DashboardSection = () => {
     navigate('/login');
   };
   return (
-    <section className="w-full max-w-[1000px] mx-auto py-16">
+    <section id="services" className="w-full max-w-[1000px] mx-auto py-16">
       <div className="flex flex-col items-center mb-12">
         <div className="flex items-center justify-center mb-4">
           <div className="w-2 h-2 bg-[#578cff] rounded-full mr-4"></div>

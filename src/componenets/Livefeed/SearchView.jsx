@@ -1,39 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search as SearchIcon, Users, FileText, Hash, Newspaper, X, TrendingUp } from 'lucide-react';
 
-const mockResults = [
-  {
-    id: '1',
-    type: 'post',
-    title: 'Agricultural Reforms Discussion',
-    description: 'Today, I met with farmers in Punjab to discuss the agricultural reforms...',
-    image: 'https://images.pexels.com/photos/2612911/pexels-photo-2612911.jpeg?auto=compress&cs=tinysrgb&w=150',
-    metadata: {
-      timestamp: '2 hours ago',
-      likes: 1243
-    }
-  },
-  {
-    id: '2',
-    type: 'user',
-    title: 'Rahul Gandhi',
-    description: '@RahulGandhi • Member of Parliament',
-    image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150',
-    metadata: {
-      followers: 25000000
-    }
-  },
-  {
-    id: '3',
-    type: 'topic',
-    title: '#FarmersProtest',
-    description: 'Trending with #AgricultureReforms',
-    metadata: {
-      posts: 45600,
-      trending: true
-    }
-  }
-];
+
 
 const SearchView = ({ isOpen, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');

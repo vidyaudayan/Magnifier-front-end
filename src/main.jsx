@@ -8,11 +8,13 @@ import {
 import './index.css'
 import App from './App.jsx'
 import Root from './routes/root';
-import store from './app/store'
+import {store} from './app/store'
 import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor } from '../src/app/store.js'
 
 import ErrorPage from './error-page';
-
+import { useEffect,useState } from 'react';
 import WelcomeNew from './componenets/WelcomeNew.jsx';
 
 import DelhiSignup from './componenets/DelhiSignup.jsx'
@@ -66,6 +68,13 @@ import { MainContentSection } from './pages/BackgroundCopyOf/sections/MainConten
 import { InfoSection } from './pages/BackgroundCopyOf/sections/InfoSection/InfoSection.jsx';
 import { FeatureSection } from './pages/BackgroundCopyOf/sections/FeatureSection/FeatureSection.jsx';
 import { DashboardSection } from './pages/BackgroundCopyOf/sections/DashboardSection/DashboardSection.jsx';
+import UsersProfilePage from './LivefeedPages/UsersProfilePage.jsx';
+import { LanguageProvider } from './context/LanguageContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
+
+
+
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -183,12 +192,12 @@ const router = createBrowserRouter([
         element:<ProfileNew/>,
 
       },
+      
       {
         path: "/profile/:userId",
         element:<ProfilePageUsers/>,
 
       },
-
 
       {
         path: "/user/:userId/posts",
@@ -272,6 +281,11 @@ const router = createBrowserRouter([
         element:<Livefeed/>,
 
         children:[
+          {
+            path: "userprofile/:userId",
+            element:<UsersProfilePage/>,
+    
+          },
 
           {
             path:"notifications",
@@ -287,13 +301,15 @@ const router = createBrowserRouter([
           },
          
          
-          {
-            path:"profile",
-            element:<ProfileNew/>
-          },
+         
           {
             path:"settings",
             element:<SettingsPage/>
+          },
+         
+          {
+            path:"profile",
+            element:<ProfileNew/>
           },
          
          
@@ -310,9 +326,15 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')).render(
-  <Provider store={store}>
+  <ThemeProvider>
+<LanguageProvider>
+ <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
   <StrictMode>
  <RouterProvider router={router} />
   </StrictMode>,
+  </PersistGate>
   </Provider>,
+  </LanguageProvider>
+  </ThemeProvider>
 )

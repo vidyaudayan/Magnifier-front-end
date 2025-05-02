@@ -5,7 +5,8 @@ import { createSlice } from '@reduxjs/toolkit';
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
-    user: null,
+    user: JSON.parse(localStorage.getItem('user')) || null,
+    loading: false,
     profilePicture: null, // Current profile picture
     previousProfilePicture: null, // Previous profile picture
    previousCoverPicture:null,
@@ -18,7 +19,17 @@ export const userSlice = createSlice({
   },
   reducers: {
     setUserDetails: (state, action) => {
-      state.user = action.payload;
+      const user = action.payload|| {};
+      if (!user || (!user.id && !user._id)) return; 
+      state.user = {
+        _id: user.id || user._id,
+    username: user.username || user.userName ||'',
+    profilePicture: user.profilePic || user.profilePicture || '',
+    walletAmount: user.walletAmount || 0
+        // other fields...
+      };
+      localStorage.setItem('user', JSON.stringify(state.user));
+      state.loading = false;
       console.log('User details', action.payload);
     },
     setProfilePicture: (state, action) => {
@@ -47,31 +58,7 @@ export const userSlice = createSlice({
       );
       console.log('Post reaction updated:', action.payload);
     },
-    /*setPosts: (state, action) => {
-      //state.posts = action.payload;
-      //console.log('Posts fetched:', action.payload);
-      state.posts = [];
-     
-      const newPosts = action.payload;
-       // Ensure we update the correct post while keeping the rest unchanged
-    state.posts = state.posts.map((post) =>
-      newPosts.find((updatedPost) => updatedPost._id === post._id)
-          ? newPosts.find((updatedPost) => updatedPost._id === post._id)
-          : post
-  );
-
-
-    // Remove duplicate posts by checking the post ID
-    const existingPostIds = new Set(state.posts.map(post => post._id));
-
-    // Filter out posts that already exist
-    const uniquePosts = newPosts.filter(post => !existingPostIds.has(post._id));
-
-    // Update state with unique posts
-    state.posts = [...uniquePosts];
-    console.log('Posts fetched:', state.posts);
-    
-    },*/
+   
     setPostss: (state, action) => {
 
       const now = new Date();
@@ -188,13 +175,22 @@ export const userSlice = createSlice({
     state.posts = [...stickyPosts, ...normalPosts];
   },
 
-  updatePostComments: (state, action) => {
-    const { postId, comments } = action.payload;
-    const postIndex = state.posts.findIndex(post => post._id === postId);
-    if (postIndex !== -1) {
-      state.posts[postIndex].comments = comments;
-    }
-  },
+ 
+
+ 
+updatePostComments: (state, action) => {
+  const { postId, comments } = action.payload;
+  state.posts = state.posts.map(post => 
+    post._id === postId 
+      ? { 
+          ...post, 
+          comments: Array.isArray(comments) 
+            ? comments 
+            : [] 
+        } 
+      : post
+  );
+},
 
   setPosts: (state, action) => {
     const now = new Date();
@@ -252,98 +248,7 @@ export const userSlice = createSlice({
     state.posts = [...stickyPosts, ...normalPosts];
   },
 
-  setPosts1: (state, action) => {
-    const now = new Date();
-  
-    const visiblePosts = action.payload.filter(post => {
-      const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
-      const end = post.stickyUntil ? new Date(post.stickyUntil) : null;
-  
-      // Only approved posts are shown
-      if (post.postStatus !== 'approved' && post.postStatus !== 'scheduled' && post.postStatus !== 'published') return false;
-  
-      // Scheduled post: show only if now is within the sticky window
-      if (post.postStatus === 'scheduled') {
-        return start && end && now >= start && now < end;
-      }
-  
-      // Published post: always show unless it's outside sticky window
-      if (post.postStatus === 'published') {
-        if (start && end) {
-          return now >= start && now < end;
-        }
-        return true; // No sticky window, always show
-      }
-  
-      return false;
-    });
-  
-    const stickyPosts = visiblePosts.filter(post => post.sticky);
-    const normalPosts = visiblePosts.filter(post => !post.sticky);
-  
-    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
-  
-    console.log("Current posts:", {
-      time: now,
-      stickyPosts: stickyPosts.map(p => ({
-        id: p._id,
-        stickyWindow: `${new Date(p.stickyStartUTC)} - ${new Date(p.stickyUntil)}`,
-        content: p.content
-      })),
-      normalPosts: normalPosts.length
-    });
-  
-    state.posts = [...stickyPosts, ...normalPosts];
-  },
-  
-  setPosts2: (state, action) => {
-    const now = new Date();
-  
-    const visiblePosts = action.payload.filter(post => {
-      const start = post.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
-      const end = post.stickyUntil ? new Date(post.stickyUntil) : null;
-  
-      // Must be approved
-      if (post.status !== 'approved') return false;
-  
-      // If there's a sticky time window, enforce it
-      const isInStickyWindow = start && end && now >= start && now < end;
-  
-      if (post.postStatus === 'scheduled') {
-        return isInStickyWindow;
-      }
-  
-      if (post.postStatus === 'published') {
-        // If sticky is true and sticky window exists, enforce time restriction
-        if (post.sticky && start && end) {
-          return isInStickyWindow;
-        }
-        // Otherwise show it
-        return true;
-      }
-  
-      return false;
-    });
-  
-    // Separate sticky and normal posts
-    const stickyPosts = visiblePosts.filter(post => post.sticky);
-    const normalPosts = visiblePosts.filter(post => !post.sticky);
-  
-    // Sort sticky posts by start time
-    stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
-  
-    console.log("Current posts:", {
-      time: now.toISOString(),
-      stickyPosts: stickyPosts.map(p => ({
-        id: p._id,
-        stickyWindow: `${new Date(p.stickyStartUTC).toISOString()} - ${new Date(p.stickyUntil).toISOString()}`,
-        content: p.content
-      })),
-      normalPosts: normalPosts.length
-    });
-  
-    state.posts = [...stickyPosts, ...normalPosts];
-  },
+ 
   
   setPostssuccess: (state, action) => {
     const now = new Date();
@@ -433,10 +338,68 @@ export const userSlice = createSlice({
     // Final post list: sticky posts first, then the rest
     state.posts = [...stickyPosts, ...normalPosts];
   },
-  
+
+  setPosts: (state, action) => {
+  const now = new Date();
+  const posts = Array.isArray(action.payload) ? action.payload : [];
+
+  const visiblePosts = posts.filter(post => {
+    // Use optional chaining to avoid undefined errors
+    const start = post?.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+    const end = post?.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
+
+    if (post?.status !== 'approved') return false;
+
+    // Non-sticky published posts show immediately
+    if (post?.postStatus === 'published') {
+      if (!post?.sticky) return true;
+
+      // Sticky published posts should only show within their sticky window
+      return start && end && now >= start && now < end;
+    }
+
+    // Scheduled posts show only during their sticky window
+    if (post?.postStatus === 'scheduled') {
+      return start && end && now >= start && now < end;
+    }
+
+    return false;
+  });
+
+  // Sticky posts that are in their sticky time window (to be pinned at top)
+  const stickyPosts = visiblePosts.filter(post => {
+    if (!post?.sticky) return false;
+
+    const start = post?.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+    const end = post?.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
+
+    return start && end && now >= start && now < end;
+  });
+
+  // Normal posts are either non-sticky or sticky but not currently in their slot
+  const normalPosts = visiblePosts.filter(post => {
+    const start = post?.stickyStartUTC ? new Date(post.stickyStartUTC) : null;
+    const end = post?.stickyEndUTC ? new Date(post.stickyEndUTC) : null;
+
+    const isInStickyWindow = start && end && now >= start && now < end;
+
+    return !post?.sticky || !isInStickyWindow;
+  });
+
+  // Optional: sort sticky posts by start time
+  stickyPosts.sort((a, b) => new Date(a.stickyStartUTC) - new Date(b.stickyStartUTC));
+
+  // Final post list: sticky posts first, then the rest
+  state.posts = [...stickyPosts, ...normalPosts];
+},
+
+setLoading: (state, action) => {
+  state.loading = action.payload;
+},
 
     clearUserDetails: (state) => {
       state.user = null;
+      state.loading = false;
       state.profilePicture = null;
       state.coverPicture=null
       state.previousProfilePicture = null;
@@ -450,99 +413,10 @@ export const userSlice = createSlice({
   },
 });
 
-export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments } = userSlice.actions;
+export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments ,setLoading} = userSlice.actions;
 
 export default userSlice.reducer;
 
 
 
-{/*import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 
-export const fetchMetrics = createAsyncThunk('user/fetchMetrics', async (_, thunkAPI) => {
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/usermatrics`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching metrics', error);
-    return thunkAPI.rejectWithValue(error.response.data);
-  }
-});
-
-export const fetchPosts = createAsyncThunk('user/fetchPosts', async (_, thunkAPI) => {
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, { withCredentials: true });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching posts', error);
-    return thunkAPI.rejectWithValue(error.response.data);
-  }
-});
-
-export const userSlice = createSlice({
-  name: 'user',
-  initialState: {
-    user: null,
-    walletAmount: 0,
-    totalLikes: 0,
-    totalDislikes: 0,
-    postCount: 0,
-    posts: [],
-    isLoadingMetrics: false,
-    isLoadingPosts: false,
-  },
-  reducers: {
-    setUserDetails: (state, action) => {
-      state.user = action.payload;
-    },
-   
-    
-    updatePostReaction: (state, action) => {
-      const { postId, updatedPost } = action.payload;
-      state.posts = state.posts.map((post) => (post._id === postId ? { ...post, ...updatedPost } : post));
-    },
-    clearUserDetails: (state) => {
-      state.user = null;
-      state.profilePicture = null;
-      state.previousProfilePicture = null;
-      state.walletAmount = 0;
-      state.totalLikes = 0;
-      state.totalDislikes = 0;
-      state.postCount = 0;
-      state.posts = []; // Clear posts as well
-      console.log('User logged out');
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchMetrics.pending, (state) => {
-        state.isLoadingMetrics = true;
-      })
-      .addCase(fetchMetrics.fulfilled, (state, action) => {
-        state.isLoadingMetrics = false;
-        const { walletAmount, totalLikes, totalDislikes, postCount } = action.payload;
-        state.walletAmount = walletAmount;
-        state.totalLikes = totalLikes;
-        state.totalDislikes = totalDislikes;
-        state.postCount = postCount;
-      })
-      .addCase(fetchMetrics.rejected, (state) => {
-        state.isLoadingMetrics = false;
-      })
-      .addCase(fetchPosts.pending, (state) => {
-        state.isLoadingPosts = true;
-      })
-      .addCase(fetchPosts.fulfilled, (state, action) => {
-        state.isLoadingPosts = false;
-        state.posts = action.payload;
-      })
-      .addCase(fetchPosts.rejected, (state) => {
-        state.isLoadingPosts = false;
-      });
-  },
-});
-
-export const { setUserDetails, updatePostReaction, clearUserDetails } = userSlice.actions;
-export default userSlice.reducer;*/}

@@ -76,7 +76,7 @@ export const InfoSection = () => {
   };
 
   return (
-    <section className="w-full py-16 flex flex-col items-center justify-center">
+    <section id="contact" className="w-full py-16 flex flex-col items-center justify-center">
       <div className="max-w-[600px] text-center mb-12">
         <div className="flex items-center justify-center mb-6">
           <div className="w-2 h-2 bg-[#578cff] rounded-full mr-2"></div>

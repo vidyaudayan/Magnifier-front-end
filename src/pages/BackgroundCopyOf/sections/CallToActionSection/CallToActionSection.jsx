@@ -27,8 +27,10 @@ export const CallToActionSection = () => {
     },
   ];
 
+  
+
   return (
-    <section className="w-full py-16 flex justify-center">
+    <section   className="w-full  py-16 flex justify-center">
       <div className="w-full max-w-[1000px] flex flex-col items-center">
         {/* Heading */}
         <div className="mb-16 text-center">

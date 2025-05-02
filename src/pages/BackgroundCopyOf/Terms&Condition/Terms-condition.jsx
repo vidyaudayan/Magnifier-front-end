@@ -10,15 +10,16 @@ const navigate = useNavigate()
   return (
     <>
     <div className=''>
-       <div className="max-w-md mx-auto flex mt-3">
-              <Button
+    <Button
                 onClick={() => navigate("/")}
                 variant="ghost"
-                className="mb-6  flex items-center gap-2 hover:bg-gray-100"
+                className="mb-6 p-3 m-2 flex items-center gap-2 hover:bg-gray-100"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Home
               </Button>
+       <div className="max-w-md mx-auto flex mt-3">
+             
               </div>
       <section className="max-w-4xl mx-auto mt-0 bg-white shadow-xl rounded-2xl p-6 md:p-10">
         <header className="mb-8 text-center">

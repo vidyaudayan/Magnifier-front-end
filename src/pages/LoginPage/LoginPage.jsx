@@ -57,22 +57,46 @@ export const LoginPage = () => {
       );
 
       const { token, user } = response.data;
-
+      console.log('Full API Response:', response.data);
       // Handle remember me functionality if needed
       if (data.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       }
-
+      localStorage.setItem('token', token);
       // Save token to localStorage
       if (token) {
         console.log("Received Token:", token);
         localStorage.setItem('token', token);
       }
 
+      console.log("User payload before dispatch:", user);
+
+if (user && user.id && user.username) {
+  dispatch(setUserDetails(user));
+} else {
+  console.warn("User data is incomplete or undefined:", user);
+}
+
+      dispatch(setUserDetails(user));
+
       // Dispatch user details to Redux store if using Redux
-      if (user) {
+      {/*if (user) {
         dispatch(setUserDetails(user));
-      }
+      }*/}
+
+      // Dispatch user details to Redux store
+{/*if (user) {
+  dispatch(setUserDetails({
+    _id: user.id, // Ensure this matches your backend
+    username: user.username,
+    profilePic: user.profilePic, // or whatever your backend calls it
+    // Include other necessary fields
+  }
+
+));
+dispatch(setUserDetails(user));
+console.log('Dispatched user data:', user);
+}*/}
 
       // Initialize wallet
       try {
@@ -115,10 +139,17 @@ export const LoginPage = () => {
     }
   };
 
+  const scrollToStateSelection = () => {
+    const stateSection = document.getElementById("state-selection");
+    if (stateSection) {
+      stateSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
-        <Button
+      
+      <Button
           onClick={() => navigate("/")}
           variant="ghost"
           className="mb-6 flex items-center gap-2 hover:bg-gray-100"
@@ -126,6 +157,8 @@ export const LoginPage = () => {
           <ArrowLeft className="h-4 w-4" />
           Back to Home
         </Button>
+      <div className="max-w-md mx-auto">
+       
 
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>
@@ -232,7 +265,8 @@ export const LoginPage = () => {
                   Don't have an account?{" "}
                   <button
                     type="button"
-                    onClick={() => navigate("/signup")}
+                    //onClick={scrollToStateSelection}
+                    onClick={() => navigate("/")}
                     className="text-[#578cff] hover:text-[#4171ff] font-medium"
                   >
                     Sign up

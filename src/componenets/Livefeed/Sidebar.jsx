@@ -95,13 +95,14 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         <nav className="mt-6 flex-1">
           {navItems.map((item) => (
             <NavLink
+            end
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 ${isActive
                   ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`
+                }hover:bg-gray-50 dark:hover:bg-gray-700`
               }
             >
               <item.icon className={`h-5 w-5 ${isCollapsed ? 'mx-auto' : 'mr-4'}`} />
@@ -111,10 +112,10 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         </nav>
 
         {/* Logout Button - Desktop */}
-        <div className="p-4 border-t dark:border-gray-700">
+        <div className="p-4  border-t dark:border-gray-700">
           <button
             onClick={handleLogout} disabled={isLoggingOut}
-            className={`flex ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''} items-center w-full  py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${isCollapsed ? 'justify-center' : ''
+            className={`flex ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''} items-center w-full mt-56  py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${isCollapsed ? 'justify-center' : ''
               }`}
           >
            
@@ -122,7 +123,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
               <Loader2 className="h-5 w-5" />
             ) : (
               <>
-                <LogOut className={`h-5 w-5 ${isCollapsed ? '' : 'mr-4'}`} />
+                <LogOut className={`h-5 w-5 ml-2 ${isCollapsed ? '' : 'mr-4'}`} />
                 {!isCollapsed && <span>Logout</span>}
               </>
             )}
@@ -146,6 +147,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         <div className="flex justify-around overflow-x-auto hide-scrollbar py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
           {navItems.map((item) => (
             <NavLink
+            end
               key={item.path}
               to={item.path}
               className={({ isActive }) =>

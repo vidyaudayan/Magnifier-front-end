@@ -7,6 +7,8 @@ const trendingTopics = [
   { id: '3', topic: 'DigitalIndia', posts: 67800, category: 'Technology' },
   { id: '4', topic: 'FarmersProtest', posts: 45600, category: 'Agriculture' },
   { id: '5', topic: 'SmartCities', posts: 34200, category: 'Urban Development' },
+  { id: '6', topic: 'Business', posts: 45200, category: 'Economy' },
+
 ];
 
 const TrendingSection = () => {

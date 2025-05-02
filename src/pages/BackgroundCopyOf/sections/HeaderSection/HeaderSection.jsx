@@ -8,7 +8,7 @@ export const HeaderSection = () => {
     title: {
       firstPart: "India's",
       icon: "/yar0hfd2ii54lrlguj1splmjos0-svg.svg",
-      secondPart: "first",
+      secondPart: "First",
       thirdPart: "Politic-Tech Platform",
     },
     subtitle: [
@@ -31,6 +31,13 @@ export const HeaderSection = () => {
     }
   };
 
+  const scrollToFeatureSelection = () => {
+    const featureSection = document.getElementById("services");
+    if (featureSection) {
+      featureSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <header className="flex flex-col items-center justify-center py-8 md:py-14 w-full max-w-7xl mx-auto px-4 md:px-6">
       <div className="flex flex-col items-center gap-2.5 w-full">
@@ -38,18 +45,22 @@ export const HeaderSection = () => {
           {/* Main heading section */}
           <div className="flex flex-col items-center text-center">
             {/* First line of heading */}
-            <h3 className="p-2">Made in India</h3>
+            <h3 className="p-4 mb-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold rounded-lg shadow-md">
+              <span className="bg-white text-transparent bg-clip-text">
+                Made in India
+              </span>
+            </h3>
             <div className="flex flex-wrap items-center justify-center gap-2 md:gap-5 mb-2 md:mb-4">
-             
-          
-            
-        
-              <h1 className="text-3xl sm:text-4xl md:text-[58px] text-[#0c0c0c] tracking-[-1px] md:tracking-[-1.74px] leading-tight md:leading-[58px] font-normal [font-family:'Helvetica_Neue-Regular',Helvetica]">
+
+
+
+
+              <h1 className="text-3xl pr-2 sm:text-4xl md:text-[58px] text-[#0c0c0c] tracking-[-1px] md:tracking-[-1.74px] leading-tight md:leading-[58px] font-normal [font-family:'Helvetica_Neue-Regular',Helvetica]">
                 {headerData.title.firstPart}
               </h1>
 
               {/* Icon between words */}
-              <div className="relative inline-flex items-center justify-center">
+              {/*<div className="relative inline-flex items-center justify-center">
                 <div className="w-[44px] h-[44px] md:w-[56px] md:h-[56px] bg-white rounded-2xl overflow-hidden shadow-[0px_0px_24px_#00000014] opacity-[0.92] flex items-center justify-center">
                   <img
                     src={headerData.title.icon}
@@ -57,9 +68,9 @@ export const HeaderSection = () => {
                     className="w-6 h-6 md:w-8 md:h-8 object-contain"
                   />
                 </div>
-              </div>
+              </div>*/}
 
-              <h1 className="text-3xl sm:text-4xl md:text-[58px] text-[#080807] tracking-[-1px] md:tracking-[-1.74px] leading-tight md:leading-[58px] font-normal [font-family:'Helvetica_Neue-Regular',Helvetica]">
+              <h1 className="text-3xl sm:text-4xl md:text-[58px] text-[#0c0c0c]  tracking-[-1px] md:tracking-[-1.74px] leading-tight md:leading-[58px] font-normal [font-family:'Helvetica_Neue-Regular',Helvetica]">
                 {headerData.title.secondPart}
               </h1>
             </div>
@@ -85,7 +96,7 @@ export const HeaderSection = () => {
           {/* CTA Section */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
             <Button
-              onClick={scrollToStateSelection}
+              onClick={scrollToFeatureSelection}
               className="w-[200px] sm:w-auto h-11 rounded-[1000px]  text-white"
             >
               <span className="[font-family:'Helvetica_Neue-Medium',Helvetica] font-medium text-[15px] tracking-[-0.16px] leading-6 mr-2">

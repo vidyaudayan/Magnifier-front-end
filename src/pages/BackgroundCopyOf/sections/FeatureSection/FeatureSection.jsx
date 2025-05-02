@@ -60,7 +60,7 @@ export const FeatureSection = () => {
   ];
 
   return (
-    <section className="w-full py-16 flex flex-col items-center">
+    <section id="faq" className="w-full py-16 flex flex-col items-center">
       {/* Header */}
       <div className="flex flex-col items-center mb-12">
         <div className="flex items-center mb-4">
