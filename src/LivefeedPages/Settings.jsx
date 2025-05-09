@@ -583,6 +583,7 @@ const SettingsPage = () => {
           >
             &times;
           </button>
+        
           {message}
         </div>
       )}
