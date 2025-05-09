@@ -1,56 +1,70 @@
 
 
 import { createSlice } from '@reduxjs/toolkit';
-
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
     user: JSON.parse(localStorage.getItem('user')) || null,
     loading: false,
-    profilePicture: null, // Current profile picture
-    previousProfilePicture: null, // Previous profile picture
-   previousCoverPicture:null,
-    walletAmount: 0, // User's wallet balance
-    totalLikes: 0, // Total likes received
-    totalDislikes: 0, // User's reactions to posts
-    postCount: 0, 
-    posts: [], // Add posts to track updates here
-
+    walletAmount: 0,
+    totalLikes: 0,
+    totalDislikes: 0,
+    postCount: 0,
+    posts: [],
   },
   reducers: {
     setUserDetails: (state, action) => {
-      const user = action.payload|| {};
-      if (!user || (!user.id && !user._id)) return; 
+      const user = action.payload || {};
+      if (!user || (!user.id && !user._id)) return;
+      
+      // Merge all user properties while standardizing on 'profilePic'
       state.user = {
+        ...state.user, // Keep existing state
+        ...user,      // Add/update with new data
         _id: user.id || user._id,
-    username: user.username || user.userName ||'',
-    profilePicture: user.profilePic || user.profilePicture || '',
-    walletAmount: user.walletAmount || 0
-        // other fields...
+        username: user.username || user.userName || '',
+        profilePic: user.profilePic || user.profilePicture || '',
+        walletAmount: user.walletAmount || 0
       };
+      
       localStorage.setItem('user', JSON.stringify(state.user));
       state.loading = false;
-      console.log('User details', action.payload);
+      console.log('User details updated:', state.user);
     },
+    
+    // Standardize on profilePic instead of profilePicture
     setProfilePicture: (state, action) => {
-      state.previousProfilePicture = state.profilePicture; // Set the previous profile picture
-      state.profilePicture = action.payload; // Update the current profile picture
-      console.log('Profile picture updated', action.payload);
+      if (state.user) {
+        state.user.profilePic = action.payload;
+        localStorage.setItem('user', JSON.stringify(state.user));
+        console.log('Profile picture updated:', action.payload);
+      }
     },
+    
     setCoverPicture: (state, action) => {
-      state.previousCoverPicture = state.coverPicture;
-      state.coverPicture = action.payload;
-      console.log('Cover picture updated', action.payload);
+      if (state.user) {
+        state.user.coverPic = action.payload;
+        localStorage.setItem('user', JSON.stringify(state.user));
+        console.log('Cover picture updated:', action.payload);
+      }
     },
+    
     updateMetrics: (state, action) => {
-      const {userName, profilePicture, walletAmount,totalLikes, totalDislikes, postCount } = action.payload;
-      state.user = { ...state.user, userName, profilePicture }; 
+      const { userName, profilePic, walletAmount, totalLikes, totalDislikes, postCount } = action.payload;
+      if (state.user) {
+        state.user = { 
+          ...state.user, 
+          userName, 
+          profilePic: profilePic || state.user.profilePic 
+        };
+      }
       state.walletAmount = walletAmount;
       state.totalLikes = totalLikes;
       state.totalDislikes = totalDislikes;
       state.postCount = postCount;
       console.log('Metrics updated:', action.payload);
     },
+    
     updatePostReaction: (state, action) => {
       const { postId, updatedPost } = action.payload;
       state.posts = state.posts.map((post) =>
@@ -58,6 +72,8 @@ export const userSlice = createSlice({
       );
       console.log('Post reaction updated:', action.payload);
     },
+  
+
    
     setPostss: (state, action) => {
 

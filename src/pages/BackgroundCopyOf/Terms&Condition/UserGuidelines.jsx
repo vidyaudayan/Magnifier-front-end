@@ -66,27 +66,27 @@ const guidelines = [
 const UserGuidelines = () => {
   const effectiveDate = 'April 19, 2025';
   const lastUpdatedDate = 'April 19, 2025';
-    const navigate = useNavigate()
+  const navigate = useNavigate()
   return (
     <>
-     <Button
-                     onClick={() => navigate("/")}
-                     variant="ghost"
-                     className="mb-6 m-3 flex items-center gap-2 hover:bg-gray-200"
-                   >
-                     <ArrowLeft className="h-4 w-4" />
-                     Back to Home
-                   </Button>
-     <div className="max-w-md mx-auto flex mt-3">
-                  
-                   </div>
+      <Button
+        onClick={() => navigate("/")}
+        variant="ghost"
+        className="mb-6 m-4 text-white flex bg-blue-800 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Home
+      </Button>
+      <div className="max-w-md mx-auto flex mt-3">
+
+      </div>
       <main className="max-w-4xl mx-auto mt-0 bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="p-6 md:p-10">
           <header className="text-center mb-10">
             <h1 className="text-3xl font-bold text-blue-600">Web Magnifier: User Guidelines</h1>
             <p className="text-sm text-gray-500 mt-2">
-            Effective Date: {effectiveDate} | Last Updated: {lastUpdatedDate}
-          </p>
+              Effective Date: {effectiveDate} | Last Updated: {lastUpdatedDate}
+            </p>
           </header>
 
           <article className="text-gray-700 space-y-10">
@@ -129,7 +129,7 @@ const UserGuidelines = () => {
           </article>
         </div>
       </main>
-      </>
+    </>
   );
 };
 

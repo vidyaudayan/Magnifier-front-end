@@ -42,7 +42,7 @@ import ProfilePageNew from './pages/ProfileNew.jsx';
 import SettingsPage from './pages/Settings.jsx';
 import ProfilePageUsers from './pages/ProfileUsers.jsx';
 import LoginJob from './componenets/Loginjob.jsx';
-import PricingPage from './pages/Pricing.jsx';
+
 import PaymentPage from './pages/Paymentpage.jsx';
 import VerificationPage from './pages/VerificationPage.jsx';
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
@@ -71,6 +71,8 @@ import { DashboardSection } from './pages/BackgroundCopyOf/sections/DashboardSec
 import UsersProfilePage from './LivefeedPages/UsersProfilePage.jsx';
 import { LanguageProvider } from './context/LanguageContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
+import SearchPostDisplayPage from './LivefeedPages/SearchPostDisplayPage.jsx';
+import PricingPage from './LivefeedPages/PricingPage.jsx';
 
 
 
@@ -161,10 +163,10 @@ const router = createBrowserRouter([
         path: "/posts",
         element: <AllPostsPage />, 
       },
-      {
+      {/*{
         path: "/post/:postId",  
         element: <SharedPostRedirect />,
-      },
+      },*/},
       {
         path: "/aboutus",
         element:<AboutUsPage/>,
@@ -256,7 +258,7 @@ const router = createBrowserRouter([
         element:<SettingsPage/>,
       },
       {
-        path:"/pricing",
+        path:"/pricingold",
         element:<PricingPage/>
       },
       {
@@ -296,11 +298,18 @@ const router = createBrowserRouter([
             element:<ElectoAI/>
           },
           {
+            path: "searchpost/:postId",  
+            element: <SearchPostDisplayPage />,
+          },
+          {
             path:"search",
             element:<SearchPage/>
           },
          
-         
+          {
+            path:"pricing",
+            element:<PricingPage/>
+          },
          
           {
             path:"settings",

@@ -6,18 +6,19 @@ import { Card, CardContent } from "../../componenets/Welcome/card";
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useForm } from 'react-hook-form'; 
+import { useForm } from 'react-hook-form';
+import { auth, RecaptchaVerifier } from "../../firebase"
+import { signInWithPhoneNumber } from 'firebase/auth';
 
+// Changed the order of steps to prioritize email verification
 const steps = [
-  { id: 1, title: "Mobile OTP" },
-  { id: 2, title: "Email OTP" },
+  { id: 1, title: "Email OTP" },
+  { id: 2, title: "Mobile OTP" },
   { id: 3, title: "Selfie" },
 ];
 
 const buttonStyles = "h-11 rounded-[29px] font-medium text-white text-sm tracking-[-0.14px] bg-blue-600";
 const outlineButtonStyles = "h-11 rounded-[29px] font-medium text-[#578cff] text-sm tracking-[-0.14px] border-[#578cff] hover:bg-[#578cff10]";
-
- // or useForm() if it's a standalone
 
 const OTPInput = ({ value, onChange }) => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -90,8 +91,8 @@ const OTPInput = ({ value, onChange }) => {
 export const VerifyPage = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [mobileOTP, setMobileOTP] = useState("");
   const [emailOTP, setEmailOTP] = useState("");
+  const [mobileOTP, setMobileOTP] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [stream, setStream] = useState(null);
   const videoRef = useRef(null);
@@ -102,9 +103,9 @@ export const VerifyPage = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [mobileOtpSent, setMobileOtpSent] = useState(false);
   const [token, setToken] = useState(null);
-
-  // const userData = JSON.parse(localStorage.getItem('signupData') || '{}');
-  const { register, handleSubmit, watch, setValue, errors } = useForm({
+  const [userData, setUserData] = useState({ email: "", phoneNumber: "" });
+  const [confirmationResult, setConfirmationResult] = useState(null);
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
       phoneNumber: "",
       mobileOtp: "",
@@ -112,6 +113,45 @@ export const VerifyPage = () => {
       otp: ""
     }
   });
+  useEffect(() => {
+    try {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+   
+        'callback': () => {
+          // reCAPTCHA solved
+        },
+        'expired-callback': () => {
+          // reCAPTCHA expired
+        }
+      });
+    } catch (error) {
+      console.error("reCAPTCHA initialization error:", error);
+    }
+  }, [auth]); 
+  
+  useEffect(() => {
+    // Fetch user data when component mounts
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/userprofile`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const { email, phoneNumber } = response.data;
+        setUserData({ email, phoneNumber });
+        setValue("email", email);
+        setValue("phoneNumber", phoneNumber);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [setValue]);
+
   useEffect(() => {
     if (showSuccess) {
       const timer = setTimeout(() => {
@@ -130,6 +170,7 @@ export const VerifyPage = () => {
       }
     } catch (err) {
       console.error("Error accessing camera:", err);
+      toast.error("Error accessing camera. Please ensure you've granted permissions.");
     }
   };
 
@@ -154,63 +195,29 @@ export const VerifyPage = () => {
     }
   };
 
-  const [userData, setUserData] = useState({ email: "", phoneNumber: "" });
-
-
-  useEffect(() => {
-    const userData = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/userprofile`);
-        const { email, phoneNumber } = response.data;
-
-        if (email) setValue('email', email);
-        if (phoneNumber) setValue('phoneNumber', phoneNumber);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
-
-    userData();
-  }, [setValue]);
-
-  const handleSendMobileOTP = async () => {
-    try {
-
-     // const phoneNumber = getValues("phoneNumber"); // Fetch directly from form
-      const phoneNumber = watch("phoneNumber"); 
-     
-      console.log("mobile", phoneNumber)
-
-      if (!phoneNumber) {
-        alert("Please enter your phone number");
-        return;
-      }
-      const formatPhoneNumber = (phoneNumber) => {
-        return phoneNumber.startsWith("+") ? phoneNumber : `+91${phoneNumber.trim()}`;
-      };
-
-      const formattedNumber = formatPhoneNumber(phoneNumber);
-      console.log('Formatted Phone Number:', formattedNumber); // Debug here
-
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/user/send-mobileotp`, { phoneNumber: formattedNumber }
-        , { headers: { 'Content-Type': 'application/json' } });
-      alert('OTP sent successfully!');
-      setMobileOtpSent(true);
-      setCurrentStep(2);
-    } catch (error) {
-      console.error('Error:', error);
-      alert(`Error sending OTP: ${error.response?.data?.error || error.message}`);
-    }
-  };
-
   const handleSendEmailOTP = async () => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/send-otp`, { email });
-      if (response.status === 200) {
-        setOtpSent(true);
-        toast.success("OTP sent to your email", { position: "top-center" });
+      const email = watch("email");
+      if (!email) {
+        toast.error("Email is required!", { position: "top-center" });
+        return;
       }
+
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/send-otp`,
+        { email },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      toast.success("OTP sent to your email", { position: "top-center" });
+      setOtpSent(true);
     } catch (error) {
+      console.error('Error:', error);
       toast.error(
         error.response?.data?.message || "Failed to send OTP. Please try again.",
         { position: "top-center" }
@@ -218,91 +225,40 @@ export const VerifyPage = () => {
     }
   };
 
-  {/*const handleVerifyMobileOTP = async () => {
-   // const { phoneNumber, mobileOtp } = getValues();
-   const phoneNumber = watch("phoneNumber");
-    const mobileOtp = watch("mobileOtp");
-   
-   console.log("Phone number:", phoneNumber);
-    console.log("verify otp", mobileOtp)
-    try {
-
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`, { phoneNumber, otp: mobileOtp });
-      alert(response.data.message);
-      if (response.status === 200) {
-        setToken(response.data.token);
-        toast.success("OTP verified successfully!", { position: "top-center" });
-        setIsMobileOtpVerified(true)
-
-
-      }
-    } catch (error) {
-      console.error(error.response?.data);
-      alert(error.response?.data?.error || "Invalid OTP");
-    }
-  };*/}
-  const handleVerifyMobileOTP = async () => {
-    try {
-      const phoneNumber = watch("phoneNumber");
-      const mobileOtp = watch("mobileOtp");
-  
-      if (!phoneNumber || !mobileOtp) {
-        toast.error("Phone number and OTP are required");
-        return;
-      }
-  
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`,
-        { phoneNumber, otp: mobileOtp },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            // Add this if your backend requires auth
-            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        }
-      );
-  
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
-        toast.success(response.data.message);
-        setIsMobileOtpVerified(true);
-        setCurrentStep(2);
-      }
-    } catch (error) {
-      console.error("Verification error:", error);
-      toast.error(
-        error.response?.data?.error || 
-        "Verification failed. Please try again."
-      );
-    }
-  };
-
   const handleVerifyEmailOTP = async () => {
+    const email = watch("email");
+    const otp = watch("otp");
+
     if (!email) {
       toast.error("Email is required!", { position: "top-center" });
       return;
     }
 
-    const otp = getValues("otp");
-    console.log("Request Data:", { email, otp });
     if (!otp) {
       toast.error("OTP is required!", { position: "top-center" });
       return;
     }
+
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify-otp`, { email, otp }, {
-        headers: {
-          "Content-Type": "application/json", // Explicit header
-        },
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/verify-otp`,
+        { email, otp },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        }
+      );
+
       if (response.status === 200) {
-        setToken(response.data.token);
-        toast.success("OTP verified successfully!", { position: "top-center" });
+        toast.success("Email verified successfully!", { position: "top-center" });
         setIsOtpVerified(true);
-        navigate("/landing");
+        setCurrentStep(2); // Move to mobile verification step
       }
     } catch (error) {
+      console.error("Verification error:", error);
       toast.error(
         error.response?.data?.message || "Failed to verify OTP. Please try again.",
         { position: "top-center" }
@@ -310,55 +266,176 @@ export const VerifyPage = () => {
     }
   };
 
-  const handleSubmitVerification = () => {
-    if (selfieImage) {
-      setShowSuccess(true);
+  {/*const handleSendMobileOTP = async () => {
+    try {
+      const phoneNumber = watch("phoneNumber");
+      console.log("mobile", phoneNumber);
+
+      if (!phoneNumber) {
+        toast.error("Please enter your phone number", { position: "top-center" });
+        return;
+      }
+
+      const formattedNumber = phoneNumber.startsWith("+") ? phoneNumber : `+91${phoneNumber.trim()}`;
+      console.log('Formatted Phone Number:', formattedNumber);
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/send-mobileotp`,
+        { phoneNumber: formattedNumber },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      toast.success('OTP sent successfully!', { position: "top-center" });
+      setMobileOtpSent(true);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error(
+        error.response?.data?.error || "Error sending OTP. Please try again.",
+        { position: "top-center" }
+      );
+    }
+  };
+
+  const handleVerifyMobileOTP = async () => {
+    try {
+      const phoneNumber = watch("phoneNumber");
+      const mobileOtp = watch("mobileOtp");
+
+      if (!phoneNumber || !mobileOtp) {
+        toast.error("Phone number and OTP are required", { position: "top-center" });
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`,
+        { phoneNumber, otp: mobileOtp },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success(response.data.message, { position: "top-center" });
+        setIsMobileOtpVerified(true);
+        setCurrentStep(3); // Move to selfie verification step
+      }
+    } catch (error) {
+      console.error("Verification error:", error);
+      toast.error(
+        error.response?.data?.error || "Verification failed. Please try again.",
+        { position: "top-center" }
+      );
+    }
+  };*/}
+  const handleSendMobileOTP = async () => {
+    try {
+      // Validate phone number
+      let phoneNumber = watch("phoneNumber").trim();
+      if (!phoneNumber) {
+        toast.error("Phone number is required");
+        return;
+      }
+  
+      // Format phone number
+      if (!phoneNumber.startsWith("+")) {
+        phoneNumber = `+91${phoneNumber}`; // Default to India
+      }
+      phoneNumber = phoneNumber.replace(/[^+\d]/g, '');
+  
+      // Verify reCAPTCHA
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          'size': 'invisible',
+          'callback': () => console.log("reCAPTCHA solved")
+        });
+      }
+  
+      // Send OTP
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        window.recaptchaVerifier
+      );
+      
+      setConfirmationResult(confirmation);
+      toast.success('OTP sent successfully!');
+      setMobileOtpSent(true);
+    } catch (error) {
+      console.error('Full error:', error);
+      toast.error(`Failed to send OTP: ${error.message}`);
+    }
+  };
+  
+  const handleVerifyMobileOTP = async () => {
+    try {
+      const otp = watch("mobileOtp");
+      const result = await confirmationResult.confirm(otp);
+      const user = result.user;
+      
+      // Send Firebase ID token to your backend
+      const idToken = await user.getIdToken();
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`,
+        { idToken },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
+      
+      toast.success('Mobile number verified!');
+      setIsMobileOtpVerified(true);
+      setCurrentStep(3);
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      toast.error('Invalid OTP. Please try again.');
+    }
+  };
+  const handleSubmitVerification = async () => {
+    if (!selfieImage) {
+      toast.error("Please take a selfie first", { position: "top-center" });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/complete-verification`,
+        { selfieImage },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setShowSuccess(true);
+        toast.success("Verification completed successfully!", { position: "top-center" });
+      }
+    } catch (error) {
+      console.error("Verification submission error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to complete verification. Please try again.",
+        { position: "top-center" }
+      );
     }
   };
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Mobile Number
-              </label>
-              <input
-                type="tel"
-             
-                {...register("phoneNumber")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
-              />
-            
-            </div>
-            <div>
-              <Button
-                onClick={handleSendMobileOTP}
-                className={`w-full mb-4 ${buttonStyles}`}
-              >
-                Send OTP
-              </Button>
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Enter OTP
-                </label>
-                <OTPInput  value={watch("mobileOtp")} 
-  onChange={(value) => setValue("mobileOtp", value)}  />
-              </div>
-              <Button
-                onClick={handleVerifyMobileOTP}
-                className={`w-full mt-4 ${buttonStyles}`}
-                disabled={mobileOTP.length !== 6}
-              >
-                Verify Mobile
-              </Button>
-            </div>
-          </div>
-        );
-
-      case 2:
+      case 1: // Email verification step
         return (
           <div className="space-y-6">
             <div>
@@ -367,7 +444,8 @@ export const VerifyPage = () => {
               </label>
               <input
                 type="email"
-                value={userData.email}
+                {...register("email")}
+                value={userData.email || ""}
                 disabled
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
               />
@@ -376,27 +454,77 @@ export const VerifyPage = () => {
               <Button
                 onClick={handleSendEmailOTP}
                 className={`w-full mb-4 ${buttonStyles}`}
+                disabled={otpSent}
               >
-                Send OTP
+                {otpSent ? "OTP Sent" : "Send OTP"}
               </Button>
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Enter OTP
-                </label>
-                <OTPInput value={emailOTP} onChange={setEmailOTP} />
-              </div>
-              <Button
-                onClick={handleVerifyEmailOTP}
-                className={`w-full mt-4 ${buttonStyles}`}
-                disabled={emailOTP.length !== 6}
-              >
-                Verify Email
-              </Button>
+              {otpSent && (
+                <div className="space-y-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Enter OTP
+                  </label>
+                  <OTPInput
+                    value={watch("otp")}
+                    onChange={(value) => setValue("otp", value)}
+                  />
+                  <Button
+                    onClick={handleVerifyEmailOTP}
+                    className={`w-full mt-4 ${buttonStyles}`}
+                    disabled={watch("otp")?.length !== 6}
+                  >
+                    Verify Email
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         );
 
-      case 3:
+      case 2: // Mobile verification step
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mobile Number
+              </label>
+              <input
+                type="tel"
+                {...register("phoneNumber")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+              />
+            </div>
+            <div>
+              <Button
+                onClick={handleSendMobileOTP}
+                className={`w-full mb-4 ${buttonStyles}`}
+                disabled={mobileOtpSent}
+              >
+                {mobileOtpSent ? "OTP Sent" : "Send OTP"}
+              </Button>
+              {mobileOtpSent && (
+                <div className="space-y-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Enter OTP
+                  </label>
+                  <OTPInput
+                    value={watch("mobileOtp")}
+                    onChange={(value) => setValue("mobileOtp", value)}
+                  />
+                  <Button
+                    onClick={handleVerifyMobileOTP}
+                    className={`w-full mt-4 ${buttonStyles}`}
+                    disabled={watch("mobileOtp")?.length !== 6}
+                  >
+                    Verify Mobile
+                  </Button>
+                </div>
+              )}
+              <div id="recaptcha-container" style={{ display: 'none' }}></div>
+            </div>
+          </div>
+        );
+
+      case 3: // Selfie verification step
         return (
           <div className="space-y-6">
             <div className="relative">
@@ -504,10 +632,11 @@ export const VerifyPage = () => {
               <React.Fragment key={step.id}>
                 <div className="flex items-center">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${step.id <= currentStep
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      step.id <= currentStep
                         ? "[background:linear-gradient(180deg,rgba(145,187,255,1)_0%,rgba(101,151,255,1)_100%)] text-white"
                         : "bg-gray-200 text-gray-600"
-                      }`}
+                    }`}
                   >
                     {step.id < currentStep ? (
                       <Check className="w-4 h-4" />
@@ -521,8 +650,9 @@ export const VerifyPage = () => {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-12 h-1 mx-2 ${step.id < currentStep ? "bg-[#578cff]" : "bg-gray-200"
-                      }`}
+                    className={`w-12 h-1 mx-2 ${
+                      step.id < currentStep ? "bg-[#578cff]" : "bg-gray-200"
+                    }`}
                   />
                 )}
               </React.Fragment>

@@ -9,7 +9,7 @@ import NavbarLanding from "../componenets/NavbarLanding.jsx";
 
 const socket = io("http://localhost:3000"); // Change to your backend URL
 
-export default function PricingPage() {
+export default function PricingPageOld() {
   const [selectedDuration, setSelectedDuration] = useState("");
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -23,15 +23,6 @@ export default function PricingPage() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   
 
-  {/*useEffect(() => {
-    socket.on("updateSlots", () => {
-      fetchPendingPosts();  // Refresh the posts when a slot is booked
-    });
-
-    return () => {
-      socket.off("updateSlots");
-    };
-  }, []);*/}
 
   useEffect(() => {
 
@@ -68,79 +59,8 @@ export default function PricingPage() {
       socket.off("slotBooked");
     };
   }, []);
- {/*const fetchAvailableSlots = async (duration) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
-        {
-          params: { duration: Number(duration) },
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-  
-      // Validate slots before setting state
-      const validSlots = response.data.filter(slot => 
-        Number(slot.startHour) < Number(slot.endHour)
-      );
-  
-      setAvailableSlots(validSlots);
-    } catch (error) {
-      console.error("Error fetching slots:", error.response?.data || error.message);
-    }
-  };*/}
 
-  {/*const fetchAvailableSlots = async (duration) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
-        { params: { duration } }
-      );
-      
-      // Format and sort slots
-      const formattedSlots = response.data
-        .map(slot => ({
-          ...slot,
-          displayTime: `${slot.startHour.toString().padStart(2, '0')}:00 - ${slot.endHour.toString().padStart(2, '0')}:00`
-        }))
-        .sort((a, b) => a.startHour - b.startHour);
-      
-      setAvailableSlots(formattedSlots);
-    } catch (error) {
-      console.error("Error fetching slots:", error);
-    }
-  };*/}
 
-  {/*const fetchAvailableSlots = async (duration) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
-        { params: { duration } }
-      );
-      
-      // Format and sort slots with AM/PM
-      const formattedSlots = response.data
-        .map(slot => {
-          const startHour = slot.startHour % 12 || 12; // Convert to 12-hour format (1-12)
-          const endHour = slot.endHour % 12 || 12;
-          const startAmPm = slot.startHour < 12 ? 'AM' : 'PM';
-          const endAmPm = slot.endHour < 12 ? 'AM' : 'PM';
-          
-          return {
-            ...slot,
-            displayTime: `${startHour}:00 ${startAmPm} - ${endHour}:00 ${endAmPm}`
-          };
-        })
-        .sort((a, b) => a.startHour - b.startHour);
-      
-      setAvailableSlots(formattedSlots);
-    } catch (error) {
-      console.error("Error fetching slots:", error);
-    }
-  };*/}
-  
-  // In your PricingPage component
 
 // More robust socket handling
 useEffect(() => {

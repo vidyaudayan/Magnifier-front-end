@@ -13,6 +13,7 @@ export const FooterSection = () => {
 
     { title: "Terms & Conditions", href: "/terms-condition", type: "page" },
     { title: "User Guidelines", href: "/user-guidelines", type: "page" },
+    { title: "Apply for job", href: "/job-application", type: "page" },
   ];
   const serviceLinks = [
     { title: "Web Magnifier", href: "#" },

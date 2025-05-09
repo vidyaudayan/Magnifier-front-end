@@ -5,7 +5,11 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSearchQuery } from '../features/search/searchSlice';
-import { Search as SearchIcon, Users, FileText, Hash, Newspaper, Clock, TrendingUp, ArrowLeft } from 'lucide-react';
+import {
+  Search as SearchIcon, ThumbsUp,
+  ThumbsDown,
+  MessageSquare, Users, FileText, Hash, Newspaper, Clock, TrendingUp, ArrowLeft
+} from 'lucide-react';
 import { getRecentSearches, addRecentSearch, clearRecentSearches } from "../utils/searchHistory"
 
 const SearchPage = () => {
@@ -17,7 +21,7 @@ const SearchPage = () => {
   const [results, setResults] = useState([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
-
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Get query from URL and update Redux store
@@ -29,9 +33,14 @@ const SearchPage = () => {
     setIsInitialLoad(false);
   }, [searchParams, dispatch]);
 
+  const handleUserClick = (userId) => {
+    setSelectedUserId(userId);
+    setActiveFilter('post');
+    navigate(`/livefeed/userprofile/${userId}`);
+  };
 
   // Fetch results when searchQuery or activeFilter changes
-  useEffect(() => {
+  {/*useEffect(() => {
     if (!isInitialLoad && searchQuery) {
       const fetchResults = async () => {
         setIsLoading(true);
@@ -68,12 +77,55 @@ const SearchPage = () => {
       };
       fetchResults();
     }
-  }, [searchQuery, isInitialLoad, activeFilter]);
+  }, [searchQuery, isInitialLoad, activeFilter]);*/}
 
+  // In your useEffect that fetches results
+  useEffect(() => {
+    if (!isInitialLoad && searchQuery) {
+      const fetchResults = async () => {
+        setIsLoading(true);
+        try {
+          let endpoint;
+          const params = { query: searchQuery }; // Always include search query
+          
+          if (activeFilter === 'all') {
+            endpoint = `${import.meta.env.VITE_BASE_URL}/post/search/all`;
+          } else if (activeFilter === 'user') {
+            endpoint = `${import.meta.env.VITE_BASE_URL}/user/search`;
+          } else if (activeFilter === 'post') {
+            endpoint = `${import.meta.env.VITE_BASE_URL}/post/searchpost`;
+            if (selectedUserId) {
+              params.userId = selectedUserId; // Add userId to params if available
+            }
+          }
+  
+          console.log('Making request to:', endpoint, 'with params:', params);
+          const response = await axios.get(endpoint, { params }); // Send params properly
+          
+          if (activeFilter === 'all') {
+            setResults({
+              users: response.data.data.users || [],
+              posts: response.data.data.posts || []
+            });
+          } else {
+            setResults(response.data.data || []);
+          }
+  
+        } catch (error) {
+          console.error('Error fetching search results:', error);
+          setResults(activeFilter === 'all' ? { users: [], posts: [] } : []);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchResults();
+    }
+  }, [searchQuery, isInitialLoad, activeFilter, selectedUserId]);
+ 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+      navigate(`/livefeed/search?query=${encodeURIComponent(searchQuery)}`);
       const updatedSearches = addRecentSearch(searchQuery);
       setRecentSearches(updatedSearches);
     }
@@ -82,7 +134,7 @@ const SearchPage = () => {
   const handleSearch = (term) => {
     dispatch(setSearchQuery(term));
     if (term.trim()) {
-      navigate(`/search?query=${encodeURIComponent(term)}`);
+      navigate(`/livefeed/search?query=${encodeURIComponent(term)}`);
       const updatedSearches = addRecentSearch(term);
       setRecentSearches(updatedSearches);
     }
@@ -97,18 +149,18 @@ const SearchPage = () => {
     { id: 'all', label: 'All', icon: SearchIcon },
     { id: 'user', label: 'People', icon: Users },
     { id: 'post', label: 'Posts', icon: FileText },
-    { id: 'news', label: 'News', icon: Newspaper },
-    { id: 'topic', label: 'Topics', icon: Hash }
+
   ];
 
   const renderUserResult = (user) => (
     <div
       key={user._id}
-      onClick={() => navigate(`/user/${user._id}/posts`)}
+      onClick={() => handleUserClick(user._id,user.username)} 
+  
       className="flex items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
     >
       <img
-        src={user.profilePic || '/default-avatar.png'}
+        src={user.profilePic || '/userProfile.avif'}
         alt={user.username}
         className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
       />
@@ -126,7 +178,7 @@ const SearchPage = () => {
     </div>
   );
 
-  const renderPostResult = (post) => (
+  {/*const renderPostResult = (post) => (
     <div
       key={post._id}
       onClick={() => navigate(`/post/${post._id}`)}
@@ -181,7 +233,85 @@ const SearchPage = () => {
         </div>
       </div>
     </div>
-  )
+  )*/}
+
+  const renderPostResult = (post) => (
+    <div
+      key={post._id}
+      onClick={() => navigate(`/livefeed/searchpost/${post._id}`)}
+      className="p-4 bg-white rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow mb-4"
+    >
+      {/* User info section */}
+      <div className="flex items-start gap-3 mb-3">
+        <img
+          src={post.userId?.profilePic || '/userpost.avif'}
+          alt={post.userId?.username}
+          className="w-10 h-10 rounded-full object-cover border border-gray-200"
+        />
+        <div>
+          <div className="font-semibold text-gray-900">{post.userId?.username}</div>
+          <div className="text-xs text-gray-500">
+            {new Date(post.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Post content */}
+      {post.content && (
+        <div className="mb-3 text-gray-800">
+          {post.content}
+        </div>
+      )}
+
+      {/* Media section */}
+      {post.postType === 'Photo' && post.mediaUrl && (
+        <div className="mb-3 rounded-lg overflow-hidden">
+          <img
+            src={post.mediaUrl}
+            alt={post.title || 'Post image'}
+            className="w-full max-h-96 object-contain rounded-lg"
+          />
+        </div>
+      )}
+
+      {post.postType === 'VoiceNote' && post.mediaUrl && (
+        <div className="mb-3">
+          <div className="bg-gray-100 p-3 rounded-lg flex items-center">
+            <button className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+              </svg>
+            </button>
+            <div className="flex-1 bg-gray-200 h-2 rounded-full overflow-hidden">
+              <div className="bg-blue-500 h-full w-1/2"></div>
+            </div>
+            <span className="ml-3 text-sm text-gray-500">1:45</span>
+          </div>
+        </div>
+      )}
+
+      {/* Like/Dislike counts */}
+      <div className="flex items-center gap-4 text-sm text-gray-500 pt-2 border-t border-gray-100">
+        <div className="flex items-center gap-1">
+          <ThumbsUp className="w-5 h-5 text-blue-500" />
+          <span>{post.likes?.toLocaleString() || 0}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <ThumbsDown className="w-5 h-5 text-red-500" />
+          <span>{post.dislikes?.toLocaleString() || 0}</span>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <MessageSquare className="w-5 h-5" />
+          <span>{post.comments?.length?.toLocaleString() || 0}</span>
+        </div>
+      </div>
+    </div>
+  );
 
   const renderOtherResult = (result) => {
     switch (result.type) {
@@ -244,115 +374,166 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-  <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-    <div className="container mx-auto max-w-4xl px-4 py-3 mt-4">
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => window.history.back()}
-          className="p-2 hover:bg-gray-100 rounded-full"
-        >
-          <ArrowLeft size={20} className="text-gray-500" />
-        </button>
-        <div className="flex-1 relative">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            placeholder="Search for people, posts, topics..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={searchQuery || ''}
-            onChange={(e) => dispatch(setSearchQuery(e.target.value))}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit(e)}
-            autoFocus
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
-        {filters.map(filter => (
-          <button
-            key={filter.id}
-            onClick={() => setActiveFilter(filter.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeFilter === filter.id
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <filter.icon size={16} />
-            {filter.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  </div>
-
-  <div className="container mx-auto max-w-4xl p-4">
-    {isLoading ? (
-      <div className="text-center py-8 text-gray-500">Loading...</div>
-    ) : searchQuery ? (
-      results.length > 0 ? (
-        <div className="space-y-4">
-          {activeFilter === 'user'
-            ? results.map(renderUserResult)
-            : activeFilter === 'post'
-              ? results.map(renderPostResult)
-              : results.map(renderOtherResult)}
-        </div>
-      ) : (
-        <div className="text-center py-8 text-gray-500">
-          No results found for "{searchQuery}"
-        </div>
-      )
-    ) : (
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Clock size={20} className="text-gray-400" />
-            Recent Searches
-          </h2>
-          {recentSearches.length > 0 && (
+    <div className="min-h-screen mt-10 bg-gray-50">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="container mx-auto max-w-4xl px-4 py-3 mt-4">
+          <div className="flex items-center gap-4">
             <button
-              onClick={clearSearches}
-              className="text-sm text-blue-500 hover:text-blue-700"
+              onClick={() => window.history.back()}
+              className="p-2 hover:bg-gray-100 rounded-full"
             >
-              Clear all
+              <ArrowLeft size={20} className="text-gray-500" />
             </button>
+            <div className="flex-1 relative">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Search for people, posts, topics..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={searchQuery || ''}
+                onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit(e)}
+                autoFocus
+              />
+            </div>
+          </div>
+          {searchQuery && (
+            <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+              {filters.map(filter => (
+                <button
+                  key={filter.id}
+                  onClick={() => {
+                    setActiveFilter(filter.id);
+                    // When switching to Posts tab, keep the user context if available
+                    {/*if (filter.id === 'post' && selectedUserId) {
+                      // You might want to update the URL here
+                      navigate(`/livefeed/search?query=${encodeURIComponent(searchQuery)}&tab=post&userId=${selectedUserId}`);
+                    }*/}
+                    if (filter.id !== 'post') {
+                      setSelectedUserId(null);
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeFilter === filter.id
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                >
+                  <filter.icon size={16} />
+                  {filter.label}
+                </button>
+              ))}
+            </div>
           )}
         </div>
-        {recentSearches.length > 0 ? (
-          <div className="space-y-2">
-            {recentSearches.map((term, index) => (
-              <button
-                key={index}
-                onClick={() => handleSearch(term)}
-                className="flex items-center gap-3 w-full p-3 text-left bg-white rounded-lg hover:bg-gray-50 transition-colors group"
-              >
-                <Clock size={18} className="text-gray-400 flex-shrink-0" />
-                <span className="text-gray-700 flex-1 truncate">{term}</span>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const updated = recentSearches.filter(t => t !== term);
-                    localStorage.setItem('recentSearches', JSON.stringify(updated));
-                    setRecentSearches(updated);
-                  }}
-                  className="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity px-2"
-                  aria-label="Remove search"
-                >
-                  ×
-                </button>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500 text-center py-4">No recent searches</p>
-        )}
+      </div>
+
+      <div className="container mx-auto max-w-4xl p-4">
+        {isLoading ? (
+          <div className="text-center py-8 text-gray-500">Loading...</div>
+        ) : searchQuery ? (
+          activeFilter === 'all' ? (
+            <>
+
+              {results.users && results.users.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-gray-500 mb-3">PEOPLE</h3>
+                  <div className="space-y-3">
+                    {results.users.map(renderUserResult)}
+                  </div>
+                </div>
+              )}
+
+              {/* Show posts section */}
+              {results.posts && results.posts.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 mb-3">POSTS</h3>
+                  <div className="space-y-3">
+                    {results.posts.map(renderPostResult)}
+                  </div>
+                </div>
+              )}
+
+              {/* Show no results message if both are empty */}
+              {(!results.users || results.users.length === 0) &&
+                (!results.posts || results.posts.length === 0) && (
+                  <div className="text-center py-8 text-gray-500">
+                    No results found for "{searchQuery}"
+                  </div>
+                )}
+            </>
+          ) : activeFilter === 'user' && results.length > 0 ? (
+            <div className="space-y-4">
+              {results.map(renderUserResult)}
+            </div>
+          ) : activeFilter === 'post' && results.length > 0 ? (
+            <div className="space-y-4">
+             
+              {/*{results.map(renderPostResult)}*/}
+              {results.length > 0 ? (
+      results.map(renderPostResult)
+    ) : (
+      <div className="text-center py-8 text-gray-500">
+        {selectedUserId 
+          ? `No posts found for this user matching "${searchQuery}"`
+          : `No posts found matching "${searchQuery}"`
+        }
       </div>
     )}
-  </div>
-</div>
-  )
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              No {activeFilter === 'user' ? 'people' : 'posts'} found for "{searchQuery}"
+            </div>
+          )
+        ) : (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Clock size={20} className="text-gray-400" />
+                Recent Searches
+              </h2>
+              {recentSearches.length > 0 && (
+                <button
+                  onClick={clearSearches}
+                  className="text-sm text-blue-500 hover:text-blue-700"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+            {recentSearches.length > 0 ? (
+              <div className="space-y-2">
+                {recentSearches.map((term, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSearch(term)}
+                    className="flex items-center gap-3 w-full p-3 text-left bg-white rounded-lg hover:bg-gray-50 transition-colors group"
+                  >
+                    <Clock size={18} className="text-gray-400 flex-shrink-0" />
+                    <span className="text-gray-700 flex-1 truncate">{term}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const updated = recentSearches.filter(t => t !== term);
+                        localStorage.setItem('recentSearches', JSON.stringify(updated));
+                        setRecentSearches(updated);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity px-2"
+                      aria-label="Remove search"
+                    >
+                      ×
+                    </button>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-4">No recent searches</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
 
 };

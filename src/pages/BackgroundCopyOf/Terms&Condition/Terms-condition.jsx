@@ -13,7 +13,7 @@ const navigate = useNavigate()
     <Button
                 onClick={() => navigate("/")}
                 variant="ghost"
-                className="mb-6 p-3 m-2 flex items-center gap-2 hover:bg-gray-100"
+                className="mb-6 m-4 text-white flex bg-blue-800 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Home

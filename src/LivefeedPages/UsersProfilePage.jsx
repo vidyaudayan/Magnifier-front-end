@@ -35,7 +35,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { setUserDetails, updatePostReaction, updateMetrics } from '../features/user/userSlice';
-import { HorizontalStats } from '../componenets/Livefeed/HorizontalStats';
+import { HorizontalStatsUsers } from '../componenets/Livefeed/HorizontalStatsUsers';
 
 const UsersProfilePage = () => {
   const dispatch = useDispatch();
@@ -72,12 +72,12 @@ const UsersProfilePage = () => {
         dispatch(setUserDetails(profileRes.data));
 
         // Check if current user is following this profile
-        if (currentUser?._id && currentUser._id !== userId) {
+        {/*if (currentUser?._id && currentUser._id !== userId) {
           const followRes = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/is-following/${userId}`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           });
           setIsFollowing(followRes.data.isFollowing);
-        }
+        }*/}
       } catch (error) {
         console.error("Error fetching user data:", error);
         toast.error("Failed to load profile data");
@@ -89,7 +89,7 @@ const UsersProfilePage = () => {
     fetchUserData();
   }, [userId, currentUser?._id, dispatch]);
 
-  const handleFollow = async () => {
+  {/*const handleFollow = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -114,7 +114,7 @@ const UsersProfilePage = () => {
       console.error("Error following user:", error);
       toast.error(error.response?.data?.message || "Failed to follow user");
     }
-  };
+  };*/}
 
   const handleShare = (post) => {
     const postId = post._id;
@@ -559,25 +559,10 @@ const UsersProfilePage = () => {
                 {user.verified && <CheckCircle2 className="w-5 h-5 text-blue-500" />}
               </div>
               
-{/*<div className="mt-2 flex flex-wrap gap-4">
-                {user.vidhanSabha && (
-                  <div className="flex items-center text-gray-600 dark:text-gray-400">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    <span className="text-sm">{user.vidhanSabha}</span>
-                  </div>
-                )}
-                {user.createdAt && (
-                  <div className="flex items-center text-gray-600 dark:text-gray-400">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    <span className="text-sm">
-                      Joined {format(new Date(user.createdAt), 'MMMM yyyy')}
-                    </span>
-                  </div>
-                )}
-              </div>*/}
+
 
               {/* Follow Button */}
-              {currentUser?._id && currentUser._id !== userId && (
+              {/*{currentUser?._id && currentUser._id !== userId && (
                 <button
                   onClick={handleFollow}
                   className={`mt-4 px-4 py-2 rounded-lg transition-colors ${
@@ -588,7 +573,7 @@ const UsersProfilePage = () => {
                 >
                   {isFollowing ? 'Following' : 'Follow'}
                 </button>
-              )}
+              )}*/}
             </div>
           </div>
 
@@ -601,7 +586,7 @@ const UsersProfilePage = () => {
             </div>
           )}
 
-          <HorizontalStats posts={posts} user={user}/>
+          <HorizontalStatsUsers posts={posts} user={user}/>
 
           {/* Tabs Navigation */}
           <div className="mt-8 border-b border-gray-200 dark:border-gray-700">

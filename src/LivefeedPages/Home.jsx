@@ -98,10 +98,12 @@ const Home = () => {
               />
 
               {/* Feed Header with Tabs */}
-              <div className="sticky top-[120px] md:top-4 z-20 -mx-4 px-4 pb-4 pt-2 bg-gray-50 dark:bg-gray-900">
+               <div className='sticky top-0 bg-slate-50 text-slate-50 z-30'>h</div>
+             
+              <div className="sticky top-[120px] md:top-4 z-10 -mx-4 px-4 pb-4  pt-2 bg-gray-50 dark:bg-gray-900">
                 <FeedHeader activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
-
+              
               {/* Post Composer */}
               <PostComposer onSubmit={handlePostSubmit} />
 

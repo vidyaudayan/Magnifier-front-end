@@ -7,6 +7,10 @@ import Settings from '../../LivefeedPages/Settings';
 import ProfileNew from '../../LivefeedPages/ProfileNew';
 import SearchPage from '../../LivefeedPages/SearchPage';
 import UsersProfilePage from '../../LivefeedPages/UsersProfilePage';
+import SearchPostDisplayPage from '../../LivefeedPages/SearchPostDisplayPage';
+import PricingPage from '../../LivefeedPages/PricingPage';
+
+
 
 const MainContent = ({ isSidebarCollapsed }) => {
   return (
@@ -21,8 +25,10 @@ const MainContent = ({ isSidebarCollapsed }) => {
           <Route path="/userprofile/:userId" element={<UsersProfilePage/>} />
           <Route path="/profile" element={<ProfileNew />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/searchpost/:postId" element={<SearchPostDisplayPage/>}/>
           <Route path="/electoai" element={<ElectoAI />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>

@@ -145,7 +145,7 @@ const PostDisplayPage = () => {
 export default PostDisplayPage;*/}
 
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link,useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import NavbarLanding from "../componenets/NavbarLanding";
@@ -158,7 +158,7 @@ const PostDisplayPage = () => {
   const [newComment, setNewComment] = useState("");
   const [displayCount, setDisplayCount] = useState(5);
 const [commentsVisible, setCommentsVisible] = useState(false);
- 
+const { postId: pathPostId } = useParams(); 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', month: 'short', day: 'numeric' };
   return new Date(dateString).toLocaleDateString(undefined, options);
@@ -168,9 +168,11 @@ const formatDate = (dateString) => {
 
 
 useEffect(() => {
+  let isMounted = true; 
     const fetchPost = async () => {
       try {
         const queryParams = new URLSearchParams(location.search);
+       
         let postId = queryParams.get("postId") || 
                     localStorage.getItem("sharedPostId") || 
                     sessionStorage.getItem("sharedPostId");
@@ -181,14 +183,17 @@ useEffect(() => {
 
         if (!postId) {
           // No post ID - redirect to all posts view
-          navigate("/posts");
+          //navigate("/posts");
           return;
         }
 
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/post/${postId}`
         );
-        
+        if (isMounted) {
+          setPost(response.data.data);
+          setLoading(false);
+        }
         if (response.data.success) {
           setPost(response.data.data);
         } else {
@@ -197,14 +202,21 @@ useEffect(() => {
       } catch (error) {
         console.error("Error fetching post:", error);
         toast.error("The shared post could not be loaded");
-        navigate("/posts");
+        if (isMounted) {
+          console.error("Error fetching post:", error);
+          toast.error("The shared post could not be loaded");
+          navigate("/posts");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchPost();
-  }, [location.search, navigate]);
+    return () => {
+      isMounted = false; // Cleanup on unmount
+    };
+  }, [location.search]);
 
   const handleAddComment = async (postId) => {
           if (!newComment.trim()) return;

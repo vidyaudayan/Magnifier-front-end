@@ -40,7 +40,7 @@ function ElectoAI() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 lg:mt-2 mt-4">
+    <div className="flex   bg-gray-50 lg:mt-2 mt-16">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 

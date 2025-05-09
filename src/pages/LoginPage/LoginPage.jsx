@@ -11,7 +11,7 @@ import { Checkbox } from "../../componenets/Welcome/checkbox";
 import { useToast } from "../../componenets/Welcome/use-toast";
 import { Toaster } from "../../componenets/Welcome/toaster";
 import { useDispatch } from "react-redux"; // Import useDispatch if using Redux
-import { setUserDetails } from "../../features/user/userSlice"; 
+import { setUserDetails } from "../../features/user/userSlice";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -43,10 +43,10 @@ export const LoginPage = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     console.log("Login Data:", data);
-    
+
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/login`, 
+        `${import.meta.env.VITE_BASE_URL}/user/login`,
         {
           username: data.username,
           password: data.password
@@ -71,11 +71,11 @@ export const LoginPage = () => {
 
       console.log("User payload before dispatch:", user);
 
-if (user && user.id && user.username) {
-  dispatch(setUserDetails(user));
-} else {
-  console.warn("User data is incomplete or undefined:", user);
-}
+      if (user && user.id && user.username) {
+        dispatch(setUserDetails(user));
+      } else {
+        console.warn("User data is incomplete or undefined:", user);
+      }
 
       dispatch(setUserDetails(user));
 
@@ -85,7 +85,7 @@ if (user && user.id && user.username) {
       }*/}
 
       // Dispatch user details to Redux store
-{/*if (user) {
+      {/*if (user) {
   dispatch(setUserDetails({
     _id: user.id, // Ensure this matches your backend
     username: user.username,
@@ -101,8 +101,8 @@ console.log('Dispatched user data:', user);
       // Initialize wallet
       try {
         const walletResponse = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/user/wallet`, 
-          { withCredentials: true }, 
+          `${import.meta.env.VITE_BASE_URL}/user/wallet`,
+          { withCredentials: true },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -126,7 +126,7 @@ console.log('Dispatched user data:', user);
       // Reset form and navigate
       reset();
       navigate("/livefeed/");
-      
+
     } catch (error) {
       console.error('Error signing in:', error);
       toast({
@@ -148,17 +148,17 @@ console.log('Dispatched user data:', user);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      
+
       <Button
-          onClick={() => navigate("/")}
-          variant="ghost"
-          className="mb-6 flex items-center gap-2 hover:bg-gray-100"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Home
-        </Button>
+        onClick={() => navigate("/")}
+        className="mb-6 flex bg-blue-900 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Home
+      </Button>
+
       <div className="max-w-md mx-auto">
-       
+
 
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>

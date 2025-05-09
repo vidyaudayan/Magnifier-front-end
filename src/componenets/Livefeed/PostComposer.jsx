@@ -191,7 +191,7 @@ const PostComposer = ({ user }) => {
   const voiceNoteInputRef = useRef(null);
   const navigate = useNavigate();
  const dispatch= useDispatch()
-
+ const disabled = false;
   const handleContentChange = (e) => {
     const text = e.target.value;
     if (text.length <= 500) {
@@ -200,6 +200,10 @@ const PostComposer = ({ user }) => {
   };
 
   const handlePhotoUpload = (e) => {
+    if (voiceNote) {
+      toast.warning("You cannot upload both an image and a voice note.");
+      return;
+    }
     const file = e.target.files[0];
     if (file) {
       setPhoto(file);
@@ -208,6 +212,10 @@ const PostComposer = ({ user }) => {
   };
 
   const handleVoiceNoteUpload = (e) => {
+    if (photo) {
+      toast.warning("You cannot upload both an image and a voice note.");
+      return;
+    }
     const file = e.target.files[0];
     if (file) {
       setVoiceNote(file);
@@ -259,7 +267,7 @@ const PostComposer = ({ user }) => {
         stickyDuration: selectedDuration
       }));
 
-      navigate("/pricing");
+      navigate("/livefeed/pricing");
     } catch (error) {
       console.error("Error saving draft:", error);
       toast.error("Failed to save post draft");
@@ -395,28 +403,33 @@ const PostComposer = ({ user }) => {
               type="file"
               ref={photoInputRef}
               onChange={handlePhotoUpload}
-              accept="image/*"
+              accept="image/*"  disabled={!!voiceNote}
               className="hidden"
             />
             <button
-              onClick={() => photoInputRef.current?.click()}
+              onClick={() => photoInputRef.current?.click()}  disabled={!!voiceNote}
               className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
             >
-              <Image className="w-5 h-5" />
+           <Image
+  className={`w-5 h-5   ${disabled ? "opacity-50 grayscale pointer-events-none cursor-not-allowed" : ""}`}
+/>
             </button>
             
             <input
               type="file"
               ref={voiceNoteInputRef}
               onChange={handleVoiceNoteUpload}
-              accept="audio/*"
+              accept="audio/*" disabled={!!photo}
               className="hidden"
             />
             <button
-              onClick={() => voiceNoteInputRef.current?.click()}
+              onClick={() => voiceNoteInputRef.current?.click()}  disabled={!!photo}
               className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
             >
-              <Mic className="w-5 h-5" />
+   <Mic
+  className={`w-5 h-5 ${disabled ? "opacity-50 grayscale pointer-events-none cursor-not-allowed" : ""}`}
+/>
+
             </button>
           </div>
 

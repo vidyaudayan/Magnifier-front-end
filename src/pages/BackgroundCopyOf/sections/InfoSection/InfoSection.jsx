@@ -14,6 +14,7 @@ import Modal from "react-modal";
 export const InfoSection = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -39,13 +40,14 @@ export const InfoSection = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setIsSubmitting(true);
     const form = new FormData();
 
     if (selectedFile) {
       form.append("identityProof", selectedFile);
     } else {
       alert("Please upload an identity proof.");
+      setIsSubmitting(false);
       return;
     }
 
@@ -72,6 +74,8 @@ export const InfoSection = () => {
       setSelectedFile(null);
     } catch (error) {
       alert("Failed to submit form. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -133,7 +137,7 @@ export const InfoSection = () => {
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white z-50 shadow-md">
                     <SelectItem value="male">Male</SelectItem>
                     <SelectItem value="female">Female</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
@@ -252,25 +256,42 @@ export const InfoSection = () => {
               <Button
                 type="submit"
                 className="px-8 py-2 h-11 rounded-[29px] font-medium text-white text-sm tracking-[-0.14px] bg-blue-600"
+                disabled={isSubmitting} // disables the button
               >
-                Submit
+                {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
+
             </div>
           </form>
         </CardContent>
       </Card>
 
-      <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
-        <div className="p-6 mt-14 bg-white rounded-lg shadow-lg">
-          <h2 className=" text-xl font-bold mb-4">Thank You!</h2>
-          <p>✅ Confirmation: You will receive an email confirming that we have received your inquiry.</p>
-          <p>🔍 Verification: Our team will review your details and verify your identity proof or membership card.</p>
-          <p>⏳ Response Time: Expect a response within 3-5 business days.</p>
-          <p>🚀 Next Steps: We will guide you through the subscription process.</p>
-          <p>Privacy Note: All information submitted is strictly confidential and used only for verification and communication purposes.</p>
-          <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded" onClick={() => setModalIsOpen(false)}>Close</button>
-        </div>
-      </Modal>
+      <Modal
+  isOpen={modalIsOpen}
+  onRequestClose={() => setModalIsOpen(false)}
+  className="fixed inset-0 flex items-center justify-center p-4"
+  overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
+>
+  <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg mx-auto z-50 transition-transform duration-300 transform scale-100">
+    <h2 className="text-2xl font-bold text-center mb-4 text-blue-700">🎉 Thank You!</h2>
+    <ul className="text-gray-700 space-y-2 text-sm sm:text-base">
+      <li>✅ <strong>Confirmation:</strong> You will receive an email confirming that we have received your inquiry.</li>
+      <li>🔍 <strong>Verification:</strong> Our team will review your details and verify your identity proof or membership card.</li>
+      <li>⏳ <strong>Response Time:</strong> Expect a response within 3-5 business days.</li>
+      <li>🚀 <strong>Next Steps:</strong> We will guide you through the subscription process.</li>
+      <li>🔒 <strong>Privacy Note:</strong> All information submitted is strictly confidential and used only for verification and communication purposes.</li>
+    </ul>
+    <div className="text-center mt-6">
+      <button
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-300"
+        onClick={() => setModalIsOpen(false)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</Modal>
+
     </section>
   );
 };
