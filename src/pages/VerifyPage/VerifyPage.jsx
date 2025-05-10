@@ -97,6 +97,8 @@ export const VerifyPage = () => {
   const [stream, setStream] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const recaptchaContainerRef = useRef(null);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [selfieImage, setSelfieImage] = useState(null);
   const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [isMobileOtpVerified, setIsMobileOtpVerified] = useState(false);
@@ -106,6 +108,7 @@ export const VerifyPage = () => {
   const [userData, setUserData] = useState({ email: "", phoneNumber: "" });
   const [confirmationResult, setConfirmationResult] = useState(null);
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+   
     defaultValues: {
       phoneNumber: "",
       mobileOtp: "",
@@ -114,21 +117,62 @@ export const VerifyPage = () => {
     }
   });
   useEffect(() => {
-    try {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-   
-        'callback': () => {
-          // reCAPTCHA solved
-        },
-        'expired-callback': () => {
-          // reCAPTCHA expired
+    const initializeRecaptcha = async () => {
+      try {
+        // Ensure container exists
+        if (!recaptchaContainerRef.current) {
+          throw new Error('Recaptcha container not found');
         }
-      });
-    } catch (error) {
-      console.error("reCAPTCHA initialization error:", error);
-    }
-  }, [auth]); 
+
+        // Clear any existing instance
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear();
+        }
+
+        // Initialize with proper container reference
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          recaptchaContainerRef.current,
+          {
+            'size': 'invisible',
+            'callback': (response) => {
+              console.log('reCAPTCHA solved:', response);
+            },
+            'expired-callback': () => {
+              console.log('reCAPTCHA expired');
+              window.recaptchaVerifier = null;
+            }
+          }
+        );
+
+        // Render the widget
+        await window.recaptchaVerifier.render();
+        console.log('reCAPTCHA initialized successfully');
+
+      } catch (error) {
+        console.error('reCAPTCHA initialization error:', error);
+        // Handle specific error cases
+        if (error.code === 'auth/argument-error') {
+          console.error('Invalid arguments provided to RecaptchaVerifier');
+        }
+      }
+    };
+
+    // Wait for auth to be ready
+    const authReadyCheck = setInterval(() => {
+      if (auth) {
+        clearInterval(authReadyCheck);
+        initializeRecaptcha();
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(authReadyCheck);
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+      }
+    };
+  }, [auth]);
   
   useEffect(() => {
     // Fetch user data when component mounts
@@ -335,6 +379,7 @@ export const VerifyPage = () => {
       );
     }
   };*/}
+ 
   const handleSendMobileOTP = async () => {
     try {
       // Validate phone number
@@ -344,19 +389,41 @@ export const VerifyPage = () => {
         return;
       }
   
-      // Format phone number
+      // Format phone number with country code
       if (!phoneNumber.startsWith("+")) {
-        phoneNumber = `+91${phoneNumber}`; // Default to India
+        phoneNumber = `+91${phoneNumber}`;
       }
       phoneNumber = phoneNumber.replace(/[^+\d]/g, '');
   
-      // Verify reCAPTCHA
+      // Initialize reCAPTCHA verifier
       if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          'size': 'invisible',
-          'callback': () => console.log("reCAPTCHA solved")
-        });
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          'recaptcha-container',
+          {
+            'size': 'invisible',
+            'callback': (response) => {
+              console.log("reCAPTCHA solved:", response);
+            },
+            'expired-callback': () => {
+              console.log("reCAPTCHA expired");
+              window.recaptchaVerifier = null;
+            }
+          }
+        );
       }
+  
+      // Wait for reCAPTCHA to be ready
+      await new Promise((resolve) => {
+        const checkRecaptcha = () => {
+          if (window.grecaptcha && window.grecaptcha.ready) {
+            resolve();
+          } else {
+            setTimeout(checkRecaptcha, 100);
+          }
+        };
+        checkRecaptcha();
+      });
   
       // Send OTP
       const confirmation = await signInWithPhoneNumber(
@@ -368,13 +435,34 @@ export const VerifyPage = () => {
       setConfirmationResult(confirmation);
       toast.success('OTP sent successfully!');
       setMobileOtpSent(true);
+  
     } catch (error) {
       console.error('Full error:', error);
-      toast.error(`Failed to send OTP: ${error.message}`);
+      
+      // Specific error handling
+      if (error.code === 'auth/invalid-app-credential') {
+        toast.error('Invalid Firebase configuration. Please contact support.');
+        // Check Firebase project settings and SHA certificates
+      } else if (error.code === 'auth/internal-error') {
+        toast.error('Verification service error. Please try again later.');
+      } else if (error.code === 'auth/invalid-phone-number') {
+        toast.error('Invalid phone number format. Include country code.');
+      } else {
+        toast.error(`Failed to send OTP: ${error.message}`);
+      }
+      
+      // Reset reCAPTCHA on error
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) {
+          console.log("Error clearing recaptcha:", e);
+        }
+        window.recaptchaVerifier = null;
+      }
     }
   };
-  
-  const handleVerifyMobileOTP = async () => {
+  {/*const handleVerifyMobileOTP = async () => {
     try {
       const otp = watch("mobileOtp");
       const result = await confirmationResult.confirm(otp);
@@ -400,7 +488,44 @@ export const VerifyPage = () => {
       console.error('Error verifying OTP:', error);
       toast.error('Invalid OTP. Please try again.');
     }
-  };
+  };*/}
+
+ const handleVerifyMobileOTP = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+  
+    try {
+      const { idToken } = req.body;
+      
+      // Verify the Firebase ID token
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
+      
+      // Get the user's phone number from the token
+      const user = await admin.auth().getUser(uid);
+      const phoneNumber = user.phoneNumber;
+      
+      // Here you would typically:
+      // 1. Find the user in your database by phoneNumber
+      // 2. Update their verification status
+      // 3. Generate a custom token if needed
+      
+      res.json({ 
+        success: true,
+        message: 'OTP verified successfully',
+        phoneNumber
+      });
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      res.status(400).json({ 
+        error: 'Invalid OTP',
+        details: error.message 
+      });
+    }
+  }
+  
   const handleSubmitVerification = async () => {
     if (!selfieImage) {
       toast.error("Please take a selfie first", { position: "top-center" });
@@ -610,6 +735,12 @@ export const VerifyPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
+      <div 
+        id="recaptcha-container" 
+        ref={recaptchaContainerRef}
+        style={{ display: 'none' }}
+      />
+      
         <Button
           onClick={() => navigate(-1)}
           variant="ghost"

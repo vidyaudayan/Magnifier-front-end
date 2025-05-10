@@ -146,13 +146,15 @@ export default PostDisplayPage;*/}
 
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, Link,useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
 import axios from "axios";
 import { toast } from "react-toastify";
-import NavbarLanding from "../componenets/NavbarLanding";
 
 const PostDisplayPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch= useDispatch()
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");

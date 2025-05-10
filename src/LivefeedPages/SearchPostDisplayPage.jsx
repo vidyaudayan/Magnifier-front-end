@@ -2,10 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { updateMetrics, updatePostReaction, setPosts, updatePostComments } from ".././features/user/userSlice"
+import { useDispatch,useSelector } from "react-redux";
+
 
 const SearchPostDisplayPage = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
+  const dispatch= useDispatch()
+  const posts = useSelector((state) => state.user.posts);
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
@@ -93,6 +98,36 @@ const SearchPostDisplayPage = () => {
     
         const handleReaction = async (postId, reactionType) => {
             try {
+
+              setPost(prevPost => {
+                if (!prevPost) return prevPost;
+                
+                const newPost = { ...prevPost };
+                const userReaction = newPost.userReaction || {};
+                
+                // Remove opposite reaction if exists
+                if (reactionType === 'like' && userReaction.disliked) {
+                  newPost.dislikes = (newPost.dislikes || 1) - 1;
+                  delete userReaction.disliked;
+                } else if (reactionType === 'dislike' && userReaction.liked) {
+                  newPost.likes = (newPost.likes || 1) - 1;
+                  delete userReaction.liked;
+                }
+                
+                // Add new reaction
+                if (reactionType === 'like') {
+                  newPost.likes = (newPost.likes || 0) + (userReaction.liked ? -1 : 1);
+                  userReaction.liked = !userReaction.liked;
+                } else {
+                  newPost.dislikes = (newPost.dislikes || 0) + (userReaction.disliked ? -1 : 1);
+                  userReaction.disliked = !userReaction.disliked;
+                }
+                
+                newPost.userReaction = userReaction;
+                return newPost;
+              });
+
+
                 const url =
                     reactionType === "like"
                         ? `${import.meta.env.VITE_BASE_URL}/post/${postId}/like`
@@ -102,7 +137,7 @@ const SearchPostDisplayPage = () => {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 }, { withCredentials: true });
     
-                const { post, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
+                const { post: updatedPost, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
                 // Dispatch to Redux store
     
                 {/*setPosts(prevPosts =>
@@ -113,7 +148,7 @@ const SearchPostDisplayPage = () => {
                 dispatch(updatePostReaction({
                     postId,
                     updatedPost: {
-                        ...post,
+                        ...updatedPost,
                         userId: posts.find(p => p._id === postId)?.userId || post.userId, // Keep existing userId data
                     }
                 }));
@@ -146,7 +181,7 @@ const SearchPostDisplayPage = () => {
         }
     };
 
-  // ... [Keep all your existing handler functions (handleAddComment, handleReaction, handleShare) unchanged]
+  
 
   if (loading) {
     return <div className="text-center p-8">Loading post...</div>;
@@ -157,7 +192,7 @@ const SearchPostDisplayPage = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
+    <div className="max-w-2xl mx-auto p-10">
     
     {/* Post Content */}
     <div className="bg-white rounded-lg shadow p-4 mb-4">

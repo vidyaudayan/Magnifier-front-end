@@ -74,6 +74,7 @@ import { LanguageProvider } from './context/LanguageContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import SearchPostDisplayPage from './LivefeedPages/SearchPostDisplayPage.jsx';
 import PricingPage from './LivefeedPages/PricingPage.jsx';
+import SharePostDisplayPage from "./LivefeedPages/SharePostDisplayPage.jsx";
 
 
 
@@ -321,6 +322,11 @@ const router = createBrowserRouter([
             path:"profile",
             element:<ProfileNew/>
           },
+          {
+            path:"displaypost",
+            element:<SharePostDisplayPage/>
+          },
+         
          
          
         ],
