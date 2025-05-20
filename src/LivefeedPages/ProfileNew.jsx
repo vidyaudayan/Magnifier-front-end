@@ -104,43 +104,43 @@ const ProfileNew = () => {
 
   const handleProfilePicUpload = async () => {
     const croppedImage = await getCroppedImg();
-    
+
     if (croppedImage) {
       try {
-        const file = new File([croppedImage], 'profile-pic.jpg', { 
+        const file = new File([croppedImage], 'profile-pic.jpg', {
           type: 'image/jpeg',
           lastModified: Date.now()
         });
-        
+
         const formData = new FormData();
         formData.append('profilePic', file);
-  
+
         const token = localStorage.getItem('token');
-        const headers = { 
+        const headers = {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         };
-  
+
         const response = await axios.post(
           `${import.meta.env.VITE_BASE_URL}/user/add-profilepic`,
           formData,
           { headers, withCredentials: true }
         );
-  
+
         if (response.data?.user) {
-          const updatedProfilePic = response.data.user.profilePic 
+          const updatedProfilePic = response.data.user.profilePic
             ? `${response.data.user.profilePic}?${Date.now()}`
             : '';
-  
+
           // Create new user object with updated profile picture
           const updatedUser = {
             ...response.data.user,
             profilePic: updatedProfilePic
           };
-  
+
           // Update local state
           setUser(updatedUser);
-          
+
           // Update Redux store
           dispatch(setUserDetails(updatedUser));
           dispatch(setUserDetails({
@@ -151,7 +151,7 @@ const ProfileNew = () => {
           if (imgRef.current) {
             imgRef.current.src = '';
           }
-  
+
           toast.success("Profile picture updated successfully");
           setSrc(null);
         }
@@ -359,7 +359,7 @@ const ProfileNew = () => {
   };
 
   const renderPosts = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
       {posts.length > 0 ? (
         posts.map((post) => (
           <div key={post._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
@@ -382,9 +382,12 @@ const ProfileNew = () => {
                     {format(new Date(post.createdAt), 'MMM d, yyyy')}
                   </div>
                 </div>
+                
+   
               </div>
+           
 
-              {currentUser?._id === user._id && (
+              
                 <div className="relative">
                   <button
                     onClick={() => setShowOverlay(showOverlay === post._id ? null : post._id)}
@@ -412,7 +415,7 @@ const ProfileNew = () => {
                     </div>
                   )}
                 </div>
-              )}
+             
             </div>
 
             {/* Post Content */}
@@ -691,18 +694,18 @@ const ProfileNew = () => {
           </div>
         )}
 
-       
-          <label htmlFor="coverPic" className="absolute bottom-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 cursor-pointer">
-            <Camera className="w-5 h-5" />
-            <input
-              type="file"
-              id="coverPic"
-              accept="image/*"
-              onChange={handleCoverPicUpload}
-              className="hidden"
-            />
-          </label>
-    
+
+        <label htmlFor="coverPic" className="absolute bottom-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 cursor-pointer">
+          <Camera className="w-5 h-5" />
+          <input
+            type="file"
+            id="coverPic"
+            accept="image/*"
+            onChange={handleCoverPicUpload}
+            className="hidden"
+          />
+        </label>
+
       </div>
 
       {/* Profile Header */}
@@ -712,115 +715,115 @@ const ProfileNew = () => {
             {/* Avatar */}
 
 
-<div className="relative">
-<img
-  src={user?.profilePic ? `${user.profilePic}?${Date.now()}` : "/userProfile.avif"}
-  alt={user?.username}
-  className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover"
-  onError={(e) => {
-    e.target.onerror = null;
-    e.target.src = "/default-profile.png";
-  }}
-/>
-  
+            <div className="relative">
+              <img
+                src={user?.profilePic ? `${user.profilePic}?${Date.now()}` : "/userProfile.avif"}
+                alt={user?.username}
+                className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/default-profile.png";
+                }}
+              />
 
-    <div className="absolute -bottom-2 -right-2 flex gap-2">
-      <label className="p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 cursor-pointer z-10">
-        <Edit3 className="w-4 h-4" />
-        <input
-          type="file"
-          id="profilePic"
-          accept="image/*"
-          ref={fileInputRef}
-          className="hidden"
-          onChange={handleFileChange}
-        />
-      </label>
-      
-      {user.profilePic && (
-        <>
-        <button
-          onClick={() => setShowDeleteModal(true)}
-          className="p-2 bg-red-500 rounded-full text-white hover:bg-red-600 z-10"
-          title="Delete profile picture"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
- {showDeleteModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg max-w-sm w-full">
-      <h3 className="text-lg font-bold mb-4">Delete Profile Picture</h3>
-      <p className="mb-6">Are you sure you want to remove your profile picture?</p>
-      <div className="flex justify-end space-x-3">
-        <button
-          onClick={() => setShowDeleteModal(false)}
-          className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => {
-            deleteProfilePic();
-            setShowDeleteModal(false);
-          }}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-    </>    
-      )}
-    </div>
 
-</div>
+              <div className="absolute -bottom-2 -right-2 flex gap-2">
+                <label className="p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 cursor-pointer z-10">
+                  <Edit3 className="w-4 h-4" />
+                  <input
+                    type="file"
+                    id="profilePic"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </label>
 
-{/* Crop Modal */}
-{src && (
-  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-    <div className="bg-white p-4 rounded-lg max-w-md w-full">
-      <ReactCrop
-        crop={crop}
-        onChange={setCrop}
-        onComplete={setCompletedCrop}
-        aspect={1}
-      >
-        <img
-          ref={imgRef}
-          src={src}
-          alt="Crop me"
-          onLoad={(e) => {
-            const { width, height } = e.currentTarget;
-            setCrop({
-              unit: 'px',
-              width: Math.min(width, height),
-              height: Math.min(width, height),
-              x: (width - Math.min(width, height)) / 2,
-              y: (height - Math.min(width, height)) / 2,
-            });
-          }}
-          style={{ maxWidth: '100%', maxHeight: '70vh' }}
-        />
-      </ReactCrop>
-      <div className="flex justify-end mt-4 space-x-2">
-        <button
-          onClick={() => setSrc(null)}
-          className="px-4 py-2 bg-gray-300 rounded"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleProfilePicUpload}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                {user.profilePic && (
+                  <>
+                    <button
+                      onClick={() => setShowDeleteModal(true)}
+                      className="p-2 bg-red-500 rounded-full text-white hover:bg-red-600 z-10"
+                      title="Delete profile picture"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    {showDeleteModal && (
+                      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg max-w-sm w-full">
+                          <h3 className="text-lg font-bold mb-4">Delete Profile Picture</h3>
+                          <p className="mb-6">Are you sure you want to remove your profile picture?</p>
+                          <div className="flex justify-end space-x-3">
+                            <button
+                              onClick={() => setShowDeleteModal(false)}
+                              className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => {
+                                deleteProfilePic();
+                                setShowDeleteModal(false);
+                              }}
+                              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+            </div>
+
+            {/* Crop Modal */}
+            {src && (
+              <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                <div className="bg-white p-4 rounded-lg max-w-md w-full">
+                  <ReactCrop
+                    crop={crop}
+                    onChange={setCrop}
+                    onComplete={setCompletedCrop}
+                    aspect={1}
+                  >
+                    <img
+                      ref={imgRef}
+                      src={src}
+                      alt="Crop me"
+                      onLoad={(e) => {
+                        const { width, height } = e.currentTarget;
+                        setCrop({
+                          unit: 'px',
+                          width: Math.min(width, height),
+                          height: Math.min(width, height),
+                          x: (width - Math.min(width, height)) / 2,
+                          y: (height - Math.min(width, height)) / 2,
+                        });
+                      }}
+                      style={{ maxWidth: '100%', maxHeight: '70vh' }}
+                    />
+                  </ReactCrop>
+                  <div className="flex justify-end mt-4 space-x-2">
+                    <button
+                      onClick={() => setSrc(null)}
+                      className="px-4 py-2 bg-gray-300 rounded"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleProfilePicUpload}
+                      className="px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* User Info */}
             <div className="mt-4 sm:ml-6 sm:mt-0">

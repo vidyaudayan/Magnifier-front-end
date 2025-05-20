@@ -29,8 +29,7 @@ const PostCard = ({
   user,
   highlightPostId,
   selectedUser,
-  expandedPosts,
-  handleViewMore
+ 
 }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.user);
@@ -66,7 +65,15 @@ const PostCard = ({
   };
   const [isUserLoaded, setIsUserLoaded] = useState(false);
 
-  
+    const [expandedPosts, setExpandedPosts] = useState({});
+   
+
+    const handleViewMore = (postId) => {
+        setExpandedPosts((prev) => ({
+            ...prev,
+            [postId]: !prev[postId], // Toggle the expanded state
+        }));
+    };
  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -447,9 +454,9 @@ const PostCard = ({
       {/* Post Content */}
       <div className="p-5">
         <p className="text-gray-900 dark:text-white text-[15px] leading-relaxed whitespace-pre-wrap">
-          {post.content && post.content.split(" ").length > 8 && !expandedPosts[post._id] ? (
+          {post.content && post.content.split(" ").length > 18 && !expandedPosts[post._id] ? (
             <>
-              {post.content.split(" ").slice(0, 8).join(" ")}...{" "}
+              {post.content.split(" ").slice(0, 18).join(" ")}...{" "}
               <button
                 className="text-blue-500 hover:underline text-xs"
                 onClick={() => handleViewMore(post._id)}

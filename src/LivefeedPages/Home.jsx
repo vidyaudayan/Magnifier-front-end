@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import FeedHeader from '../componenets/Livefeed/FeedHeader';
@@ -13,72 +13,73 @@ import { toast } from 'react-toastify';
 const Home = () => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('personalized');
-  const { posts, walletAmount, totalLikes, totalDislikes, postCount, } = useSelector(
-         (state) => state.user
-     )
-     const [loading, setLoading] = useState(true);
-     const  user  = useSelector((state) => state.user);
-     useEffect(() => {
-      const fetchPosts = async () => {
-        try {
-          const token = localStorage.getItem('token');
-          const response = await axios.get(
-            `${import.meta.env.VITE_BASE_URL}/post`,
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
-          );
-          console.log('Fetched posts:', response.data.posts);
+  const { posts } = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(true);
+  const user = useSelector((state) => state.user);
 
-          dispatch(setPosts(response.data.posts));
-        } catch (error) {
-          console.error('Error fetching posts:', error);
-          toast.error('Failed to load posts');
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      fetchPosts();
-    }, [dispatch]);
-  
-    const handlePostSubmit = async (newPost) => {
+  useEffect(() => {
+    const fetchPosts = async () => {
       try {
-        const formData = new FormData();
-        formData.append('content', newPost.content);
-        if (newPost.images) {
-          newPost.images.forEach(image => {
-            formData.append('media', image);
-          });
-        }
-  
+        setLoading(true);
         const token = localStorage.getItem('token');
-        const response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/post/create`,
-          formData,
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/post?filter=${activeTab}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data'
-            }
+            headers: { Authorization: `Bearer ${token}` }
           }
         );
-  
-        // Add the new post to the beginning of the posts array
-        dispatch(setPosts([response.data.post, ...posts]));
-        toast.success('Post created successfully!');
+        
+        dispatch(setPosts(response.data.posts));
       } catch (error) {
-        console.error('Error creating post:', error);
-        toast.error('Failed to create post');
+        console.error('Error fetching posts:', error);
+        toast.error('Failed to load posts');
+      } finally {
+        setLoading(false);
       }
     };
-  
-    if (loading) {
-      return <div className="min-h-screen flex items-center justify-center">Loading posts...</div>;
+
+    fetchPosts();
+  }, [dispatch, activeTab]); // Refetch when tab changes
+
+  const handlePostSubmit = async (newPost) => {
+    try {
+      const formData = new FormData();
+      formData.append('content', newPost.content);
+      formData.append('state', user.state); // Add user's state
+      formData.append('vidhanSabha', user.vidhanSabha); // Add user's constituency
+      
+      if (newPost.images) {
+        newPost.images.forEach(image => {
+          formData.append('media', image);
+        });
+      }
+
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/post/create`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      // Add the new post to the beginning of the posts array
+      dispatch(setPosts([response.data.post, ...posts]));
+      toast.success('Post created successfully!');
+    } catch (error) {
+      console.error('Error creating post:', error);
+      toast.error('Failed to create post');
     }
+  };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading posts...</div>;
+  }
 
   return (
-   
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row md:gap-6">
@@ -98,9 +99,9 @@ const Home = () => {
               />
 
               {/* Feed Header with Tabs */}
-               <div className='sticky top-0 bg-slate-50 text-slate-50 z-30'>h</div>
+              <div className='sticky top-0 bg-slate-50 text-slate-50 z-30 dark:bg-slate-900 dark:text-slate-900'>h</div>
              
-              <div className="sticky top-[120px] md:top-4 z-10 -mx-4 px-4 pb-4  pt-2 bg-gray-50 dark:bg-gray-900">
+              <div className="sticky top-[120px] md:top-4 z-10 -mx-4 px-4 pb-4 pt-2 bg-gray-50 dark:bg-gray-900">
                 <FeedHeader activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
               
@@ -111,8 +112,7 @@ const Home = () => {
               <div className="space-y-4 pb-20">
                 {posts && posts.length > 0 ? (
                   posts.map((post) => (
-                    <PostCard key={post._id} post={post} user={user} // make sure to pass the current user
-                />
+                    <PostCard key={post._id} post={post} user={user} />
                   ))
                 ) : (
                   <div className="text-center py-10 text-gray-500">
@@ -121,12 +121,6 @@ const Home = () => {
                 )}
               </div>
             </div>
-
-
-            {/* Create Post Button */}
-            {/*<button className="fixed bottom-20 right-6 md:bottom-6 bg-blue-500 text-white rounded-full p-4 shadow-lg hover:bg-blue-600 transition-colors md:z-10 z-50">
-            <PlusCircle className="w-6 h-6" />
-            </button>*/}
           </div>
 
           {/* Trending Section - Desktop Only */}
@@ -138,7 +132,6 @@ const Home = () => {
         </div>
       </div>
     </div>
-   
   );
 };
 

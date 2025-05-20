@@ -74,8 +74,10 @@ import { LanguageProvider } from './context/LanguageContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import SearchPostDisplayPage from './LivefeedPages/SearchPostDisplayPage.jsx';
 import PricingPage from './LivefeedPages/PricingPage.jsx';
-import SharePostDisplayPage from "./LivefeedPages/SharePostDisplayPage.jsx";
-
+import SharePostDisplayPage from "./LivefeedPages/SharePostDisplayPage.jsx"
+import { LoginDashboard } from "./pages/LoginPage/Logindashboard.jsx";
+import DashboardSelector from "./pages/DashboardSelector.jsx";
+import DashboardViewer from "./pages/DashboardViewer.jsx";
 
 
 
@@ -109,6 +111,20 @@ const router = createBrowserRouter([
         path: "/login",
         element:<LoginPage/>,
       },
+      {
+        path: "/logindashboard",
+        element:<LoginDashboard/>,
+      },
+      {
+        path: "/selectdashboard",
+        element:<DashboardSelector/>,
+      },
+      {
+        path: "/dashboard/:type",
+        element:<DashboardViewer/>,
+      },
+     
+     
       {
         path: "/verify",
         element:<VerifyPage/>,
@@ -348,9 +364,9 @@ createRoot(document.getElementById('root')).render(
     <PersistGate loading={null} persistor={persistor}>
   <StrictMode>
  <RouterProvider router={router} />
-  </StrictMode>,
+  </StrictMode>
   </PersistGate>
-  </Provider>,
+  </Provider>
   </LanguageProvider>
   </ThemeProvider>
 )

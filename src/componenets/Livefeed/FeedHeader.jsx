@@ -2,7 +2,7 @@ import React from 'react';
 import { Users, MapPin, Flag } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
-
+ 
 const FeedHeader = ({ activeTab, onTabChange }) => {
 const { t } = useLanguage();
 
@@ -12,7 +12,7 @@ const { t } = useLanguage();
     { id: 'national', label:  t('national'), icon: Flag },
   ];
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-sm mt-4">
       <div className="flex items-center p-1">
         <div className="flex flex-1">
           {tabs.map((tab) => (

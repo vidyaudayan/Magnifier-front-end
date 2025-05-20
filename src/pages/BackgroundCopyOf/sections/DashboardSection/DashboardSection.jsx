@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 export const DashboardSection = () => {
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate('/login');
+    navigate('/logindashboard');
   };
   return (
     <section id="services" className="w-full max-w-[1000px] mx-auto py-16">
