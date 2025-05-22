@@ -182,8 +182,8 @@ export const DelhiSignUpPage = () => {
             toast.success("Signup completed! please verify your email and mobile for login ");
 
             alert("signup sucess")
-            navigate("/verify");
-            //navigate("/livefeed/*");
+            //navigate("/verify");
+            navigate("/livefeed/*");
 
         } catch (error) {
             if (error.response && error.response.status === 400) {
