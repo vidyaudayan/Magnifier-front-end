@@ -7,8 +7,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
-import { auth, RecaptchaVerifier } from "../../firebase"
-import { signInWithPhoneNumber } from 'firebase/auth';
+// import { auth, RecaptchaVerifier } from "../../firebase"
+// import { signInWithPhoneNumber } from 'firebase/auth';
 
 // Changed the order of steps to prioritize email verification
 const steps = [
@@ -239,76 +239,76 @@ export const VerifyPage = () => {
     }
   };
 
-  const handleSendEmailOTP = async () => {
-    try {
-      const email = watch("email");
-      if (!email) {
-        toast.error("Email is required!", { position: "top-center" });
-        return;
-      }
+  // const handleSendEmailOTP = async () => {
+  //   try {
+  //     const email = watch("email");
+  //     if (!email) {
+  //       toast.error("Email is required!", { position: "top-center" });
+  //       return;
+  //     }
 
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/send-otp`,
-        { email },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-      toast.success("OTP sent to your email", { position: "top-center" });
-      setOtpSent(true);
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error(
-        error.response?.data?.message || "Failed to send OTP. Please try again.",
-        { position: "top-center" }
-      );
-    }
-  };
+  //     const token = localStorage.getItem("token");
+  //     await axios.post(
+  //       `${import.meta.env.VITE_BASE_URL}/user/send-otp`,
+  //       { email },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': `Bearer ${token}`
+  //         }
+  //       }
+  //     );
+  //     toast.success("OTP sent to your email", { position: "top-center" });
+  //     setOtpSent(true);
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     toast.error(
+  //       error.response?.data?.message || "Failed to send OTP. Please try again.",
+  //       { position: "top-center" }
+  //     );
+  //   }
+  // };
 
-  const handleVerifyEmailOTP = async () => {
-    const email = watch("email");
-    const otp = watch("otp");
+  // const handleVerifyEmailOTP = async () => {
+  //   const email = watch("email");
+  //   const otp = watch("otp");
 
-    if (!email) {
-      toast.error("Email is required!", { position: "top-center" });
-      return;
-    }
+  //   if (!email) {
+  //     toast.error("Email is required!", { position: "top-center" });
+  //     return;
+  //   }
 
-    if (!otp) {
-      toast.error("OTP is required!", { position: "top-center" });
-      return;
-    }
+  //   if (!otp) {
+  //     toast.error("OTP is required!", { position: "top-center" });
+  //     return;
+  //   }
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/verify-otp`,
-        { email, otp },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }
-      );
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const response = await axios.post(
+  //       `${import.meta.env.VITE_BASE_URL}/user/verify-otp`,
+  //       { email, otp },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": `Bearer ${token}`
+  //         }
+  //       }
+  //     );
 
-      if (response.status === 200) {
-        toast.success("Email verified successfully!", { position: "top-center" });
-        setIsOtpVerified(true);
-        setCurrentStep(2); // Move to mobile verification step
-      }
-    } catch (error) {
-      console.error("Verification error:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to verify OTP. Please try again.",
-        { position: "top-center" }
-      );
-    }
-  };
+  //     if (response.status === 200) {
+  //       toast.success("Email verified successfully!", { position: "top-center" });
+  //       setIsOtpVerified(true);
+  //       setCurrentStep(2); // Move to mobile verification step
+  //     }
+  //   } catch (error) {
+  //     console.error("Verification error:", error);
+  //     toast.error(
+  //       error.response?.data?.message || "Failed to verify OTP. Please try again.",
+  //       { position: "top-center" }
+  //     );
+  //   }
+  // };
 
   {/*const handleSendMobileOTP = async () => {
     try {

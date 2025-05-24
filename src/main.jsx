@@ -75,6 +75,12 @@ import { ThemeProvider } from './context/ThemeContext.jsx';
 import SearchPostDisplayPage from './LivefeedPages/SearchPostDisplayPage.jsx';
 import PricingPage from './LivefeedPages/PricingPage.jsx';
 import SharePostDisplayPage from "./LivefeedPages/SharePostDisplayPage.jsx";
+import Bulletin from "./componenets/Bulletin.jsx";
+import WebmagnifierLearnmore from "./componenets/LearnMore/WebmagnifierLearnmore.jsx";
+import ElectoaiLearnmore from "./componenets/LearnMore/ElectoaiLearnmore.jsx";
+import VotermagnifierLearnmore from "./componenets/LearnMore/VotermagnifierLearnmore.jsx";
+import MediamagnifierLearnmore from "./componenets/LearnMore/MediamagnifierLearnmore.jsx";
+
 
 
 
@@ -108,6 +114,26 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element:<LoginPage/>,
+      },
+      {
+        path:"/webmagnifierlearnmore",
+        element:<WebmagnifierLearnmore/>
+
+      },
+      {
+        path:"/electoailearnmore",
+        element: <ElectoaiLearnmore/>
+
+      },
+      {
+        path:"/votermagnifierlearnmore",
+        element:<VotermagnifierLearnmore/>
+
+      },
+      {
+        path:"/mediamagnifierlearnmore",
+        element:<MediamagnifierLearnmore/>
+
       },
       {
         path: "/verify",
@@ -186,6 +212,11 @@ const router = createBrowserRouter([
       {
         path: "/faq",
         element:<FAQ/>,
+      },
+      {
+        path:"/bulletin",
+        element:<Bulletin/>
+
       },
       {
         path: "/user-guidelines",

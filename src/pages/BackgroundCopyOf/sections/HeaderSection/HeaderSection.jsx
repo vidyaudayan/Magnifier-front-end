@@ -45,10 +45,10 @@ export const HeaderSection = () => {
           {/* Main heading section */}
           <div className="flex flex-col items-center text-center">
             {/* First line of heading */}
-            <h3 className="p-4 mb-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold rounded-lg shadow-md">
-              <span className="bg-white text-transparent bg-clip-text">
+            <h3 className=" mb-4  text-black font-bold  ">
+              
                 Made in India
-              </span>
+             
             </h3>
             <div className="flex flex-wrap items-center justify-center gap-2 md:gap-5 mb-2 md:mb-4">
 
