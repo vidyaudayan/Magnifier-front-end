@@ -45,7 +45,7 @@ const [showReportDialog, setShowReportDialog] = useState(false);
 const [reportReason, setReportReason] = useState('');
 const [selectedReportType, setSelectedReportType] = useState('');
   const postRef = useRef(null);
-  console.log('Redux currentUser in component:', currentUser);
+  //console.log('Redux currentUser in component:', currentUser);
   const currentPosts = useSelector(state => state.user.posts);
   const posts = useSelector((state) => state.user.posts);
   PostCard.defaultProps = {
@@ -297,37 +297,7 @@ const handleReportPost = async () => {
     }
   };
 
-  {/*const handleEditComment = async (postId, commentId, newCommentText) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.patch(
-        `${import.meta.env.VITE_BASE_URL}/post/${postId}/comment/${commentId}`,
-        { comment: newCommentText },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      // Update the posts state with the edited comment
-      //setPosts(posts.map(post =>
-        //post._id === postId ? response.data : post
-      //));
-
-      const post = posts.find(p => p._id === postId);
-    if (!post) throw new Error('Post not found');
-    const updatedComments = post.comments.map(comment =>
-      comment._id === commentId ? { ...comment, text: newCommentText } : comment
-    );
-
-    // Dispatch the action to update the comments list for the post
-    dispatch(updatePostComments({ postId, comments: updatedComments }));
-    
-    const updatedPost = posts.find(p => p._id === postId);
-    setComments(updatedPost.comments);
-      toast.success("Comment updated successfully");
-    } catch (error) {
-      console.error("Error editing comment:", error);
-      toast.error(error.response?.data?.message || "Failed to edit comment");
-    }
-  };*/}
+  
   const handleEditComment = async (postId, commentId, newCommentText) => {
     try {
       const token = localStorage.getItem("token");

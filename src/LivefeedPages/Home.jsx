@@ -13,21 +13,27 @@ import { toast } from 'react-toastify';
 const Home = () => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('personalized');
-  const { posts } = useSelector((state) => state.user);
+  const { user,posts } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(true);
-  const user = useSelector((state) => state.user);
+  //const user = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/post?filter=${activeTab}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+         
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/post`, {
+  headers: { Authorization: `Bearer ${token}` },
+  params: {
+    filter: activeTab,
+    state: user.state,
+    vidhanSabha: user.vidhanSabha
+  }
+});
+
+        
+        
         
         dispatch(setPosts(response.data.posts));
       } catch (error) {
@@ -39,7 +45,7 @@ const Home = () => {
     };
 
     fetchPosts();
-  }, [dispatch, activeTab]); // Refetch when tab changes
+  }, [dispatch, activeTab,user.state, user.vidhanSabha]); // Refetch when tab changes
 
   const handlePostSubmit = async (newPost) => {
     try {
