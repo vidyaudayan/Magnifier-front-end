@@ -114,7 +114,7 @@ const navigate=useNavigate()
   const originalSlides = [
     { id: 1, content: 'Web Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/login',learnmoreURL:'/webmagnifierlearnmore' },
     { id: 2, content: 'ElectoAI', image: '../src/assets/Images/image-11.png',loginURL:'/login',learnmoreURL:'/electoailearnmore' },
-    { id: 3, content: 'Voter Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/login',learnmoreURL:'/votermagnifierlearnmore' },
+    { id: 3, content: 'Voter Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/logindashboard',learnmoreURL:'/votermagnifierlearnmore' },
     { id: 4, content: 'Media Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/login',learnmoreURL:'/mediamagnifierlearnmore' },
   ];
 

@@ -80,6 +80,9 @@ import WebmagnifierLearnmore from "./componenets/LearnMore/WebmagnifierLearnmore
 import ElectoaiLearnmore from "./componenets/LearnMore/ElectoaiLearnmore.jsx";
 import VotermagnifierLearnmore from "./componenets/LearnMore/VotermagnifierLearnmore.jsx";
 import MediamagnifierLearnmore from "./componenets/LearnMore/MediamagnifierLearnmore.jsx";
+import { LoginDashboard } from "./pages/LoginPage/LoginDashboard.jsx";
+import DashboardSelector from "./pages/DashboardSelector.jsx";
+import DashboardViewer from "./pages/DashboardViewer.jsx";
 
 
 
@@ -133,6 +136,22 @@ const router = createBrowserRouter([
       {
         path:"/mediamagnifierlearnmore",
         element:<MediamagnifierLearnmore/>
+
+      },
+      
+      {
+        path:"/logindashboard",
+        element:<LoginDashboard/>
+
+      },
+       {
+        path:"/selectdashboard",
+        element:<DashboardSelector/>
+
+      },
+      {
+        path:"/dashboard/:type",
+        element:<DashboardViewer/>
 
       },
       {

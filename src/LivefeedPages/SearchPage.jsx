@@ -5,6 +5,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSearchQuery } from '../features/search/searchSlice';
+import PostCard from '../componenets/Livefeed/PostCard';
 import {
   Search as SearchIcon, ThumbsUp,
   ThumbsDown,
@@ -23,6 +24,8 @@ const SearchPage = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { posts } = useSelector((state) => state.user);
+  const user = useSelector(state => state.user.user);
 
   // Get query from URL and update Redux store
   useEffect(() => {
@@ -236,82 +239,18 @@ const SearchPage = () => {
   )*/}
 
   const renderPostResult = (post) => (
-    <div
-      key={post._id}
-      onClick={() => navigate(`/livefeed/searchpost/${post._id}`)}
-      className="p-4 bg-white rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow mb-4"
-    >
-      {/* User info section */}
-      <div className="flex items-start gap-3 mb-3">
-        <img
-          src={post.userId?.profilePic || '/userpost.avif'}
-          alt={post.userId?.username}
-          className="w-10 h-10 rounded-full object-cover border border-gray-200"
-        />
-        <div>
-          <div className="font-semibold text-gray-900">{post.userId?.username}</div>
-          <div className="text-xs text-gray-500">
-            {new Date(post.createdAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Post content */}
-      {post.content && (
-        <div className="mb-3 text-gray-800">
-          {post.content}
-        </div>
-      )}
-
-      {/* Media section */}
-      {post.postType === 'Photo' && post.mediaUrl && (
-        <div className="mb-3 rounded-lg overflow-hidden">
-          <img
-            src={post.mediaUrl}
-            alt={post.title || 'Post image'}
-            className="w-full max-h-96 object-contain rounded-lg"
-          />
-        </div>
-      )}
-
-      {post.postType === 'VoiceNote' && post.mediaUrl && (
-        <div className="mb-3">
-          <div className="bg-gray-100 p-3 rounded-lg flex items-center">
-            <button className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-              </svg>
-            </button>
-            <div className="flex-1 bg-gray-200 h-2 rounded-full overflow-hidden">
-              <div className="bg-blue-500 h-full w-1/2"></div>
-            </div>
-            <span className="ml-3 text-sm text-gray-500">1:45</span>
-          </div>
-        </div>
-      )}
-
-      {/* Like/Dislike counts */}
-      <div className="flex items-center gap-4 text-sm text-gray-500 pt-2 border-t border-gray-100">
-        <div className="flex items-center gap-1">
-          <ThumbsUp className="w-5 h-5 text-blue-500" />
-          <span>{post.likes?.toLocaleString() || 0}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <ThumbsDown className="w-5 h-5 text-red-500" />
-          <span>{post.dislikes?.toLocaleString() || 0}</span>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <MessageSquare className="w-5 h-5" />
-          <span>{post.comments?.length?.toLocaleString() || 0}</span>
-        </div>
-      </div>
-    </div>
-  );
+      <div className="space-y-4 pb-20">
+                {posts && posts.length > 0 ? (
+                  posts.map((post) => (
+                    <PostCard key={post._id} post={post} user={user} />
+                  ))
+                ) : (
+                  <div className="text-center py-10 text-gray-500">
+                    No posts available. Create one!
+                  </div>
+                )}
+              </div>
+  );
 
   const renderOtherResult = (result) => {
     switch (result.type) {
