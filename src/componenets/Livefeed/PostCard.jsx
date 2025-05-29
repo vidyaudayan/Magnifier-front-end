@@ -20,7 +20,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { updateMetrics, updatePostReaction, setPosts, updatePostComments } from '../../features/user/userSlice';
+import { updateMetrics, updatePostReaction, setPosts, updatePostComments ,updateWalletData} from '../../features/user/userSlice';
 import { useSelector } from 'react-redux';
 import { Edit3, Trash2 } from 'lucide-react';
 
@@ -264,6 +264,14 @@ const handleReportPost = async () => {
         totalDislikes: response.data.totalDislikes,
         postCount: response.data.postCount
       }));
+
+      if (response.data.earnedPoints !== undefined) {
+        dispatch(updateWalletData({
+          earnedPoints: response.data.earnedPoints,
+          rechargedPoints: response.data.rechargedPoints,
+          // Include transactions if needed
+        }));
+      }
 
     } catch (error) {
       if (error.response) {
@@ -583,6 +591,9 @@ const handleReportPost = async () => {
           <span className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 cursor-default">
             {post.dislikes || 0} Dislikes
           </span>
+           <span className="text-sm text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 cursor-default">
+      {post.impressions || 0} Impressions
+    </span>
           <button
             onClick={() => setCommentsVisible(!commentsVisible)}
             className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"

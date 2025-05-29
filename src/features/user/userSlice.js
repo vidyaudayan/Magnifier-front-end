@@ -11,6 +11,7 @@ export const userSlice = createSlice({
     totalDislikes: 0,
     postCount: 0,
     posts: [],
+     availableStates: [],
   },
   reducers: {
     setUserDetails: (state, action) => {
@@ -24,7 +25,7 @@ export const userSlice = createSlice({
         _id: user.id || user._id,
         username: user.username || user.userName || '',
         profilePic: user.profilePic || user.profilePicture || '',
-        walletAmount: user.walletAmount || 0
+        walletAmount: user.walletAmount || 0, state: user.state || '',
       };
       
       localStorage.setItem('user', JSON.stringify(state.user));
@@ -48,6 +49,19 @@ export const userSlice = createSlice({
         console.log('Cover picture updated:', action.payload);
       }
     },
+     updateWalletData: (state, action) => {
+      const { walletAmount } = action.payload;
+      state.walletAmount = walletAmount;
+
+      // Also update wallet in user object if available
+      if (state.user) {
+        state.user.walletAmount = walletAmount;
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
+
+      console.log("Wallet updated:", walletAmount);
+    },
+
     
     updateMetrics: (state, action) => {
       const { userName, profilePic, walletAmount, totalLikes, totalDislikes, postCount } = action.payload;
@@ -408,6 +422,10 @@ updatePostComments: (state, action) => {
   // Final post list: sticky posts first, then the rest
   state.posts = [...stickyPosts, ...normalPosts];
 },
+setAvailableStates: (state, action) => {
+      state.availableStates = action.payload || [];
+      console.log('Available states updated:', state.availableStates);
+    },
 
 setLoading: (state, action) => {
   state.loading = action.payload;
@@ -424,12 +442,14 @@ setLoading: (state, action) => {
       state.totalDislikes = 0;
       state.postCount = 0;
       state.posts = []; // Clear posts as well
+        state.availableStates = [];
       console.log('User logged out');
     },
   },
 });
 
-export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments ,setLoading} = userSlice.actions;
+ 
+export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments ,setLoading, updateWalletData,} = userSlice.actions;
 
 export default userSlice.reducer;
 

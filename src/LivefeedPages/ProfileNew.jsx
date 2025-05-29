@@ -63,7 +63,7 @@ const ProfileNew = () => {
   const fileInputRef = useRef(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const imgRef = useRef(null);
-
+  const profilePicInputRef = useRef(null);
   const handleFileChange = (event) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
@@ -208,9 +208,10 @@ const ProfileNew = () => {
     };
   }, [showProfilePicDropdown, showCoverPicDropdown]);
 
-  useEffect(() => {
+  {/* useEffect(() => {
     const fetchUserData = async () => {
       try {
+          setLoading(true);
         const token = localStorage.getItem('token');
         const [profileRes, postsRes] = await Promise.all([
           axios.get(`${import.meta.env.VITE_BASE_URL}/user/userprofile`, {
@@ -220,10 +221,20 @@ const ProfileNew = () => {
             headers: { Authorization: `Bearer ${token}` }
           })
         ]);
+ const userData = profileRes.data || {
+      username: 'New User',
+      email: '',
+      profilePic: '',
+      coverPic: '',
+      bio: '',
+      walletAmount: 0
+    };
 
-        setUser(profileRes.data);
+    setUser(userData);
+    dispatch(setUserDetails(userData));
+        //setUser(profileRes.data);
         setPosts(postsRes.data.data || []);
-        dispatch(setUserDetails(profileRes.data));
+        //dispatch(setUserDetails(profileRes.data));
       } catch (error) {
         console.error("Error fetching user data:", error);
         toast.error("Failed to load profile data");
@@ -233,7 +244,104 @@ const ProfileNew = () => {
     };
 
     fetchUserData();
-  }, [userId, dispatch]);
+  }, [userId, dispatch]);*/}
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+
+      // Fetch profile data
+      const profileRes = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/user/userprofile`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      // Initialize user data with default values if empty
+      const userData = profileRes.data || {
+        username: 'New User',
+        email: '',
+        profilePic: '',
+        coverPic: '',
+        bio: '',
+        walletAmount: 0
+      };
+
+      setUser(userData);
+      dispatch(setUserDetails(userData));
+
+      // Fetch posts - handle case where user has no posts
+      try {
+        const postsRes = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/user/userPosts`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        setPosts(postsRes.data?.data || []);
+      } catch (postsError) {
+        console.log("No posts found for user, setting empty array");
+        setPosts([]);
+      }
+
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+
+      // Initialize default user if profile fetch fails
+      const defaultUser = {
+        username: 'New User',
+        email: '',
+        profilePic: '',
+        coverPic: '',
+        bio: '',
+        walletAmount: 0
+      };
+
+      setUser(defaultUser);
+      dispatch(setUserDetails(defaultUser));
+      setPosts([]);
+
+      if (error.response?.status !== 404) {
+        toast.error("Failed to load profile data");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add this at the top of your component
+  const [error, setError] = useState(null);
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center p-6 max-w-md">
+          <h2 className="text-xl font-bold mb-4">Profile Unavailable</h2>
+          <p className="mb-4">We couldn't load the profile data. Please try again later.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Then wrap your data fetching in a try-catch
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await fetchUserData();
+      } catch (err) {
+        setError(err);
+      }
+    };
+    loadData();
+  }, [userId]);
 
   const handleCoverPicUpload = async (event) => {
     const file = event.target.files[0];
@@ -380,6 +488,24 @@ const ProfileNew = () => {
     }));
   };
 
+  const handleProfilePicChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => setSrc(reader.result));
+      reader.readAsDataURL(e.target.files[0]);
+      setShowProfilePicDropdown(false);
+    }
+  };
+
+  const handleCoverPicChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      // Handle cover photo upload here
+      const file = e.target.files[0];
+      console.log('Cover photo selected:', file);
+      setShowCoverPicDropdown(false);
+    }
+  };
+
   const deleteCoverPic = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -414,8 +540,8 @@ const ProfileNew = () => {
             <div className="p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-center space-x-3">
                 <img
-                  src={user.profilePic || "/default-profile.png"}
-                  alt={user.username}
+                  src={user?.profilePic || "/default-profile.png"}
+                  alt={user?.username || "User"}
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
@@ -725,87 +851,65 @@ const ProfileNew = () => {
     );
   }
 
+
   return (
-
-
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Cover Image */}
-      <div className="relative h-48 md:h-64 w-full">
-        {user.coverPic ? (
-          <img
-            src={user.coverPic}
-            alt="Cover"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-            <span className="text-white text-lg">Cover Photo</span>
+    <div className="relative h-48 md:h-64 w-full">
+  {user.coverPic ? (
+    <img
+      src={user.coverPic}
+      alt="Cover"
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+      <span className="text-white text-lg">Cover Photo</span>
+    </div>
+  )}
+
+  <div className="absolute bottom-4 right-4">
+    <div className="relative cover-pic-dropdown-container">
+      <button
+        onClick={() => setShowCoverPicDropdown(!showCoverPicDropdown)}
+        className="p-2 bg-black/50 rounded-full text-white hover:bg-black/70 cursor-pointer"
+      >
+        <Camera className="w-5 h-5" />
+      </button>
+
+      {showCoverPicDropdown && (
+        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
+          <div className="py-1">
+            <label className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+              <Camera className="w-4 h-4 mr-2" />
+              <span>{user.coverPic ? "Change" : "Add"} cover photo</span>
+              <input
+                type="file"
+                accept="image/*"
+                ref={coverPicInputRef}
+                className="hidden"
+                onChange={handleCoverPicUpload}
+              />
+            </label>
+
+            {user.coverPic && (
+              <button
+                onClick={() => {
+                  setShowCoverPicDropdown(false);
+                  setShowDeleteCoverModal(true);
+                }}
+                className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete cover photo
+              </button>
+            )}
           </div>
-        )}
-
-        {/*<label htmlFor="coverPic" className="absolute bottom-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 cursor-pointer">
-          <Camera className="w-5 h-5" />
-          <input
-            type="file"
-            id="coverPic"
-            accept="image/*"
-            onChange={handleCoverPicUpload}
-            className="hidden"
-          />
-        </label>*/}
-        <input
-  type="file"
-  id="coverPic"
-  accept="image/*"
-  ref={coverPicInputRef}
-  onChange={handleCoverPicUpload}
-  className="hidden"
-/>
-
-        {/* Cover Photo Actions */}
-      <div className="absolute bottom-4 right-4">
-  <div className="relative">
-    <button
-      onClick={() => setShowCoverPicDropdown(!showCoverPicDropdown)}
-      className="p-2 bg-black/50 rounded-full text-white hover:bg-black/70 cursor-pointer"
-    >
-      <Camera className="w-5 h-5" />
-    </button>
-
-    {showCoverPicDropdown && (
-      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
-        <div className="py-1">
-          <label
-            className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-            //onClick={() => coverPicInputRef.current?.click()}
-           onClick={() => {
-    console.log('Attempting to click file input');
-    console.log('Input ref:', coverPicInputRef.current);
-    coverPicInputRef.current?.click();
-  }}
-          >
-            <Camera className="w-4 h-4 mr-2" />
-            <span>{user.coverPic ? "Change" : "Add"} cover photo</span>
-          </label>
-
-          {user.coverPic && (
-            <button
-              onClick={() => {
-                setShowCoverPicDropdown(false);
-                setShowDeleteCoverModal(true);
-              }}
-              className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete cover photo
-            </button>
-          )}
         </div>
-      </div>
-    )}
+      )}
+    </div>
   </div>
 </div>
-      </div>
 
       {/* Profile Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -824,7 +928,7 @@ const ProfileNew = () => {
               />
 
               <div className="absolute -bottom-2 -right-2">
-                <div className="relative">
+                <div className="relative profile-pic-dropdown-container">
                   <button
                     onClick={() => setShowProfilePicDropdown(!showProfilePicDropdown)}
                     className="p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 cursor-pointer z-10"
@@ -834,24 +938,14 @@ const ProfileNew = () => {
 
                   {showProfilePicDropdown && (
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
-                      <div
-                        className="py-1"
-                        role="menu"
-                        aria-orientation="vertical"
-                        aria-labelledby="options-menu"
-                      >
-                        <label
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                          role="menuitem"
-                          htmlFor="profilePic"
-                        >
+                      <div className="py-1">
+                        <label className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                           <Camera className="w-4 h-4 mr-2" />
                           <span>{user.profilePic ? "Change" : "Add"} profile photo</span>
                           <input
                             type="file"
-                            id="profilePic"
                             accept="image/*"
-                            ref={fileInputRef}
+                            ref={profilePicInputRef}
                             className="hidden"
                             onChange={handleFileChange}
                           />
@@ -864,7 +958,6 @@ const ProfileNew = () => {
                               setShowDeleteModal(true);
                             }}
                             className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            role="menuitem"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete profile photo
@@ -886,7 +979,7 @@ const ProfileNew = () => {
                   </h1>
                 </div>
                 <div className='text-sm text-slate-600'>
-                  <span>{user.email}</span>
+                  {/* Additional user info can go here */}
                 </div>
                 {user.verified && <CheckCircle2 className="w-5 h-5 text-blue-500" />}
               </div>
@@ -912,12 +1005,12 @@ const ProfileNew = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`
-                  pb-4 px-1 border-b-2 font-medium text-sm
-                  ${activeTab === tab.id
+                    pb-4 px-1 border-b-2 font-medium text-sm
+                    ${activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                     }
-                `}
+                  `}
                 >
                   {tab.label}
                 </button>
@@ -1033,7 +1126,6 @@ const ProfileNew = () => {
         )}
       </div>
     </div>
-
   );
 };
 

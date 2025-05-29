@@ -78,6 +78,7 @@ import SharePostDisplayPage from "./LivefeedPages/SharePostDisplayPage.jsx"
 import { LoginDashboard } from "./pages/LoginPage/Logindashboard.jsx";
 import DashboardSelector from "./pages/DashboardSelector.jsx";
 import DashboardViewer from "./pages/DashboardViewer.jsx";
+import Wallet from "./LivefeedPages/Wallet.jsx";
 
 
 
@@ -341,6 +342,10 @@ const router = createBrowserRouter([
           {
             path:"displaypost",
             element:<SharePostDisplayPage/>
+          },
+           {
+            path:"wallet",
+            element:<Wallet/>
           },
          
          

@@ -9,7 +9,7 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
-
+import { Wallet } from 'lucide-react';
 const Sidebar = () => {
   const location = useLocation();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -20,6 +20,7 @@ const Sidebar = () => {
     { path: "/profile", icon: <FaUser />, label: "Profile" },
     { path: "/settings", icon: <FaCog />, label: "Settings" },
     { path: "/search", icon: <FaSearch />, label: "Search" },
+   { path: "/wallet", icon: <Wallet />, label: "Wallet" },
   ];
 
   const toggleMobileSidebar = () => {

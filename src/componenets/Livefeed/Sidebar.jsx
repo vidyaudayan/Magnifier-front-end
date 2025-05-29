@@ -11,7 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Microscope,
-  Menu, LogOut, Loader2
+  Menu, LogOut, Loader2,Wallet,
 } from 'lucide-react';
 import logo from "../../assets/Images/logonew.jpeg"
 import { useDispatch } from 'react-redux';
@@ -29,6 +29,7 @@ const navItems = [
   { icon: Bot, label: 'ElectoAI', path: '/livefeed/electoai' },
   { icon: Bell, label: 'Notifications', path: '/livefeed/notifications' },
   { icon: Settings, label: 'Settings', path: '/livefeed/settings' },
+  { icon: Wallet, label: 'Wallet', path: '/livefeed/wallet' },
 ];
 
 const Sidebar = ({ isCollapsed, onToggle }) => {

@@ -96,7 +96,7 @@ export const LoginPage = () => {
 ));
 dispatch(setUserDetails(user));
 console.log('Dispatched user data:', user);
-}*/}
+}
 
       // Initialize wallet
       try {
@@ -114,7 +114,7 @@ console.log('Dispatched user data:', user);
         // You might want to store this in state/context/Redux
       } catch (walletError) {
         console.error("Error initializing wallet:", walletError);
-      }
+      }*/}
 
       // Show success message
       toast({
