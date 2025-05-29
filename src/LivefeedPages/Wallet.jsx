@@ -180,7 +180,7 @@ const walletAmount = useSelector((state) => state.user.walletAmount);
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 dark:bg-slate-800">
       <div className="flex items-center space-x-3 mb-8">
         <Coins className="w-8 h-8 text-yellow-500" />
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Points</h1>

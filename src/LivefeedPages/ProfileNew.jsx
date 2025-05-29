@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 
 import { toast } from 'react-toastify';
-import { setUserDetails, updatePostReaction, updateMetrics } from '../features/user/userSlice';
+import { setUserDetails, updatePostReaction, updateMetrics,setPoints } from '../features/user/userSlice';
 import { HorizontalStats } from '../componenets/Livefeed/HorizontalStats';
 
 const ProfileNew = () => {
@@ -64,7 +64,28 @@ const ProfileNew = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const imgRef = useRef(null);
   const profilePicInputRef = useRef(null);
-  const handleFileChange = (event) => {
+ const rechargedPoints = useSelector((state) => state.user.rechargedPoints);
+const earnedPoints = useSelector((state) => state.user.earnedPoints);
+console.log("Recharged:", rechargedPoints, "Earned:", earnedPoints);
+
+const getCoverPhotoHeight = () => {
+    if (window.innerWidth < 640) return '12rem'; // mobile
+    if (window.innerWidth < 1024) return '16rem'; // tablet
+    return '20rem'; // desktop
+  };
+
+  const [coverPhotoHeight, setCoverPhotoHeight] = useState(getCoverPhotoHeight());
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCoverPhotoHeight(getCoverPhotoHeight());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+const handleFileChange = (event) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const reader = new FileReader();
@@ -266,11 +287,13 @@ const ProfileNew = () => {
         profilePic: '',
         coverPic: '',
         bio: '',
-        walletAmount: 0
+        walletAmount: 0,  rechargedPoints: '',
+  warnedPoints: ''
       };
 
       setUser(userData);
       dispatch(setUserDetails(userData));
+      dispatch(setPoints(userData));
 
       // Fetch posts - handle case where user has no posts
       try {
@@ -532,12 +555,12 @@ const ProfileNew = () => {
   };
 
   const renderPosts = () => (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-6 sm:space-y-6 pb-6 sm:pb-10">
       {posts.length > 0 ? (
         posts.map((post) => (
           <div key={post._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             {/* Post Header */}
-            <div className="p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
+            <div className="p-3 sm:p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-center space-x-3">
                 <img
                   src={user?.profilePic || "/default-profile.png"}
@@ -602,7 +625,7 @@ const ProfileNew = () => {
                 <img
                   src={post.mediaUrl}
                   alt="Post media"
-                  className="w-full h-auto max-h-96 object-contain rounded-lg mt-4"
+                  className="w-3/4  px-8 h-[450px] object-cover rounded-xl mt-4"
                 />
               )}
               {post.postType === "VoiceNote" && post.mediaUrl && (
@@ -742,7 +765,7 @@ const ProfileNew = () => {
     const mediaPosts = posts.filter(post => post.postType === "Photo" || post.postType === "VoiceNote");
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3  md:grid-cols-3  gap-4">
         {mediaPosts.length > 0 ? (
           mediaPosts.map((post) => (
             <div key={post._id} className="relative group">
@@ -836,7 +859,8 @@ const ProfileNew = () => {
             <span className="text-xs text-gray-500 dark:text-gray-400">Wallet</span>
           </div>
           <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-            {user?.walletAmount?.toLocaleString() || 0}
+            {/*{user?.walletAmount?.toLocaleString() || 0}*/}
+    {rechargedPoints+ earnedPoints}
           </p>
         </div>
       </div>
@@ -853,9 +877,9 @@ const ProfileNew = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50  dark:bg-gray-900">
       {/* Cover Image */}
-    <div className="relative h-48 md:h-64 w-full">
+    <div className="relative  h-48 md:h-64 w-full">
   {user.coverPic ? (
     <img
       src={user.coverPic}
@@ -912,7 +936,7 @@ const ProfileNew = () => {
 </div>
 
       {/* Profile Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 dark:bg-slate-800">
         <div className="relative -mt-16">
           <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-end">
             {/* Avatar */}
@@ -998,7 +1022,7 @@ const ProfileNew = () => {
           <HorizontalStats posts={posts} user={user} />
 
           {/* Tabs Navigation */}
-          <div className="mt-8 border-b border-gray-200 dark:border-gray-700">
+          <div className="mt-8  border-b border-gray-200 dark:border-gray-700">
             <nav className="flex space-x-8">
               {tabs.map((tab) => (
                 <button

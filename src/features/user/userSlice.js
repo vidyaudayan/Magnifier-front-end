@@ -12,6 +12,8 @@ export const userSlice = createSlice({
     postCount: 0,
     posts: [],
      availableStates: [],
+     rechargedPoints: 0, // ✅ add this
+  earnedPoints: 0 
   },
   reducers: {
     setUserDetails: (state, action) => {
@@ -25,7 +27,9 @@ export const userSlice = createSlice({
         _id: user.id || user._id,
         username: user.username || user.userName || '',
         profilePic: user.profilePic || user.profilePicture || '',
-        walletAmount: user.walletAmount || 0, state: user.state || '',
+        //walletAmount: user.walletAmount || 0, state: user.state || '',
+     rechargedPoints: user.rechargedPoints || 0,
+  warnedPoints: user.warnedPoints || 0,
       };
       
       localStorage.setItem('user', JSON.stringify(state.user));
@@ -49,6 +53,23 @@ export const userSlice = createSlice({
         console.log('Cover picture updated:', action.payload);
       }
     },
+
+    setPoints: (state, action) => {
+  const { rechargedPoints, earnedPoints } = action.payload;
+
+  state.rechargedPoints = rechargedPoints || 0;
+  state.earnedPoints = earnedPoints || 0;
+
+  // Also save to user object if needed
+  if (state.user) {
+    state.user.rechargedPoints = rechargedPoints || 0;
+    state.user.earnedPoints = earnedPoints || 0;
+    localStorage.setItem('user', JSON.stringify(state.user));
+  }
+
+  console.log("Recharged:", rechargedPoints, "Warned:", earnedPoints);
+},
+
      updateWalletData: (state, action) => {
       const { walletAmount } = action.payload;
       state.walletAmount = walletAmount;
@@ -449,7 +470,7 @@ setLoading: (state, action) => {
 });
 
  
-export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments ,setLoading, updateWalletData,} = userSlice.actions;
+export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments ,setLoading, updateWalletData,setPoints} = userSlice.actions;
 
 export default userSlice.reducer;
 

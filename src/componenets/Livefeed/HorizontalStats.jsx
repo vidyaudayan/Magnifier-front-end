@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { FileText,MessageSquare,ThumbsUp,ThumbsDown,Eye,Wallet,ChevronLeft, ChevronRight} from 'lucide-react';
 
 export const HorizontalStats = ({ posts, user }) => {
     const [scrollPosition, setScrollPosition] = useState(0);
     const statsRef = useRef(null);
-  
+  const rechargedPoints = useSelector((state) => state.user.rechargedPoints);
+  const earnedPoints = useSelector((state) => state.user.earnedPoints);
     const stats = [
       {
         icon: <FileText className="w-5 h-5 text-blue-500" />,
@@ -35,7 +37,7 @@ export const HorizontalStats = ({ posts, user }) => {
       {
         icon: <Wallet className="w-5 h-5 text-yellow-500" />,
         label: "Wallet",
-        value: user?.walletAmount?.toLocaleString() || 0
+        value:  rechargedPoints+ earnedPoints
       }
     ];
   

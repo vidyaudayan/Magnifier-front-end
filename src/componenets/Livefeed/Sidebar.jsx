@@ -11,7 +11,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Microscope,
-  Menu, LogOut, Loader2,Wallet,
+  Menu, 
+  LogOut, 
+  Loader2,
+  Wallet,
+  X
 } from 'lucide-react';
 import logo from "../../assets/Images/logonew.jpeg"
 import { useDispatch } from 'react-redux';
@@ -28,14 +32,16 @@ const navItems = [
   { icon: Search, label: 'Search', path: '/livefeed/search' },
   { icon: Bot, label: 'ElectoAI', path: '/livefeed/electoai' },
   { icon: Bell, label: 'Notifications', path: '/livefeed/notifications' },
+   { icon: Wallet, label: 'Wallet', path: '/livefeed/wallet' },
   { icon: Settings, label: 'Settings', path: '/livefeed/settings' },
-  { icon: Wallet, label: 'Wallet', path: '/livefeed/wallet' },
+ 
 ];
 
 const Sidebar = ({ isCollapsed, onToggle }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     if (window.confirm("Are you sure you want to log out?")) {
@@ -60,23 +66,25 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         toast.error("Logout failed. Please try again.");
       } finally {
         setIsLoggingOut(false);
+        setIsMobileMenuOpen(false);
       }
     }
   };
+
   return (
     <>
       {/* Desktop Sidebar */}
       <div
         className={`hidden md:block ${isCollapsed ? 'w-16' : 'w-64'
-          } bg-white dark:bg-gray-800 h-screen fixed left-0 transition-all duration-300 ease-in-out shadow-lg`}
+          } bg-white dark:bg-gray-800 h-screen fixed left-0 transition-all z-40 duration-300 ease-in-out shadow-lg`}
       >
         <div className="p-4 flex items-center justify-between border-b dark:border-gray-700">
           <div className={`flex items-center ${isCollapsed ? 'justify-center w-full' : ''}`}>
-           <img src={logo} className="h-10 w-10 " alt="" />
+            <img src={logo} className="h-10 w-10 " alt="" />
            
             {!isCollapsed && (
               <span className="ml-2 text-xl font-bold text-gray-800 dark:text-white">
-                 Magnifier
+                Magnifier
               </span>
             )}
           </div>
@@ -93,10 +101,10 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           </button>
         </div>
 
-        <nav className="mt-6 flex-1">
+        <nav className="mt-6  flex-1">
           {navItems.map((item) => (
             <NavLink
-            end
+              end
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
@@ -112,14 +120,14 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           ))}
         </nav>
 
-        {/* Logout Button - Desktop */}
-        <div className="p-4  border-t dark:border-gray-700">
+        {/* Logout Button - Desktop Only */}
+        <div className="p-4 border-t dark:border-gray-700">
           <button
-            onClick={handleLogout} disabled={isLoggingOut}
-            className={`flex ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''} items-center w-full mt-56  py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${isCollapsed ? 'justify-center' : ''
+            onClick={handleLogout} 
+            disabled={isLoggingOut}
+            className={`flex ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''} items-center w-full mt-56 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${isCollapsed ? 'justify-center' : ''
               }`}
           >
-           
             {isLoggingOut ? (
               <Loader2 className="h-5 w-5" />
             ) : (
@@ -136,19 +144,26 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       <div className="md:hidden fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg z-50">
         <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
           <div className="flex items-center space-x-2">
-          <img src={logo} className="h-10 w-10 " alt="" />
+            <img src={logo} className="h-10 w-10 " alt="" />
             <span className="text-lg font-bold text-gray-800 dark:text-white">
-               Magnifier
+              Magnifier
             </span>
           </div>
-          <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-            <Menu className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            ) : (
+              <Menu className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            )}
           </button>
         </div>
         <div className="flex justify-around overflow-x-auto hide-scrollbar py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
           {navItems.map((item) => (
             <NavLink
-            end
+              end
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
@@ -161,16 +176,25 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
               <item.icon className="h-6 w-6" />
             </NavLink>
           ))}
-
-          {/* Logout Button - Mobile */}
-          <button
-            onClick={handleLogout}
-            className="flex flex-col items-center p-2 rounded-lg text-red-600 dark:text-red-400"
-          >
-            <LogOut className="h-6 w-6" />
-            <span className="text-xs mt-1">Logout</span>
-          </button>
         </div>
+
+        {/* Mobile Menu (for logout) */}
+        {isMobileMenuOpen && (
+          <div className="absolute right-4 top-16 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 w-48 border dark:border-gray-700 z-50">
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className={`flex items-center w-full px-4 py-3 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {isLoggingOut ? (
+                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+              ) : (
+                <LogOut className="h-5 w-5 mr-3" />
+              )}
+              <span>Logout</span>
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
