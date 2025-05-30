@@ -79,6 +79,11 @@ import { LoginDashboard } from "./pages/LoginPage/Logindashboard.jsx";
 import DashboardSelector from "./pages/DashboardSelector.jsx";
 import DashboardViewer from "./pages/DashboardViewer.jsx";
 import Wallet from "./LivefeedPages/Wallet.jsx";
+import WebmagnifierLearnmore from "./componenets/LearnMore/WebmagnifierLearnmore.jsx";
+import ElectoaiLearnmore from "./componenets/LearnMore/ElectoaiLearnmore.jsx";
+import VotermagnifierLearnmore from "./componenets/LearnMore/VotermagnifierLearnmore.jsx";
+import MediamagnifierLearnmore from "./componenets/LearnMore/MediamagnifierLearnmore.jsx";
+import Bulletin from "./componenets/Bulletin.jsx";
 
 
 
@@ -111,6 +116,26 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element:<LoginPage/>,
+      },
+       {
+        path:"/webmagnifierlearnmore",
+        element:<WebmagnifierLearnmore/>
+
+      },
+      {
+        path:"/electoailearnmore",
+        element: <ElectoaiLearnmore/>
+
+      },
+      {
+        path:"/votermagnifierlearnmore",
+        element:<VotermagnifierLearnmore/>
+
+      },
+      {
+        path:"/mediamagnifierlearnmore",
+        element:<MediamagnifierLearnmore/>
+
       },
       {
         path: "/logindashboard",
@@ -249,6 +274,11 @@ const router = createBrowserRouter([
       {
         path: "/faq",
         element:<FeatureSection/>,
+      },
+       {
+        path:"/bulletin",
+        element:<Bulletin/>
+
       },
       {
         path: "/service",

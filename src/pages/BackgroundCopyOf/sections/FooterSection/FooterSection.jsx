@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "../../../../componenets/Welcome/button";
 import { Separator } from "../../../../componenets/Welcome/separator";
 import logo from "../../../../assets/Images/logo.jpg"
+import { Link } from "react-router-dom";
 export const FooterSection = () => {
 
   const quickLinks = [
@@ -14,6 +15,7 @@ export const FooterSection = () => {
     { title: "Terms & Conditions", href: "/terms-condition", type: "page" },
     { title: "User Guidelines", href: "/user-guidelines", type: "page" },
     { title: "Apply for job", href: "/job-application", type: "page" },
+    {title:"Bulletin", href:"/bulletin",type:"page"}
   ];
   const serviceLinks = [
     { title: "Web Magnifier", href: "#" },
@@ -36,7 +38,7 @@ export const FooterSection = () => {
   return (
     <footer className="w-full py-16 bg-transparent">
       <div className="container max-w-6xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-40">
           {/* Logo and CTA section */}
           <div className="col-span-1">
             <div className="mb-4">
@@ -72,23 +74,24 @@ export const FooterSection = () => {
             <h3 className="text-xl text-[#292929] font-normal tracking-[-0.60px] leading-[30px] mb-6">
               Quick links
             </h3>
-            <ul className="space-y-4">
-              {quickLinks.map((link, index) => (
-                <li key={index}>
-                  <a onClick={(e) => {
-                    if (link.type === "hash") {
-                      e.preventDefault();
-                      document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                    href={link.href}
-                    className="text-lg text-[#636363] tracking-[-0.36px] leading-7 hover:text-blue-700 transition-colors"
-                  >
-                    {link.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
+           <ul className="grid grid-cols-2 gap-x-28 gap-y-4">
+  {quickLinks.map((link, index) => (
+    <li key={index}>
+      <a
+        onClick={(e) => {
+          if (link.type === "hash") {
+            e.preventDefault();
+            document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+        href={link.href}
+        className="text-lg text-[#636363] tracking-[-0.36px] leading-7 hover:text-blue-700 transition-colors"
+      >
+        {link.title}
+      </a>
+    </li>
+  ))}
+</ul>
           </div>
 
           {/* Services section */}
@@ -132,6 +135,19 @@ export const FooterSection = () => {
             </ul>
 
           </div>
+
+           {/* <div className="col-span-1">
+            <h3 className="text-xl text-[#292929] font-normal tracking-[-0.60px] leading-[30px] mb-6">
+              <Link to={"/bulletin"}>
+                Bulletin
+              </Link>
+             
+            </h3>
+      
+
+          </div> */}
+
+          
         </div>
 
         <Separator className="my-8 bg-[#292929] opacity-10" />
