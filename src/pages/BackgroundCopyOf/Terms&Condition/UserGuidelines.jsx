@@ -69,14 +69,14 @@ const UserGuidelines = () => {
   const navigate = useNavigate()
   return (
     <>
-      <Button
+      {/* <Button
         onClick={() => navigate("/")}
         variant="ghost"
         className="mb-6 m-4 text-white flex bg-blue-800 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Home
-      </Button>
+      </Button> */}
       <div className="max-w-md mx-auto flex mt-3">
 
       </div>

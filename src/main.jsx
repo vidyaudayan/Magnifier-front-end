@@ -74,20 +74,27 @@ import { LanguageProvider } from './context/LanguageContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import SearchPostDisplayPage from './LivefeedPages/SearchPostDisplayPage.jsx';
 import PricingPage from './LivefeedPages/PricingPage.jsx';
+
 import SharePostDisplayPage from "./LivefeedPages/SharePostDisplayPage.jsx"
 import { LoginDashboard } from "./pages/LoginPage/Logindashboard.jsx";
 import DashboardSelector from "./pages/DashboardSelector.jsx";
 import DashboardViewer from "./pages/DashboardViewer.jsx";
 import Wallet from "./LivefeedPages/Wallet.jsx";
+
+
+
+
 import WebmagnifierLearnmore from "./componenets/LearnMore/WebmagnifierLearnmore.jsx";
 import ElectoaiLearnmore from "./componenets/LearnMore/ElectoaiLearnmore.jsx";
 import VotermagnifierLearnmore from "./componenets/LearnMore/VotermagnifierLearnmore.jsx";
 import MediamagnifierLearnmore from "./componenets/LearnMore/MediamagnifierLearnmore.jsx";
+
 import Bulletin from "./componenets/Bulletin.jsx";
 import { MediaMagnifierLogin } from "./pages/LoginPage/MediaMagnifierLogin.jsx";
 import { ElectoAILogin } from "./pages/LoginPage/ElectoAILogin.jsx";
 import Subscription from "./componenets/Subscription.jsx";
 import { ChatProvider } from "./context/ChatContex.jsx";
+
 
 export const server = "http://localhost:5000"
 
@@ -171,6 +178,42 @@ const router = createBrowserRouter([
 
 
       {
+        path:"/webmagnifierlearnmore",
+        element:<WebmagnifierLearnmore/>
+
+      },
+      {
+        path:"/electoailearnmore",
+        element: <ElectoaiLearnmore/>
+
+      },
+      {
+        path:"/votermagnifierlearnmore",
+        element:<VotermagnifierLearnmore/>
+
+      },
+      {
+        path:"/mediamagnifierlearnmore",
+        element:<MediamagnifierLearnmore/>
+
+      },
+      
+      {
+        path:"/logindashboard",
+        element:<LoginDashboard/>
+
+      },
+       {
+        path:"/selectdashboard",
+        element:<DashboardSelector/>
+
+      },
+      {
+        path:"/dashboard/:type",
+        element:<DashboardViewer/>
+
+      },
+      {
         path: "/verify",
         element: <VerifyPage />,
       },
@@ -247,6 +290,11 @@ const router = createBrowserRouter([
       {
         path: "/faq",
         element: <FAQ />,
+      },
+      {
+        path:"/bulletin",
+        element:<Bulletin/>
+
       },
       {
         path: "/user-guidelines",

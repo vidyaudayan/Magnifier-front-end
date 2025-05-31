@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 import { MdArrowOutward } from "react-icons/md";
@@ -309,5 +310,6 @@ const navigate=useNavigate()
     </div>
   );
 };
+
 
 export default Slider;
