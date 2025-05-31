@@ -1,12 +1,22 @@
-
-
 import { createSlice } from '@reduxjs/toolkit';
+const userFromLocalStorage = JSON.parse(localStorage.getItem('user'));
+
+const normalizedUser = userFromLocalStorage
+  ? {
+      ...userFromLocalStorage,
+      _id: userFromLocalStorage.id || userFromLocalStorage._id || '',
+      username: userFromLocalStorage.username || userFromLocalStorage.userName || '',
+      profilePic: userFromLocalStorage.profilePic || userFromLocalStorage.profilePicture || '',
+      walletAmount: userFromLocalStorage.walletAmount || 0,
+      state: userFromLocalStorage.state || '',
+    }
+  : null;
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    user: normalizedUser,
     loading: false,
-    walletAmount: 0,
+    walletAmount: normalizedUser?.walletAmount || 0,
     totalLikes: 0,
     totalDislikes: 0,
     postCount: 0,
@@ -26,7 +36,7 @@ export const userSlice = createSlice({
         ...user,      // Add/update with new data
         _id: user.id || user._id,
         username: user.username || user.userName || '',
-        profilePic: user.profilePic || user.profilePicture || '',
+        profilePic: user.profilePic || user.profilePicture || '',state: user.state || '',
         //walletAmount: user.walletAmount || 0, state: user.state || '',
      rechargedPoints: user.rechargedPoints || 0,
   warnedPoints: user.warnedPoints || 0,

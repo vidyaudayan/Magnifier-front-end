@@ -4,25 +4,25 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
-import axios from "axios"; // Make sure to import axios
+import axios from "axios";
 import { Button } from "../../componenets/Welcome/button";
 import { Card, CardContent } from "../../componenets/Welcome/card";
 import { Checkbox } from "../../componenets/Welcome/checkbox";
 import { useToast } from "../../componenets/Welcome/use-toast";
 import { Toaster } from "../../componenets/Welcome/toaster";
-import { useDispatch } from "react-redux"; // Import useDispatch if using Redux
+import { useDispatch } from "react-redux";
 import { setUserDetails } from "../../features/user/userSlice";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(6, "Password must be at least 8 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   rememberMe: z.boolean().optional(),
 });
 
 export const LoginDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const dispatch = useDispatch(); // Initialize dispatch if using Redux
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,63 +42,44 @@ export const LoginDashboard = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    console.log("Login Data:", data);
-
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/user/login`,
         {
           username: data.username,
-          password: data.password
+          password: data.password,
+          appName: "voterMagnifier",
         },
         {
-          withCredentials: true
+          withCredentials: true,
         }
       );
 
       const { token, user } = response.data;
-      console.log('Full API Response:', response.data);
-      // Handle remember me functionality if needed
+
       if (data.rememberMe) {
-        localStorage.setItem('rememberMe', 'true');
-      }
-      localStorage.setItem('token', token);
-      // Save token to localStorage
-      if (token) {
-        console.log("Received Token:", token);
-        localStorage.setItem('token', token);
+        localStorage.setItem("rememberMe", "true");
       }
 
-      console.log("User payload before dispatch:", user);
+      if (token) {
+        localStorage.setItem("token", token);
+      }
 
       if (user && user.id && user.username) {
         dispatch(setUserDetails(user));
-      } else {
-        console.warn("User data is incomplete or undefined:", user);
       }
 
-      dispatch(setUserDetails(user));
+      // ✅ New: Show toast if user is not subscribed
+      if (!user?.subscribed) {
+        toast({
+          title: "Subscription Required",
+          description: "You are not subscribed. Please subscribe to access full features.",
+          variant: "warning",
+        });
+        navigate("/subscription")
+      }
+      return
 
-      // Dispatch user details to Redux store if using Redux
-      {/*if (user) {
-        dispatch(setUserDetails(user));
-      }*/}
-
-      // Dispatch user details to Redux store
-      {/*if (user) {
-  dispatch(setUserDetails({
-    _id: user.id, // Ensure this matches your backend
-    username: user.username,
-    profilePic: user.profilePic, // or whatever your backend calls it
-    // Include other necessary fields
-  }
-
-));
-dispatch(setUserDetails(user));
-console.log('Dispatched user data:', user);
-}*/}
-
-      // Initialize wallet
       try {
         const walletResponse = await axios.post(
           `${import.meta.env.VITE_BASE_URL}/user/wallet`,
@@ -109,29 +90,26 @@ console.log('Dispatched user data:', user);
             },
           }
         );
-        const { walletAmount: initializedAmount } = walletResponse.data;
-        console.log("Wallet Initialized:", initializedAmount);
-        // You might want to store this in state/context/Redux
+        const { walletAmount } = walletResponse.data;
+        console.log("Wallet Initialized:", walletAmount);
       } catch (walletError) {
         console.error("Error initializing wallet:", walletError);
       }
 
-      // Show success message
       toast({
         title: "Success",
         description: "You are logged in",
         variant: "default",
       });
 
-      // Reset form and navigate
       reset();
-      navigate("/selectdashboard");
-
+      navigate("/dashboard/voter");
     } catch (error) {
-      console.error('Error signing in:', error);
+      console.error("Error signing in:", error);
       toast({
         title: "Error",
-        description: error.response?.data?.message || 'An error occurred during sign-in.',
+        description:
+          error.response?.data?.message || "An error occurred during sign-in.",
         variant: "destructive",
       });
     } finally {
@@ -139,16 +117,8 @@ console.log('Dispatched user data:', user);
     }
   };
 
-  const scrollToStateSelection = () => {
-    const stateSection = document.getElementById("state-selection");
-    if (stateSection) {
-      stateSection.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-
       <Button
         onClick={() => navigate("/")}
         className="mb-6 flex bg-blue-900 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
@@ -158,8 +128,6 @@ console.log('Dispatched user data:', user);
       </Button>
 
       <div className="max-w-md mx-auto">
-
-
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -170,8 +138,6 @@ console.log('Dispatched user data:', user);
         <Card className="rounded-lg shadow-lg">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Rest of your form remains the same */}
-              {/* Username */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Username
@@ -189,7 +155,6 @@ console.log('Dispatched user data:', user);
                 )}
               </div>
 
-              {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Password
@@ -220,7 +185,6 @@ console.log('Dispatched user data:', user);
                 )}
               </div>
 
-              {/* Remember me + forgot password */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Checkbox
@@ -246,7 +210,6 @@ console.log('Dispatched user data:', user);
                 </button>
               </div>
 
-              {/* Submit */}
               <Button
                 type="submit"
                 disabled={isLoading}
@@ -259,13 +222,11 @@ console.log('Dispatched user data:', user);
                 )}
               </Button>
 
-              {/* Sign up link */}
               <div className="text-center">
                 <p className="text-sm text-gray-600">
                   Don't have an account?{" "}
                   <button
                     type="button"
-                    //onClick={scrollToStateSelection}
                     onClick={() => navigate("/")}
                     className="text-[#578cff] hover:text-[#4171ff] font-medium"
                   >

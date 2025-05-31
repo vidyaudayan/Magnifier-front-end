@@ -16,21 +16,22 @@ export const BackgroundCopyOf = () => {
       {/* Fixed Navigation */}
       <NavigationSection />
       
-      <div className="bg-white w-full max-w-[1440px] relative pt-[100px] md:pt-[84px]">
+      <div className="bg-white w-full max-w-[1440px] relative pt-[100px] md:pt-[84px] ">
         {/* Header below Navigation */}
         <HeaderSection />
 
-     
 
-        {/* Services Section */}
-        <section id="services" className="scroll-mt-[100px] md:scroll-mt-[84px]">
+         <section id="services" className="scroll-mt-[100px] md:scroll-mt-[84px] -mt-28  md:-mt-36 relative z-10">
           <DashboardSection />
-          {/*<CallToActionSection />*/}
+          {/* <CallToActionSection /> */}
         </section>
 
-           {/* State Selection Section */}
+        {/* State Selection Section */}
         <StateSelectionSection />
 
+
+        {/* Services Section */}
+       
 
         {/* Features Section */}
         <section id="features" className="scroll-mt-[100px] md:scroll-mt-[84px]">

@@ -38,7 +38,7 @@ const navigate=useNavigate()
       return {
         ...defaultConfig,
         slideWidth: containerWidth - 40,
-        slideHeight: 400,
+        slideHeight: 300,
         gap: 20,
         visibleSlides: 1,
         textSize: {
@@ -113,9 +113,9 @@ const navigate=useNavigate()
 
   const originalSlides = [
     { id: 1, content: 'Web Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/login',learnmoreURL:'/webmagnifierlearnmore' },
-    { id: 2, content: 'ElectoAI', image: '../src/assets/Images/image-11.png',loginURL:'/login',learnmoreURL:'/electoailearnmore' },
-    { id: 3, content: 'Voter Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/login',learnmoreURL:'/votermagnifierlearnmore' },
-    { id: 4, content: 'Media Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/login',learnmoreURL:'/mediamagnifierlearnmore' },
+    { id: 2, content: 'ElectoAI', image: '../src/assets/Images/image-11.png',loginURL:'/electoailogin',learnmoreURL:'/electoailearnmore' },
+    { id: 3, content: 'Voter Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/logindashboard',learnmoreURL:'/votermagnifierlearnmore' },
+    { id: 4, content: 'Media Magnifier', image: '../src/assets/Images/image-11.png',loginURL:'/mediamagnifierlogin',learnmoreURL:'/mediamagnifierlearnmore' },
   ];
 
   const slides = [
@@ -250,7 +250,7 @@ const navigate=useNavigate()
                       adipisicing elit. Consectetur, expedita
                     </h1>
                   </div>
-                  <div className='flex flex-col sm:flex-row justify-around gap-0 sm:gap-6'>
+                  <div className='flex  flex-row justify-around gap-0 sm:gap-6'>
   {/* Discover button with hover effect */}
   <div 
   className="my-2 sm:my-auto lg:my-14 flex items-center cursor-pointer group"
@@ -282,7 +282,7 @@ const navigate=useNavigate()
                 </div>
                 
                 {/* Image positioned absolutely at bottom */}
-                <div className="absolute bottom-[-85px] left-4 right-4 z-10">
+                <div className="absolute bottom-0  md:bottom-[-85px]  left-4 right-4 z-10">
                   <img src={slide.image} alt="" className="w-full h-auto rounded-xl sm:rounded-2xl" />
                 </div>
               </div>
@@ -290,16 +290,16 @@ const navigate=useNavigate()
           ))} 
         </div>
       </div>
-      <div className={`flex justify-center space-x-2 sm:space-x-3 ${spacing.navBottom || ''} mt-[0px]`}>
+       <div className={`flex flex-wrap justify-center gap-3 sm:gap-4 ${spacing.navBottom} mt-4`}>
         {originalSlides.map((slide, index) => {
           const isActive = index === (currentIndex - 2 + originalSlides.length) % originalSlides.length;
           return (
             <span
               key={slide.id}
               onClick={() => !isAnimating && handleDotClick(index)}
-              className={`cursor-pointer transition-colors duration-200 ${
-                isActive ? 'text-black font-medium' : 'text-gray-500 hover:text-gray-700'
-              } ${isAnimating ? 'opacity-50' : ''}`}
+              className={`cursor-pointer transition-colors duration-200 text-sm sm:text-base
+                ${isActive ? 'text-black font-bold' : 'text-gray-500 hover:text-gray-700'} 
+                ${isAnimating ? 'opacity-50' : ''}`}
             >
               {slide.content}
             </span>
