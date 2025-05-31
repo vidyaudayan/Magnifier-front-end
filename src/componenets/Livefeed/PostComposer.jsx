@@ -237,6 +237,8 @@ const PostComposer = ({ user }) => {
       setLoading(true);
       const formData = new FormData();
       formData.append('content', content);
+      formData.append('state', user.state); 
+      formData.append('vidhanSabha', user.vidhanSabha);
       formData.append('status', 'draft');
       formData.append('stickyDuration', selectedDuration);
       if (photo) formData.append('media', photo);

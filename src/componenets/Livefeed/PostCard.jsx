@@ -11,7 +11,7 @@ import {
   MoreHorizontal,
   CheckCircle2,
   ExternalLink,
-  Mic,
+  Mic,Flag,
   Image as ImageIcon,
   ChevronDown,
   ChevronUp
@@ -20,7 +20,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { updateMetrics, updatePostReaction, setPosts, updatePostComments } from '../../features/user/userSlice';
+import { updateMetrics, updatePostReaction, setPosts, updatePostComments ,updateWalletData} from '../../features/user/userSlice';
 import { useSelector } from 'react-redux';
 import { Edit3, Trash2 } from 'lucide-react';
 
@@ -29,8 +29,7 @@ const PostCard = ({
   user,
   highlightPostId,
   selectedUser,
-  expandedPosts,
-  handleViewMore
+ 
 }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.user);
@@ -40,8 +39,13 @@ const PostCard = ({
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [displayCount, setDisplayCount] = useState(6);
   const [loading, setLoading] = useState(false);
+
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+const [showReportDialog, setShowReportDialog] = useState(false);
+const [reportReason, setReportReason] = useState('');
+const [selectedReportType, setSelectedReportType] = useState('');
   const postRef = useRef(null);
-  console.log('Redux currentUser in component:', currentUser);
+  //console.log('Redux currentUser in component:', currentUser);
   const currentPosts = useSelector(state => state.user.posts);
   const posts = useSelector((state) => state.user.posts);
   PostCard.defaultProps = {
@@ -66,7 +70,34 @@ const PostCard = ({
   };
   const [isUserLoaded, setIsUserLoaded] = useState(false);
 
-  
+    const [expandedPosts, setExpandedPosts] = useState({});
+   
+const handleReportPost = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/post/report/${post._id}`,
+      { 
+        reason: reportReason,
+        reportType: selectedReportType 
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.success("Post reported successfully. Admin will review it.");
+    setShowReportDialog(false);
+    setReportReason('');
+    setSelectedReportType('');
+  } catch (error) {
+    console.error("Error reporting post:", error);
+    toast.error(error.response?.data?.message || "Failed to report post");
+  }
+};
+    const handleViewMore = (postId) => {
+        setExpandedPosts((prev) => ({
+            ...prev,
+            [postId]: !prev[postId], // Toggle the expanded state
+        }));
+    };
  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -234,6 +265,14 @@ const PostCard = ({
         postCount: response.data.postCount
       }));
 
+      if (response.data.earnedPoints !== undefined) {
+        dispatch(updateWalletData({
+          earnedPoints: response.data.earnedPoints,
+          rechargedPoints: response.data.rechargedPoints,
+          // Include transactions if needed
+        }));
+      }
+
     } catch (error) {
       if (error.response) {
         if (error.response.status === 400) {
@@ -266,37 +305,7 @@ const PostCard = ({
     }
   };
 
-  {/*const handleEditComment = async (postId, commentId, newCommentText) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.patch(
-        `${import.meta.env.VITE_BASE_URL}/post/${postId}/comment/${commentId}`,
-        { comment: newCommentText },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      // Update the posts state with the edited comment
-      //setPosts(posts.map(post =>
-        //post._id === postId ? response.data : post
-      //));
-
-      const post = posts.find(p => p._id === postId);
-    if (!post) throw new Error('Post not found');
-    const updatedComments = post.comments.map(comment =>
-      comment._id === commentId ? { ...comment, text: newCommentText } : comment
-    );
-
-    // Dispatch the action to update the comments list for the post
-    dispatch(updatePostComments({ postId, comments: updatedComments }));
-    
-    const updatedPost = posts.find(p => p._id === postId);
-    setComments(updatedPost.comments);
-      toast.success("Comment updated successfully");
-    } catch (error) {
-      console.error("Error editing comment:", error);
-      toast.error(error.response?.data?.message || "Failed to edit comment");
-    }
-  };*/}
+  
   const handleEditComment = async (postId, commentId, newCommentText) => {
     try {
       const token = localStorage.getItem("token");
@@ -439,17 +448,98 @@ const PostCard = ({
             </div>
           </div>
         </div>
-        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 -mt-1">
-          <MoreHorizontal className="w-5 h-5" />
+       <div className="relative">
+  <button 
+    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 -mt-1"
+    onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+  >
+    <MoreHorizontal className="w-5 h-5" />
+  </button>
+  
+  {showOptionsMenu && (
+    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
+      <div className="py-1">
+        {currentUser?._id !== post.userId?._id && (
+          <button
+            onClick={() => {
+              setShowOptionsMenu(false);
+              setShowReportDialog(true);
+            }}
+            className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
+          >
+            <Flag className="w-4 h-4 mr-2" />
+            Report Post
+          </button>
+        )}
+      </div>
+    </div>
+  )}
+</div>
+
+{showReportDialog && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
+      <h3 className="text-lg font-medium mb-4 dark:text-white">Report Post</h3>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">
+        Please select the reason for reporting this post:
+      </p>
+      
+      <div className="space-y-2 mb-4">
+        {['Inappropriate Content', 'Hate Speech', 'Harassment', 'Spam', 'False Information', 'Other'].map((type) => (
+          <label key={type} className="flex items-center space-x-2">
+            <input
+              type="radio"
+              name="reportType"
+              value={type}
+              checked={selectedReportType === type}
+              onChange={() => setSelectedReportType(type)}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+            />
+            <span className="text-gray-700 dark:text-gray-300">{type}</span>
+          </label>
+        ))}
+      </div>
+      
+      {selectedReportType === 'Other' && (
+        <textarea
+          placeholder="Please specify the reason..."
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded mb-4 dark:bg-gray-700 dark:text-white"
+          rows={3}
+          value={reportReason}
+          onChange={(e) => setReportReason(e.target.value)}
+        />
+      )}
+      
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={() => {
+            setShowReportDialog(false);
+            setReportReason('');
+            setSelectedReportType('');
+          }}
+          className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+        >
+          Cancel
         </button>
+        <button
+          onClick={handleReportPost}
+          disabled={!selectedReportType || (selectedReportType === 'Other' && !reportReason)}
+          className="px-4 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:bg-red-300 disabled:cursor-not-allowed"
+        >
+          Submit Report
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
   
       {/* Post Content */}
       <div className="p-5">
         <p className="text-gray-900 dark:text-white text-[15px] leading-relaxed whitespace-pre-wrap">
-          {post.content && post.content.split(" ").length > 8 && !expandedPosts[post._id] ? (
+          {post.content && post.content.split(" ").length > 18 && !expandedPosts[post._id] ? (
             <>
-              {post.content.split(" ").slice(0, 8).join(" ")}...{" "}
+              {post.content.split(" ").slice(0, 18).join(" ")}...{" "}
               <button
                 className="text-blue-500 hover:underline text-xs"
                 onClick={() => handleViewMore(post._id)}
@@ -501,6 +591,9 @@ const PostCard = ({
           <span className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 cursor-default">
             {post.dislikes || 0} Dislikes
           </span>
+           <span className="text-sm text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 cursor-default">
+      {post.impressions || 0} Impressions
+    </span>
           <button
             onClick={() => setCommentsVisible(!commentsVisible)}
             className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"

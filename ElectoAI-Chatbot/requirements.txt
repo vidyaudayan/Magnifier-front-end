@@ -1,0 +1,9 @@
+Flask>=2.0.0
+flask-cors>=3.0.10
+python-dotenv>=1.0.0
+google-cloud-storage>=2.14.0
+rapidfuzz>=3.0.0
+sentence-transformers>=2.2.2
+pinecone-client>=3.0.0
+pinecone
+google-cloud-aiplatform>=1.43.0  # for vertexai

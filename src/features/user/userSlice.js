@@ -1,16 +1,33 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const userFromLocalStorage = JSON.parse(localStorage.getItem('user'));
+
+const normalizedUser = userFromLocalStorage
+  ? {
+      ...userFromLocalStorage,
+      _id: userFromLocalStorage.id || userFromLocalStorage._id || '',
+      username: userFromLocalStorage.username || userFromLocalStorage.userName || '',
+      profilePic: userFromLocalStorage.profilePic || userFromLocalStorage.profilePicture || '',
+      walletAmount: userFromLocalStorage.walletAmount || 0,
+      state: userFromLocalStorage.state || '',
+    }
+  : null;
+
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    user: normalizedUser,
     loading: false,
-    walletAmount: 0,
+    walletAmount: normalizedUser?.walletAmount || 0,
     totalLikes: 0,
     totalDislikes: 0,
     postCount: 0,
     posts: [],
-    availableStates: [], // Add to store available states
+
+     availableStates: [],
+     rechargedPoints: 0, // ✅ add this
+  earnedPoints: 0 
+
   },
   reducers: {
     setUserDetails: (state, action) => {
@@ -22,9 +39,12 @@ export const userSlice = createSlice({
         ...user,
         _id: user.id || user._id,
         username: user.username || user.userName || '',
-        profilePic: user.profilePic || user.profilePicture || '',
-        walletAmount: user.walletAmount || 0,
-        state: user.state || '', // Add state field
+
+        profilePic: user.profilePic || user.profilePicture || '',state: user.state || '',
+        //walletAmount: user.walletAmount || 0, state: user.state || '',
+     rechargedPoints: user.rechargedPoints || 0,
+  warnedPoints: user.warnedPoints || 0,
+
       };
 
       localStorage.setItem('user', JSON.stringify(state.user));
@@ -47,6 +67,38 @@ export const userSlice = createSlice({
         console.log('Cover picture updated:', action.payload);
       }
     },
+
+
+    setPoints: (state, action) => {
+  const { rechargedPoints, earnedPoints } = action.payload;
+
+  state.rechargedPoints = rechargedPoints || 0;
+  state.earnedPoints = earnedPoints || 0;
+
+  // Also save to user object if needed
+  if (state.user) {
+    state.user.rechargedPoints = rechargedPoints || 0;
+    state.user.earnedPoints = earnedPoints || 0;
+    localStorage.setItem('user', JSON.stringify(state.user));
+  }
+
+  console.log("Recharged:", rechargedPoints, "Warned:", earnedPoints);
+},
+
+     updateWalletData: (state, action) => {
+      const { walletAmount } = action.payload;
+      state.walletAmount = walletAmount;
+
+      // Also update wallet in user object if available
+      if (state.user) {
+        state.user.walletAmount = walletAmount;
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
+
+      console.log("Wallet updated:", walletAmount);
+    },
+
+    
 
     updateMetrics: (state, action) => {
       const { userName, profilePic, walletAmount, totalLikes, totalDislikes, postCount } = action.payload;
@@ -121,7 +173,12 @@ export const userSlice = createSlice({
       state.posts = [...stickyPosts, ...normalPosts];
     },
 
-    setAvailableStates: (state, action) => {
+
+  // Final post list: sticky posts first, then the rest
+  state.posts = [...stickyPosts, ...normalPosts];
+},
+setAvailableStates: (state, action) => {
+
       state.availableStates = action.payload || [];
       console.log('Available states updated:', state.availableStates);
     },
@@ -140,25 +197,22 @@ export const userSlice = createSlice({
       state.totalLikes = 0;
       state.totalDislikes = 0;
       state.postCount = 0;
-      state.posts = [];
-      state.availableStates = []; // Clear available states
-      localStorage.removeItem('user');
+
+      state.posts = []; // Clear posts as well
+        state.availableStates = [];
+
       console.log('User logged out');
     },
   },
 });
 
-export const {
-  setPosts,
-  setUserDetails,
-  clearUserDetails,
-  setProfilePicture,
-  updateMetrics,
-  updatePostReaction,
-  setCoverPicture,
-  updatePostComments,
-  setLoading,
-  setAvailableStates,
-} = userSlice.actions;
+
+ 
+export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments ,setLoading, updateWalletData,setPoints} = userSlice.actions;
 
 export default userSlice.reducer;
+
+
+
+
+

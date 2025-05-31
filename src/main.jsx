@@ -9,13 +9,13 @@ import {
 import './index.css'
 import App from './App.jsx'
 import Root from './routes/root';
-import {store} from './app/store'
+import { store } from './app/store'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor } from '../src/app/store.js'
 
 import ErrorPage from './error-page';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import WelcomeNew from './componenets/WelcomeNew.jsx';
 
 import DelhiSignup from './componenets/DelhiSignup.jsx'
@@ -74,50 +74,109 @@ import { LanguageProvider } from './context/LanguageContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import SearchPostDisplayPage from './LivefeedPages/SearchPostDisplayPage.jsx';
 import PricingPage from './LivefeedPages/PricingPage.jsx';
-import SharePostDisplayPage from "./LivefeedPages/SharePostDisplayPage.jsx";
-import Bulletin from "./componenets/Bulletin.jsx";
+
+import SharePostDisplayPage from "./LivefeedPages/SharePostDisplayPage.jsx"
+import { LoginDashboard } from "./pages/LoginPage/Logindashboard.jsx";
+import DashboardSelector from "./pages/DashboardSelector.jsx";
+import DashboardViewer from "./pages/DashboardViewer.jsx";
+import Wallet from "./LivefeedPages/Wallet.jsx";
+
+
+
+
 import WebmagnifierLearnmore from "./componenets/LearnMore/WebmagnifierLearnmore.jsx";
 import ElectoaiLearnmore from "./componenets/LearnMore/ElectoaiLearnmore.jsx";
 import VotermagnifierLearnmore from "./componenets/LearnMore/VotermagnifierLearnmore.jsx";
 import MediamagnifierLearnmore from "./componenets/LearnMore/MediamagnifierLearnmore.jsx";
-import { LoginDashboard } from "./pages/LoginPage/LoginDashboard.jsx";
-import DashboardSelector from "./pages/DashboardSelector.jsx";
-import DashboardViewer from "./pages/DashboardViewer.jsx";
+
+import Bulletin from "./componenets/Bulletin.jsx";
+import { MediaMagnifierLogin } from "./pages/LoginPage/MediaMagnifierLogin.jsx";
+import { ElectoAILogin } from "./pages/LoginPage/ElectoAILogin.jsx";
+import Subscription from "./componenets/Subscription.jsx";
+import { ChatProvider } from "./context/ChatContex.jsx";
 
 
-
+export const server = "http://localhost:5000"
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root/>,
+    element: <Root />,
     errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
-        element:<BackgroundCopyOf/>,
+        element: <BackgroundCopyOf />,
       },
       {
         path: "/welcome",
-        element:<WelcomeNew/>,
+        element: <WelcomeNew />,
       },
       {
         path: "/signup/delhi",
-        element:<DelhiSignUpPage/>,
+        element: <DelhiSignUpPage />,
       },
       {
         path: "/signup/bihar",
         element: <BiharSignUpPage />,
       },
       {
-        path: "/signup/west-bengal", 
+        path: "/signup/west-bengal",
         element: <BengalSignUpPage />,
       },
       {
         path: "/login",
-        element:<LoginPage/>,
+        element: <LoginPage />,
       },
+      {
+        path: "/webmagnifierlearnmore",
+        element: <WebmagnifierLearnmore />
+
+      },
+      {
+        path: "/electoailearnmore",
+        element: <ElectoaiLearnmore />
+
+      },
+      {
+        path: "/votermagnifierlearnmore",
+        element: <VotermagnifierLearnmore />
+
+      },
+      {
+        path: "/mediamagnifierlearnmore",
+        element: <MediamagnifierLearnmore />
+
+      },
+      {
+        path: "/logindashboard",
+        element: <LoginDashboard />,
+      },
+      {
+        path: "/mediamagnifierlogin",
+        element: <MediaMagnifierLogin />,
+      },
+      {
+        path: "/electoailogin",
+        element: <ElectoAILogin />,
+      },
+      {
+        path: "/electoai",
+        element: <ElectoAI />
+
+      },
+
+      {
+        path: "/selectdashboard",
+        element: <DashboardSelector />,
+      },
+      {
+        path: "/dashboard/:type",
+        element: <DashboardViewer />,
+      },
+
+
       {
         path:"/webmagnifierlearnmore",
         element:<WebmagnifierLearnmore/>
@@ -156,59 +215,59 @@ const router = createBrowserRouter([
       },
       {
         path: "/verify",
-        element:<VerifyPage/>,
+        element: <VerifyPage />,
       },
-      
-      
+
+
       {
         path: "/signup/olddelhi",
-        element:<AuthDelhi/>,
+        element: <AuthDelhi />,
       },
       {
         path: "/signup/oldbihar",
-        element:<AuthBihar/>,
+        element: <AuthBihar />,
       },
       {
         path: "/signup/oldwest bengal",
-        element:<AuthBengal/>,
+        element: <AuthBengal />,
       },
-      
+
       {
         path: "/joblogin",
-        element:<LoginJob/>,
+        element: <LoginJob />,
       },
-     
+
       {
         path: "/loginshare",
-        element:<LoginFormShare/>,
+        element: <LoginFormShare />,
       },
       {
         path: "/job-application",
-        element:<Jobapplication /> ,
+        element: <Jobapplication />,
       },
       {
         path: "/verification",
-        element:<VerificationPage /> ,
+        element: <VerificationPage />,
       },
-     
-     
+
+
       {
         path: "/landing",
-        element:<LandingPage/>,
+        element: <LandingPage />,
       },
       {
         path: "/posts",
-        element:<LandingPage/>,
+        element: <LandingPage />,
       },
       {
         path: "/displaypost",
         element: <PrivateRoute>
-        <PostDisplayPage />
-      </PrivateRoute>,
+          <PostDisplayPage />
+        </PrivateRoute>,
       },
       {
         path: "/posts",
-        element: <AllPostsPage />, 
+        element: <AllPostsPage />,
       },
       {/*{
         path: "/post/:postId",  
@@ -216,21 +275,21 @@ const router = createBrowserRouter([
       },*/},
       {
         path: "/aboutus",
-        element:<AboutUsPage/>,
+        element: <AboutUsPage />,
       },
       {
         path: "/dashboard",
-        element:<Dashboard/>,
+        element: <Dashboard />,
       },
-      
-      
+
+
       {
         path: "/support",
-        element:<Support/>,
+        element: <Support />,
       },
       {
         path: "/faq",
-        element:<FAQ/>,
+        element: <FAQ />,
       },
       {
         path:"/bulletin",
@@ -239,168 +298,183 @@ const router = createBrowserRouter([
       },
       {
         path: "/user-guidelines",
-        element:<UserGuidelines/>,
+        element: <UserGuidelines />,
       },
       {
         path: "/pro",
-        element:<ProfileNew/>,
+        element: <ProfileNew />,
 
       },
-      
+
       {
         path: "/profile/:userId",
-        element:<ProfilePageUsers/>,
+        element: <ProfilePageUsers />,
 
       },
 
       {
         path: "/user/:userId/posts",
-        element:<SearchUserPost/>,
+        element: <SearchUserPost />,
       },
-     
+
       {
         path: "/userposts",
         element: (
           <PrivateRoute>
-            <UserPostDisplay/>  
+            <UserPostDisplay />
           </PrivateRoute>
         ),
       },
       {
         path: "/terms-condition",
-        element:<TermsAndConditions/>,
+        element: <TermsAndConditions />,
       },
 
       {
         path: "/features",
-        element:<MainContentSection/>,
+        element: <MainContentSection />,
       },
       {
         path: "/contact",
-        element:<InfoSection/>,
+        element: <InfoSection />,
       },
       {
         path: "/faq",
-        element:<FeatureSection/>,
+        element: <FeatureSection />,
+      },
+      {
+        path: "/bulletin",
+        element: <Bulletin />
+
+      },
+      {
+        path: "/subscription",
+        element: <Subscription />
       },
       {
         path: "/service",
-        element:<DashboardSection/>,
+        element: <DashboardSection />,
       },
-     
-     
-     
 
 
-     
+
+
+
+
       {
         path: "/forgot-password",
-        element:<ForgotPassword/>,
+        element: <ForgotPassword />,
       },
       {
         path: "/reset-password/:token",
-        element:<ResetPassword/>,
+        element: <ResetPassword />,
       },
       {
         path: "/reset-password/:token",
-        element:<ResetPassword/>,
+        element: <ResetPassword />,
       },
       {
         path: "/settings",
-        element:<SettingsPage/>,
+        element: <SettingsPage />,
       },
       {
-        path:"/pricingold",
-        element:<PricingPage/>
+        path: "/pricingold",
+        element: <PricingPage />
       },
       {
-        path:"/payment",
-        element:<PaymentPage/>
+        path: "/payment",
+        element: <PaymentPage />
       },
       {
-        path:"/success",
-        element:<PaymentSuccess/>
+        path: "/success",
+        element: <PaymentSuccess />
       },
       {
-        path:"/retry-payment",
-        element:<RetryPaymentPage/>
+        path: "/retry-payment",
+        element: <RetryPaymentPage />
       },
       {
-        path:"/s",
-        element:<SearchResults/>
+        path: "/s",
+        element: <SearchResults />
       },
-      
-      {
-        path:"/livefeed/*",
-        element:<Livefeed/>,
 
-        children:[
+      {
+        path: "/livefeed/*",
+        element: <Livefeed />,
+
+        children: [
           {
             path: "userprofile/:userId",
-            element:<UsersProfilePage/>,
-    
+            element: <UsersProfilePage />,
+
           },
 
           {
-            path:"notifications",
-            element:<Notifications/>
+            path: "notifications",
+            element: <Notifications />
           },
           {
-            path:"electoai",
-            element:<ElectoAI/>
+            path: "electoai",
+            element: <ElectoAI />
           },
           {
-            path: "searchpost/:postId",  
+            path: "searchpost/:postId",
             element: <SearchPostDisplayPage />,
           },
           {
-            path:"search",
-            element:<SearchPage/>
+            path: "search",
+            element: <SearchPage />
           },
-         
+
           {
-            path:"pricing",
-            element:<PricingPage/>
+            path: "pricing",
+            element: <PricingPage />
           },
-         
+
           {
-            path:"settings",
-            element:<SettingsPage/>
+            path: "settings",
+            element: <SettingsPage />
           },
-         
+
           {
-            path:"profile",
-            element:<ProfileNew/>
+            path: "profile",
+            element: <ProfileNew />
           },
           {
-            path:"displaypost",
-            element:<SharePostDisplayPage/>
+            path: "displaypost",
+            element: <SharePostDisplayPage />
           },
-         
-         
-         
+          {
+            path: "wallet",
+            element: <Wallet />
+          },
+
+
+
         ],
       },
-      
-     
-     
-     
-     
-     
+
+
+
+
+
+
     ],
   },
 ]);
 
 createRoot(document.getElementById('root')).render(
   <ThemeProvider>
-<LanguageProvider>
- <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-  <StrictMode>
- <RouterProvider router={router} />
-  </StrictMode>,
-  </PersistGate>
-  </Provider>,
-  </LanguageProvider>
+    <LanguageProvider>
+      <ChatProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <StrictMode>
+            <RouterProvider router={router} />
+          </StrictMode>
+        </PersistGate>
+      </Provider>
+      </ChatProvider>
+    </LanguageProvider>
   </ThemeProvider>
 )

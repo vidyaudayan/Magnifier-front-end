@@ -1,4 +1,8 @@
+
 import React from 'react'
+import logo from '../../assets/Images/logo.jpg';
+import { FooterSection } from '../../pages/BackgroundCopyOf/sections/FooterSection/FooterSection';
+
 
 const ElectoaiLearnmore = () => {
   return (
@@ -36,5 +40,6 @@ anytime, anywhere.
            </div>
   )
 }
+
 
 export default ElectoaiLearnmore

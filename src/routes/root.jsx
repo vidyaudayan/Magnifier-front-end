@@ -48,7 +48,7 @@ export default function Root() {
       <div id="detail">
         
       <Context.Provider value={{
-          fetchUserDetails, 
+          fetchUserDetails 
       
       }}>
       
@@ -67,7 +67,7 @@ export default function Root() {
     <Outlet />
    
     </main>
-    </Context.Provider>,
+    </Context.Provider>
    
       </div>
    

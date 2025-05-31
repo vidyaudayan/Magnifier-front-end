@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 export const CallToActionSection = () => {
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate('/login');
+    navigate('/logindashboard');
   };
   // Feature card data for mapping
   const featureCards = [

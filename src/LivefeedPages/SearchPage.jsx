@@ -8,11 +8,11 @@ import { setSearchQuery } from '../features/search/searchSlice';
 import PostCard from '../componenets/Livefeed/PostCard';
 import {
   Search as SearchIcon, ThumbsUp,
-  ThumbsDown,
+  ThumbsDown,MessageCircle,Share2,
   MessageSquare, Users, FileText, Hash, Newspaper, Clock, TrendingUp, ArrowLeft
 } from 'lucide-react';
 import { getRecentSearches, addRecentSearch, clearRecentSearches } from "../utils/searchHistory"
-
+import PostCard from '../componenets/Livefeed/PostCard';
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -24,8 +24,14 @@ const SearchPage = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { posts } = useSelector((state) => state.user);
-  const user = useSelector(state => state.user.user);
+
+ const { posts } = useSelector((state) => state.user);
+   const currentUser = useSelector((state) => state.user.user);
+    const user = useSelector(state => state.user.user);
+    const [newComment, setNewComment] = useState('');
+    //const [comments, setComments] = useState(post.comments);
+    const [commentsVisible, setCommentsVisible] = useState(false);
+    const [displayCount, setDisplayCount] = useState(6);
 
   // Get query from URL and update Redux store
   useEffect(() => {
@@ -249,8 +255,10 @@ const SearchPage = () => {
                     No posts available. Create one!
                   </div>
                 )}
-              </div>
-  );
+
+              </div>
+  );
+
 
   const renderOtherResult = (result) => {
     switch (result.type) {
@@ -313,22 +321,22 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen mt-10 bg-gray-50">
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="container mx-auto max-w-4xl px-4 py-3 mt-4">
+    <div className="min-h-screen mt-10 bg-gray-50 dark:bg-gray-900">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 dark:border-gray-700">
+        <div className="container mx-auto max-w-4xl px-4 py-3 mt-4 ">
           <div className="flex items-center gap-4">
             <button
               onClick={() => window.history.back()}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-2 hover:bg-gray-100 rounded-full dark:border-gray-700"
             >
-              <ArrowLeft size={20} className="text-gray-500" />
+              <ArrowLeft size={20} className="text-gray-500 dark:border-gray-400" />
             </button>
             <div className="flex-1 relative">
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="text"
                 placeholder="Search for people, posts, topics..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800  dark:text-white"
                 value={searchQuery || ''}
                 onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit(e)}
@@ -337,7 +345,7 @@ const SearchPage = () => {
             </div>
           </div>
           {searchQuery && (
-            <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+            <div className="flex gap-2 mt-3 overflow-x-auto pb-2 ">
               {filters.map(filter => (
                 <button
                   key={filter.id}
@@ -354,7 +362,7 @@ const SearchPage = () => {
                   }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeFilter === filter.id
                       ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700  dark:text-gray-300  dark:hover:bg-gray-600'
                     }`}
                 >
                   <filter.icon size={16} />

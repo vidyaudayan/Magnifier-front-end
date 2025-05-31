@@ -76,7 +76,7 @@ export const HeaderSection = () => {
             </div>
 
             {/* Second line of heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-[58px] text-[#292929] tracking-[-1px] md:tracking-[-1.74px] leading-tight md:leading-[58px] font-normal [font-family:'Helvetica_Neue-Regular',Helvetica] mb-4 md:mb-8 px-4">
+            <h1 className="text-3xl sm:text-4xl md:text-[58px] text-[#0c0c0c] tracking-[-1px] md:tracking-[-1.74px] leading-tight md:leading-[58px] font-normal [font-family:'Helvetica_Neue-Regular',Helvetica] mb-4 md:mb-8 px-4">
               {headerData.title.thirdPart}
             </h1>
 
@@ -85,7 +85,7 @@ export const HeaderSection = () => {
               {headerData.subtitle.map((line, index) => (
                 <p
                   key={index}
-                  className="text-base sm:text-lg md:text-xl text-[#636363] tracking-[-0.10px] leading-relaxed md:leading-[30px] [font-family:'Helvetica_Neue-Regular',Helvetica]"
+                  className="text-base sm:text-lg md:text-xl text-[#0c0c0c] tracking-[-0.10px] leading-relaxed md:leading-[30px] [font-family:'Helvetica_Neue-Regular',Helvetica]"
                 >
                   {line}
                 </p>

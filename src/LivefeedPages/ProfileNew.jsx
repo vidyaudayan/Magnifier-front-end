@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 
 import { toast } from 'react-toastify';
-import { setUserDetails, updatePostReaction, updateMetrics } from '../features/user/userSlice';
+import { setUserDetails, updatePostReaction, updateMetrics,setPoints } from '../features/user/userSlice';
 import { HorizontalStats } from '../componenets/Livefeed/HorizontalStats';
 
 const ProfileNew = () => {
@@ -46,13 +46,16 @@ const ProfileNew = () => {
   const [activeTab, setActiveTab] = useState('posts');
   const [showOverlay, setShowOverlay] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showCoverPicDropdown, setShowCoverPicDropdown] = useState(false);
+  const [showDeleteCoverModal, setShowDeleteCoverModal] = useState(false);
+  const [showProfilePicDropdown, setShowProfilePicDropdown] = useState(false);
   const tabs = [
     { id: 'posts', label: 'Posts' },
     { id: 'media', label: 'Media' },
     { id: 'stats', label: 'Stats' }
   ];
   console.log("currentUser:", currentUser, "user:", user);
-
+  const coverPicInputRef = useRef(null);
   const [src, setSrc] = useState(null);
   const [crop, setCrop] = useState({ aspect: 1 / 1 }); // Square crop for profile pics
   const [image, setImage] = useState(null);
@@ -60,8 +63,29 @@ const ProfileNew = () => {
   const fileInputRef = useRef(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const imgRef = useRef(null);
+  const profilePicInputRef = useRef(null);
+ const rechargedPoints = useSelector((state) => state.user.rechargedPoints);
+const earnedPoints = useSelector((state) => state.user.earnedPoints);
+console.log("Recharged:", rechargedPoints, "Earned:", earnedPoints);
 
-  const handleFileChange = (event) => {
+const getCoverPhotoHeight = () => {
+    if (window.innerWidth < 640) return '12rem'; // mobile
+    if (window.innerWidth < 1024) return '16rem'; // tablet
+    return '20rem'; // desktop
+  };
+
+  const [coverPhotoHeight, setCoverPhotoHeight] = useState(getCoverPhotoHeight());
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCoverPhotoHeight(getCoverPhotoHeight());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+const handleFileChange = (event) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const reader = new FileReader();
@@ -104,43 +128,43 @@ const ProfileNew = () => {
 
   const handleProfilePicUpload = async () => {
     const croppedImage = await getCroppedImg();
-    
+
     if (croppedImage) {
       try {
-        const file = new File([croppedImage], 'profile-pic.jpg', { 
+        const file = new File([croppedImage], 'profile-pic.jpg', {
           type: 'image/jpeg',
           lastModified: Date.now()
         });
-        
+
         const formData = new FormData();
         formData.append('profilePic', file);
-  
+
         const token = localStorage.getItem('token');
-        const headers = { 
+        const headers = {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         };
-  
+
         const response = await axios.post(
           `${import.meta.env.VITE_BASE_URL}/user/add-profilepic`,
           formData,
           { headers, withCredentials: true }
         );
-  
+
         if (response.data?.user) {
-          const updatedProfilePic = response.data.user.profilePic 
+          const updatedProfilePic = response.data.user.profilePic
             ? `${response.data.user.profilePic}?${Date.now()}`
             : '';
-  
+
           // Create new user object with updated profile picture
           const updatedUser = {
             ...response.data.user,
             profilePic: updatedProfilePic
           };
-  
+
           // Update local state
           setUser(updatedUser);
-          
+
           // Update Redux store
           dispatch(setUserDetails(updatedUser));
           dispatch(setUserDetails({
@@ -151,7 +175,7 @@ const ProfileNew = () => {
           if (imgRef.current) {
             imgRef.current.src = '';
           }
-  
+
           toast.success("Profile picture updated successfully");
           setSrc(null);
         }
@@ -186,9 +210,29 @@ const ProfileNew = () => {
     }
   };
 
+  // Add this effect to your component
   useEffect(() => {
+    const handleClickOutside = (event) => {
+      // For profile pic dropdown
+      if (showProfilePicDropdown && !event.target.closest('.profile-pic-dropdown-container')) {
+        setShowProfilePicDropdown(false);
+      }
+      // For cover pic dropdown
+      if (showCoverPicDropdown && !event.target.closest('.cover-pic-dropdown-container')) {
+        setShowCoverPicDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfilePicDropdown, showCoverPicDropdown]);
+
+  {/* useEffect(() => {
     const fetchUserData = async () => {
       try {
+          setLoading(true);
         const token = localStorage.getItem('token');
         const [profileRes, postsRes] = await Promise.all([
           axios.get(`${import.meta.env.VITE_BASE_URL}/user/userprofile`, {
@@ -198,10 +242,20 @@ const ProfileNew = () => {
             headers: { Authorization: `Bearer ${token}` }
           })
         ]);
+ const userData = profileRes.data || {
+      username: 'New User',
+      email: '',
+      profilePic: '',
+      coverPic: '',
+      bio: '',
+      walletAmount: 0
+    };
 
-        setUser(profileRes.data);
+    setUser(userData);
+    dispatch(setUserDetails(userData));
+        //setUser(profileRes.data);
         setPosts(postsRes.data.data || []);
-        dispatch(setUserDetails(profileRes.data));
+        //dispatch(setUserDetails(profileRes.data));
       } catch (error) {
         console.error("Error fetching user data:", error);
         toast.error("Failed to load profile data");
@@ -211,7 +265,106 @@ const ProfileNew = () => {
     };
 
     fetchUserData();
-  }, [userId, dispatch]);
+  }, [userId, dispatch]);*/}
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+
+      // Fetch profile data
+      const profileRes = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/user/userprofile`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      // Initialize user data with default values if empty
+      const userData = profileRes.data || {
+        username: 'New User',
+        email: '',
+        profilePic: '',
+        coverPic: '',
+        bio: '',
+        walletAmount: 0,  rechargedPoints: '',
+  warnedPoints: ''
+      };
+
+      setUser(userData);
+      dispatch(setUserDetails(userData));
+      dispatch(setPoints(userData));
+
+      // Fetch posts - handle case where user has no posts
+      try {
+        const postsRes = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/user/userPosts`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        setPosts(postsRes.data?.data || []);
+      } catch (postsError) {
+        console.log("No posts found for user, setting empty array");
+        setPosts([]);
+      }
+
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+
+      // Initialize default user if profile fetch fails
+      const defaultUser = {
+        username: 'New User',
+        email: '',
+        profilePic: '',
+        coverPic: '',
+        bio: '',
+        walletAmount: 0
+      };
+
+      setUser(defaultUser);
+      dispatch(setUserDetails(defaultUser));
+      setPosts([]);
+
+      if (error.response?.status !== 404) {
+        toast.error("Failed to load profile data");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add this at the top of your component
+  const [error, setError] = useState(null);
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center p-6 max-w-md">
+          <h2 className="text-xl font-bold mb-4">Profile Unavailable</h2>
+          <p className="mb-4">We couldn't load the profile data. Please try again later.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Then wrap your data fetching in a try-catch
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await fetchUserData();
+      } catch (err) {
+        setError(err);
+      }
+    };
+    loadData();
+  }, [userId]);
 
   const handleCoverPicUpload = async (event) => {
     const file = event.target.files[0];
@@ -358,17 +511,60 @@ const ProfileNew = () => {
     }));
   };
 
+  const handleProfilePicChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => setSrc(reader.result));
+      reader.readAsDataURL(e.target.files[0]);
+      setShowProfilePicDropdown(false);
+    }
+  };
+
+  const handleCoverPicChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      // Handle cover photo upload here
+      const file = e.target.files[0];
+      console.log('Cover photo selected:', file);
+      setShowCoverPicDropdown(false);
+    }
+  };
+
+  const deleteCoverPic = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BASE_URL}/user/delete-coverpic`,
+        { headers, withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        const updatedUser = {
+          ...response.data.user,
+          coverPic: '' // Set to empty or null
+        };
+        setUser(updatedUser);
+        dispatch(setUserDetails(updatedUser));
+        toast.success("Cover photo deleted successfully");
+      }
+    } catch (error) {
+      console.error('Error deleting cover photo:', error);
+      toast.error("Failed to delete cover photo");
+    }
+  };
+
   const renderPosts = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-6 pb-6 sm:pb-10">
       {posts.length > 0 ? (
         posts.map((post) => (
           <div key={post._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             {/* Post Header */}
-            <div className="p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
+            <div className="p-3 sm:p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-center space-x-3">
                 <img
-                  src={user.profilePic || "/default-profile.png"}
-                  alt={user.username}
+                  src={user?.profilePic || "/default-profile.png"}
+                  alt={user?.username || "User"}
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
@@ -382,37 +578,40 @@ const ProfileNew = () => {
                     {format(new Date(post.createdAt), 'MMM d, yyyy')}
                   </div>
                 </div>
+
+
               </div>
 
-              {currentUser?._id === user._id && (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowOverlay(showOverlay === post._id ? null : post._id)}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  >
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
 
-                  {showOverlay === post._id && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10">
-                      <button
-                        onClick={() => deletePost(post._id)}
-                        className="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete Post
-                      </button>
-                      <button
-                        onClick={() => setShowOverlay(null)}
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left"
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Cancel
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+
+              <div className="relative">
+                <button
+                  onClick={() => setShowOverlay(showOverlay === post._id ? null : post._id)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                </button>
+
+                {showOverlay === post._id && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10">
+                    <button
+                      onClick={() => deletePost(post._id)}
+                      className="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Post
+                    </button>
+                    <button
+                      onClick={() => setShowOverlay(null)}
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+
             </div>
 
             {/* Post Content */}
@@ -426,7 +625,7 @@ const ProfileNew = () => {
                 <img
                   src={post.mediaUrl}
                   alt="Post media"
-                  className="w-full h-auto max-h-96 object-contain rounded-lg mt-4"
+                  className="w-3/4  px-8 h-[450px] object-cover rounded-xl mt-4"
                 />
               )}
               {post.postType === "VoiceNote" && post.mediaUrl && (
@@ -566,7 +765,7 @@ const ProfileNew = () => {
     const mediaPosts = posts.filter(post => post.postType === "Photo" || post.postType === "VoiceNote");
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3  md:grid-cols-3  gap-4">
         {mediaPosts.length > 0 ? (
           mediaPosts.map((post) => (
             <div key={post._id} className="relative group">
@@ -660,7 +859,8 @@ const ProfileNew = () => {
             <span className="text-xs text-gray-500 dark:text-gray-400">Wallet</span>
           </div>
           <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-            {user?.walletAmount?.toLocaleString() || 0}
+            {/*{user?.walletAmount?.toLocaleString() || 0}*/}
+    {rechargedPoints+ earnedPoints}
           </p>
         </div>
       </div>
@@ -675,188 +875,138 @@ const ProfileNew = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Cover Image */}
-      <div className="relative h-48 md:h-64 w-full">
-        {user.coverPic ? (
-          <img
-            src={user.coverPic}
-            alt="Cover"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-            <span className="text-white text-lg">Cover Photo</span>
-          </div>
-        )}
 
-       
-          <label htmlFor="coverPic" className="absolute bottom-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 cursor-pointer">
-            <Camera className="w-5 h-5" />
-            <input
-              type="file"
-              id="coverPic"
-              accept="image/*"
-              onChange={handleCoverPicUpload}
-              className="hidden"
-            />
-          </label>
-    
-      </div>
+  return (
+    <div className="min-h-screen bg-gray-50  dark:bg-gray-900">
+      {/* Cover Image */}
+    <div className="relative  h-48 md:h-64 w-full">
+  {user.coverPic ? (
+    <img
+      src={user.coverPic}
+      alt="Cover"
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+      <span className="text-white text-lg">Cover Photo</span>
+    </div>
+  )}
+
+  <div className="absolute bottom-4 right-4">
+    <div className="relative cover-pic-dropdown-container">
+      <button
+        onClick={() => setShowCoverPicDropdown(!showCoverPicDropdown)}
+        className="p-2 bg-black/50 rounded-full text-white hover:bg-black/70 cursor-pointer"
+      >
+        <Camera className="w-5 h-5" />
+      </button>
+
+      {showCoverPicDropdown && (
+        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
+          <div className="py-1">
+            <label className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+              <Camera className="w-4 h-4 mr-2" />
+              <span>{user.coverPic ? "Change" : "Add"} cover photo</span>
+              <input
+                type="file"
+                accept="image/*"
+                ref={coverPicInputRef}
+                className="hidden"
+                onChange={handleCoverPicUpload}
+              />
+            </label>
+
+            {user.coverPic && (
+              <button
+                onClick={() => {
+                  setShowCoverPicDropdown(false);
+                  setShowDeleteCoverModal(true);
+                }}
+                className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete cover photo
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
 
       {/* Profile Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 dark:bg-slate-800">
         <div className="relative -mt-16">
           <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-end">
             {/* Avatar */}
+            <div className="relative">
+              <img
+                src={user?.profilePic ? `${user.profilePic}?${Date.now()}` : "/userProfile.avif"}
+                alt={user?.username}
+                className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/default-profile.png";
+                }}
+              />
 
+              <div className="absolute -bottom-2 -right-2">
+                <div className="relative profile-pic-dropdown-container">
+                  <button
+                    onClick={() => setShowProfilePicDropdown(!showProfilePicDropdown)}
+                    className="p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 cursor-pointer z-10"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
 
-<div className="relative">
-<img
-  src={user?.profilePic ? `${user.profilePic}?${Date.now()}` : "/userProfile.avif"}
-  alt={user?.username}
-  className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover"
-  onError={(e) => {
-    e.target.onerror = null;
-    e.target.src = "/default-profile.png";
-  }}
-/>
-  
+                  {showProfilePicDropdown && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
+                      <div className="py-1">
+                        <label className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                          <Camera className="w-4 h-4 mr-2" />
+                          <span>{user.profilePic ? "Change" : "Add"} profile photo</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={profilePicInputRef}
+                            className="hidden"
+                            onChange={handleFileChange}
+                          />
+                        </label>
 
-    <div className="absolute -bottom-2 -right-2 flex gap-2">
-      <label className="p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 cursor-pointer z-10">
-        <Edit3 className="w-4 h-4" />
-        <input
-          type="file"
-          id="profilePic"
-          accept="image/*"
-          ref={fileInputRef}
-          className="hidden"
-          onChange={handleFileChange}
-        />
-      </label>
-      
-      {user.profilePic && (
-        <>
-        <button
-          onClick={() => setShowDeleteModal(true)}
-          className="p-2 bg-red-500 rounded-full text-white hover:bg-red-600 z-10"
-          title="Delete profile picture"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
- {showDeleteModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg max-w-sm w-full">
-      <h3 className="text-lg font-bold mb-4">Delete Profile Picture</h3>
-      <p className="mb-6">Are you sure you want to remove your profile picture?</p>
-      <div className="flex justify-end space-x-3">
-        <button
-          onClick={() => setShowDeleteModal(false)}
-          className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => {
-            deleteProfilePic();
-            setShowDeleteModal(false);
-          }}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-    </>    
-      )}
-    </div>
-
-</div>
-
-{/* Crop Modal */}
-{src && (
-  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-    <div className="bg-white p-4 rounded-lg max-w-md w-full">
-      <ReactCrop
-        crop={crop}
-        onChange={setCrop}
-        onComplete={setCompletedCrop}
-        aspect={1}
-      >
-        <img
-          ref={imgRef}
-          src={src}
-          alt="Crop me"
-          onLoad={(e) => {
-            const { width, height } = e.currentTarget;
-            setCrop({
-              unit: 'px',
-              width: Math.min(width, height),
-              height: Math.min(width, height),
-              x: (width - Math.min(width, height)) / 2,
-              y: (height - Math.min(width, height)) / 2,
-            });
-          }}
-          style={{ maxWidth: '100%', maxHeight: '70vh' }}
-        />
-      </ReactCrop>
-      <div className="flex justify-end mt-4 space-x-2">
-        <button
-          onClick={() => setSrc(null)}
-          className="px-4 py-2 bg-gray-300 rounded"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleProfilePicUpload}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                        {user.profilePic && (
+                          <button
+                            onClick={() => {
+                              setShowProfilePicDropdown(false);
+                              setShowDeleteModal(true);
+                            }}
+                            className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete profile photo
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* User Info */}
             <div className="mt-4 sm:ml-6 sm:mt-0">
-              <div className="flex flex-col   space-x-2">
-                <div className='pl-2 '>
+              <div className="flex flex-col space-x-2">
+                <div className='pl-2'>
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {user.username}
                   </h1>
-
                 </div>
                 <div className='text-sm text-slate-600'>
-                  <span>{user.email}</span>
+                  {/* Additional user info can go here */}
                 </div>
-
-
-
                 {user.verified && <CheckCircle2 className="w-5 h-5 text-blue-500" />}
               </div>
-
-
-              {/*<div className="mt-2 flex flex-wrap gap-4">
-                {user.vidhanSabha && (
-                  <div className="flex items-center text-gray-600 dark:text-gray-400">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    <span className="text-sm">{user.vidhanSabha}</span>
-                  </div>
-                )}
-                {user.createdAt && (
-                  <div className="flex items-center text-gray-600 dark:text-gray-400">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    <span className="text-sm">
-                      Joined {format(new Date(user.createdAt), 'MMMM yyyy')}
-                    </span>
-                  </div>
-                )}
-              </div>*/}
             </div>
           </div>
 
@@ -868,9 +1018,11 @@ const ProfileNew = () => {
               </p>
             </div>
           )}
+
           <HorizontalStats posts={posts} user={user} />
+
           {/* Tabs Navigation */}
-          <div className="mt-8 border-b border-gray-200 dark:border-gray-700">
+          <div className="mt-8  border-b border-gray-200 dark:border-gray-700">
             <nav className="flex space-x-8">
               {tabs.map((tab) => (
                 <button
@@ -897,6 +1049,105 @@ const ProfileNew = () => {
             {activeTab === 'stats' && renderStats()}
           </div>
         </div>
+
+        {/* Crop Modal */}
+        {src && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+            <div className="bg-white p-4 rounded-lg max-w-md w-full">
+              <ReactCrop
+                crop={crop}
+                onChange={setCrop}
+                onComplete={setCompletedCrop}
+                aspect={1}
+              >
+                <img
+                  ref={imgRef}
+                  src={src}
+                  alt="Crop me"
+                  onLoad={(e) => {
+                    const { width, height } = e.currentTarget;
+                    setCrop({
+                      unit: 'px',
+                      width: Math.min(width, height),
+                      height: Math.min(width, height),
+                      x: (width - Math.min(width, height)) / 2,
+                      y: (height - Math.min(width, height)) / 2,
+                    });
+                  }}
+                  style={{ maxWidth: '100%', maxHeight: '70vh' }}
+                />
+              </ReactCrop>
+              <div className="flex justify-end mt-4 space-x-2">
+                <button
+                  onClick={() => setSrc(null)}
+                  className="px-4 py-2 bg-gray-300 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleProfilePicUpload}
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg max-w-sm w-full">
+              <h3 className="text-lg font-bold mb-4">Delete Profile Picture</h3>
+              <p className="mb-6">Are you sure you want to remove your profile picture?</p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    deleteProfilePic();
+                    setShowDeleteModal(false);
+                  }}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Cover Photo Confirmation Modal */}
+        {showDeleteCoverModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg max-w-sm w-full dark:bg-gray-800">
+              <h3 className="text-lg font-bold mb-4 dark:text-white">Delete Cover Photo</h3>
+              <p className="mb-6 dark:text-gray-300">Are you sure you want to remove your cover photo?</p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowDeleteCoverModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await deleteCoverPic();
+                    setShowDeleteCoverModal(false);
+                  }}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

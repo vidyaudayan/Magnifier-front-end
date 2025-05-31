@@ -7,8 +7,12 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
-// import { auth, RecaptchaVerifier } from "../../firebase"
-// import { signInWithPhoneNumber } from 'firebase/auth';
+
+import { useRecaptcha } from "../../componenets/hooks/useRecaptcha";
+//import { auth } from "../../firebase";
+//import { auth, RecaptchaVerifier } from "../../firebase"
+//import {  getAuth,signInWithPhoneNumber } from 'firebase/auth';
+import {getAuth,  signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
 
 // Changed the order of steps to prioritize email verification
 const steps = [
@@ -16,7 +20,7 @@ const steps = [
   { id: 2, title: "Mobile OTP" },
   { id: 3, title: "Selfie" },
 ];
-
+const auth = getAuth();
 const buttonStyles = "h-11 rounded-[29px] font-medium text-white text-sm tracking-[-0.14px] bg-blue-600";
 const outlineButtonStyles = "h-11 rounded-[29px] font-medium text-[#578cff] text-sm tracking-[-0.14px] border-[#578cff] hover:bg-[#578cff10]";
 
@@ -97,16 +101,26 @@ export const VerifyPage = () => {
   const [stream, setStream] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const recaptchaContainerRef = useRef(null);
-  const [isSendingOtp, setIsSendingOtp] = useState(false);
+//const recaptchaVerifier = useRef(null);
+ // const recaptchaContainerRef = useRef(null);
+
+ const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
+ const [verificationId, setVerificationId] = useState(null);
+ 
+ //const { recaptchaVerifier, isReady, error, resetRecaptcha, initializing } = useRecaptcha(auth);
+  //const [isSending, setIsSending] = useState(false);
+
+
+ const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [selfieImage, setSelfieImage] = useState(null);
   const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [isMobileOtpVerified, setIsMobileOtpVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [mobileOtpSent, setMobileOtpSent] = useState(false);
   const [token, setToken] = useState(null);
+  const[confirmationResult,setConfirmationResult]= useState(null)
   const [userData, setUserData] = useState({ email: "", phoneNumber: "" });
-  const [confirmationResult, setConfirmationResult] = useState(null);
+ // const [confirmationResult, setConfirmationResult] = useState(null);
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
    
     defaultValues: {
@@ -116,63 +130,79 @@ export const VerifyPage = () => {
       otp: ""
     }
   });
+ 
+  const recaptchaContainerRef = useRef(null);
+
+  
   useEffect(() => {
-    const initializeRecaptcha = async () => {
+    if (currentStep === 2 && !window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+        callback: (response) => {
+          console.log("Recaptcha solved");
+        },
+        "expired-callback": () => {
+          toast.error("reCAPTCHA expired");
+        },
+      });
+  
+      window.recaptchaVerifier.render().then((widgetId) => {
+        window.recaptchaWidgetId = widgetId;
+      });
+    }
+  }, [currentStep]);
+  
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState(null);
+
+  useEffect(() => {
+    // Initialize reCAPTCHA when component mounts
+    const initializeRecaptcha = () => {
       try {
-        // Ensure container exists
-        if (!recaptchaContainerRef.current) {
-          throw new Error('Recaptcha container not found');
-        }
-
-        // Clear any existing instance
-        if (window.recaptchaVerifier) {
-          window.recaptchaVerifier.clear();
-        }
-
-        // Initialize with proper container reference
-        window.recaptchaVerifier = new RecaptchaVerifier(
-          auth,
-          recaptchaContainerRef.current,
+        const verifier = new RecaptchaVerifier(
+          'recaptcha-container',
           {
-            'size': 'invisible',
-            'callback': (response) => {
-              console.log('reCAPTCHA solved:', response);
+            size: 'invisible',
+            callback: (response) => {
+              console.log('reCAPTCHA verified:', response);
             },
             'expired-callback': () => {
               console.log('reCAPTCHA expired');
-              window.recaptchaVerifier = null;
+              setRecaptchaVerifier(null);
             }
-          }
+          },
+          auth
         );
-
-        // Render the widget
-        await window.recaptchaVerifier.render();
-        console.log('reCAPTCHA initialized successfully');
-
+        
+        setRecaptchaVerifier(verifier);
       } catch (error) {
         console.error('reCAPTCHA initialization error:', error);
-        // Handle specific error cases
-        if (error.code === 'auth/argument-error') {
-          console.error('Invalid arguments provided to RecaptchaVerifier');
-        }
+        toast.error('Failed to initialize security check');
       }
     };
-
-    // Wait for auth to be ready
-    const authReadyCheck = setInterval(() => {
-      if (auth) {
-        clearInterval(authReadyCheck);
-        initializeRecaptcha();
-      }
-    }, 100);
-
+  
+    initializeRecaptcha();
+  
     return () => {
-      clearInterval(authReadyCheck);
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
+      // Cleanup reCAPTCHA when component unmounts
+      if (recaptchaVerifier) {
+        recaptchaVerifier.clear();
       }
     };
-  }, [auth]);
+  }, [auth])
+ 
+
+  useEffect(() => {
+    return () => {
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) {
+          console.log('Recaptcha cleanup error:', e);
+        }
+        window.recaptchaVerifier = null;
+      }
+    };
+  }, []);
   
   useEffect(() => {
     // Fetch user data when component mounts
@@ -310,158 +340,155 @@ export const VerifyPage = () => {
   //   }
   // };
 
-  {/*const handleSendMobileOTP = async () => {
-    try {
-      const phoneNumber = watch("phoneNumber");
-      console.log("mobile", phoneNumber);
 
-      if (!phoneNumber) {
-        toast.error("Please enter your phone number", { position: "top-center" });
-        return;
-      }
 
-      const formattedNumber = phoneNumber.startsWith("+") ? phoneNumber : `+91${phoneNumber.trim()}`;
-      console.log('Formatted Phone Number:', formattedNumber);
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/send-mobileotp`,
-        { phoneNumber: formattedNumber },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-      toast.success('OTP sent successfully!', { position: "top-center" });
-      setMobileOtpSent(true);
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error(
-        error.response?.data?.error || "Error sending OTP. Please try again.",
-        { position: "top-center" }
-      );
-    }
-  };
-
-  const handleVerifyMobileOTP = async () => {
-    try {
-      const phoneNumber = watch("phoneNumber");
-      const mobileOtp = watch("mobileOtp");
-
-      if (!phoneNumber || !mobileOtp) {
-        toast.error("Phone number and OTP are required", { position: "top-center" });
-        return;
-      }
-
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`,
-        { phoneNumber, otp: mobileOtp },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      if (response.data.success) {
-        toast.success(response.data.message, { position: "top-center" });
-        setIsMobileOtpVerified(true);
-        setCurrentStep(3); // Move to selfie verification step
-      }
-    } catch (error) {
-      console.error("Verification error:", error);
-      toast.error(
-        error.response?.data?.error || "Verification failed. Please try again.",
-        { position: "top-center" }
-      );
-    }
-  };*/}
  
-  const handleSendMobileOTP = async () => {
+{/*const handleSendMobileOTP = async () => {
     try {
-      // Validate phone number
       let phoneNumber = watch("phoneNumber").trim();
       if (!phoneNumber) {
         toast.error("Phone number is required");
         return;
       }
   
-      // Format phone number with country code
+      // Format phone number
       if (!phoneNumber.startsWith("+")) {
         phoneNumber = `+91${phoneNumber}`;
       }
       phoneNumber = phoneNumber.replace(/[^+\d]/g, '');
   
-      // Initialize reCAPTCHA verifier
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(
-          auth,
-          'recaptcha-container',
-          {
-            'size': 'invisible',
-            'callback': (response) => {
-              console.log("reCAPTCHA solved:", response);
-            },
-            'expired-callback': () => {
-              console.log("reCAPTCHA expired");
-              window.recaptchaVerifier = null;
-            }
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/send-mobileotp`,
+        { phoneNumber },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           }
-        );
+        }
+      );
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        //appVerifier
+      );
+  
+      if (response.data.success) {
+        setConfirmationResult(confirmationResult);
+        setVerificationId(response.data.verificationId);
+        toast.success('OTP sent successfully!');
+        setMobileOtpSent(true);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error(
+        error.response?.data?.error || "Failed to send OTP. Please try again."
+      );
+    }
+  };*/}
+
+  const handleSendMobileOTP = async () => {
+    try {
+      let phoneNumber = watch("phoneNumber").trim();
+      
+      // Validate phone number
+      if (!phoneNumber) {
+        toast.error("Phone number is required");
+        return;
       }
   
-      // Wait for reCAPTCHA to be ready
-      await new Promise((resolve) => {
-        const checkRecaptcha = () => {
-          if (window.grecaptcha && window.grecaptcha.ready) {
-            resolve();
-          } else {
-            setTimeout(checkRecaptcha, 100);
-          }
-        };
-        checkRecaptcha();
-      });
+      // Format phone number
+      if (!phoneNumber.startsWith("+")) {
+        phoneNumber = `+91${phoneNumber}`; // Default to India if no country code
+      }
+  
+      setIsSendingOtp(true);
+  
+      // Verify reCAPTCHA is ready
+      if (!recaptchaVerifier) {
+        throw new Error('Security check not ready. Please try again.');
+      }
   
       // Send OTP
       const confirmation = await signInWithPhoneNumber(
         auth,
         phoneNumber,
-        window.recaptchaVerifier
+        recaptchaVerifier
       );
       
       setConfirmationResult(confirmation);
-      toast.success('OTP sent successfully!');
       setMobileOtpSent(true);
-  
+      toast.success("OTP sent successfully");
+      
     } catch (error) {
-      console.error('Full error:', error);
+      console.error("OTP sending failed:", error);
       
-      // Specific error handling
-      if (error.code === 'auth/invalid-app-credential') {
-        toast.error('Invalid Firebase configuration. Please contact support.');
-        // Check Firebase project settings and SHA certificates
-      } else if (error.code === 'auth/internal-error') {
-        toast.error('Verification service error. Please try again later.');
-      } else if (error.code === 'auth/invalid-phone-number') {
-        toast.error('Invalid phone number format. Include country code.');
-      } else {
-        toast.error(`Failed to send OTP: ${error.message}`);
+      let errorMessage = "Failed to send OTP. Please try again.";
+      
+      if (error.code === 'auth/invalid-phone-number') {
+        errorMessage = "Invalid phone number format";
+      } else if (error.code === 'auth/invalid-app-credential') {
+        errorMessage = "Firebase configuration error. Please contact support.";
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = "Too many attempts. Please try again later.";
+      } else if (error.message.includes('reCAPTCHA')) {
+        errorMessage = "Security check failed. Please refresh the page.";
       }
       
-      // Reset reCAPTCHA on error
-      if (window.recaptchaVerifier) {
-        try {
-          window.recaptchaVerifier.clear();
-        } catch (e) {
-          console.log("Error clearing recaptcha:", e);
-        }
-        window.recaptchaVerifier = null;
+      toast.error(errorMessage);
+      
+      // Reset reCAPTCHA on failure
+      if (recaptchaVerifier) {
+        recaptchaVerifier.clear();
+        setRecaptchaVerifier(null);
       }
+    } finally {
+      setIsSendingOtp(false);
     }
   };
+
+  const handleVerifyMobileOTP = async () => {
+    const code = watch("mobileOtp");
+  
+    if (!code || code.length !== 6) {
+      toast.error("Please enter a valid 6-digit OTP");
+      return;
+    }
+  
+    try {
+      const result = await confirmationResult.confirm(code);
+      const user = result.user;
+      
+      // Optional: Send verification to your backend
+      try {
+        const idToken = await user.getIdToken();
+        const token = localStorage.getItem("token");
+        await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`,
+          { idToken },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+      } catch (backendError) {
+        console.error("Backend verification error:", backendError);
+      }
+  
+      setIsMobileOtpVerified(true);
+      setCurrentStep(3);
+      toast.success("Mobile number verified!");
+    } catch (error) {
+      console.error("OTP verification failed:", error);
+      toast.error("Invalid OTP. Please try again.");
+    }
+  };
+  
+
+
   {/*const handleVerifyMobileOTP = async () => {
     try {
       const otp = watch("mobileOtp");
@@ -490,42 +517,46 @@ export const VerifyPage = () => {
     }
   };*/}
 
- const handleVerifyMobileOTP = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-  
+  {/*const handleVerifyMobileOTP = async () => {
     try {
-      const { idToken } = req.body;
-      
-      // Verify the Firebase ID token
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      const uid = decodedToken.uid;
-      
-      // Get the user's phone number from the token
-      const user = await admin.auth().getUser(uid);
-      const phoneNumber = user.phoneNumber;
-      
-      // Here you would typically:
-      // 1. Find the user in your database by phoneNumber
-      // 2. Update their verification status
-      // 3. Generate a custom token if needed
-      
-      res.json({ 
-        success: true,
-        message: 'OTP verified successfully',
-        phoneNumber
-      });
+      const otp = watch("mobileOtp");
+      if (!otp || otp.length !== 6) {
+        toast.error("Please enter a valid 6-digit OTP");
+        return;
+      }
+  
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/verify-mobileotp`,
+        { 
+          verificationId, // From the send OTP response
+          otp 
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+  
+      if (response.data.success) {
+        toast.success('Mobile number verified successfully!');
+        setIsMobileOtpVerified(true);
+        setCurrentStep(3); // Move to next step
+        
+        // If you get a token from backend, store it
+        if (response.data.token) {
+          localStorage.setItem('firebaseToken', response.data.token);
+        }
+      }
     } catch (error) {
       console.error('Error verifying OTP:', error);
-      res.status(400).json({ 
-        error: 'Invalid OTP',
-        details: error.message 
-      });
+      toast.error(
+        error.response?.data?.error || "Invalid OTP. Please try again."
+      );
     }
-  }
-  
+  };*/}
   const handleSubmitVerification = async () => {
     if (!selfieImage) {
       toast.error("Please take a selfie first", { position: "top-center" });
@@ -735,12 +766,16 @@ export const VerifyPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-      <div 
+      {/*<div 
         id="recaptcha-container" 
         ref={recaptchaContainerRef}
         style={{ display: 'none' }}
-      />
-      
+      />*/}
+
+<div id="recaptcha-container" ref={recaptchaContainerRef}></div>
+
+
+     
         <Button
           onClick={() => navigate(-1)}
           variant="ghost"
@@ -750,6 +785,7 @@ export const VerifyPage = () => {
           Back to Sign Up
         </Button>
 
+       
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Verify Your Account</h2>
           <p className="mt-2 text-sm text-gray-600">
