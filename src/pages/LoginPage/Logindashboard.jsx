@@ -76,9 +76,9 @@ export const LoginDashboard = () => {
           description: "You are not subscribed. Please subscribe to access full features.",
           variant: "warning",
         });
-        navigate("/subscription")
+     
       }
-      return
+      
 
       try {
         const walletResponse = await axios.post(

@@ -77,8 +77,6 @@ export const MediaMagnifierLogin = () => {
         description: "You are not subscribed. Please subscribe to access full features.",
         variant: "warning",
       });
-      navigate("/subscription");
-      return; // ❗️Prevent further code from running
     }
 
       try {
