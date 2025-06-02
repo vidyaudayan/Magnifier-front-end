@@ -370,7 +370,7 @@ const PostComposer = ({ user }) => {
   
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 mb-4">
+    <div className="bg-white dark:bg-slate-800 dark:text-white rounded-2xl shadow-sm border border-gray-200/50 mb-4">
     <div className="p-4">
       <div className="flex items-start space-x-3">
         {metrics?.profilePicture ? (
@@ -395,7 +395,7 @@ const PostComposer = ({ user }) => {
             value={content}
             onChange={handleContentChange}
             onClick={() => setIsExpanded(true)}
-            className="w-full p-2 min-h-[60px] bg-transparent border-0 focus:ring-0 text-gray-900 text-[15px] leading-relaxed resize-none placeholder-gray-500"
+            className="w-full p-2 min-h-[60px] bg-transparent border-0 focus:ring-0 text-gray-900 text-[15px] leading-relaxed resize-none placeholder-gray-500 dark:text-white"
             style={{ height: isExpanded ? '120px' : '60px' }}
           />
 
@@ -472,13 +472,13 @@ const PostComposer = ({ user }) => {
       {isExpanded && (
         <div className="flex items-center justify-between mt-4">
           <div className="flex-1 max-w-[200px]">
-            <label className="block text-sm ml-12 font-medium text-gray-700 mb-1">
+            <label className="block text-sm ml-12 font-medium text-gray-700 mb-1 dark:text-white">
               Display  post on top for
             </label>
             <select
               value={selectedDuration}
               onChange={(e) => handleDurationClick(e.target.value)}
-              className="w-full p-2 ml-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
+              className="w-full p-2 ml-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm dark:bg-slate-600"
             >
               <option value="0">Please select time duration</option>
               <option value="3600000">1 Hour</option>

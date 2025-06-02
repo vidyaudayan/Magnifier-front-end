@@ -322,7 +322,7 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen mt-10 bg-gray-50 dark:bg-gray-900">
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 dark:border-gray-700">
+      <div className="bg-white border-b border-gray-200 sticky dark:bg-slate-900 top-0 z-10 dark:border-gray-700">
         <div className="container mx-auto max-w-4xl px-4 py-3 mt-4 ">
           <div className="flex items-center gap-4">
             <button
@@ -435,8 +435,8 @@ const SearchPage = () => {
         ) : (
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Clock size={20} className="text-gray-400" />
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2 dark:text-white ">
+                <Clock size={20} className="text-gray-400 " />
                 Recent Searches
               </h2>
               {recentSearches.length > 0 && (
@@ -449,12 +449,12 @@ const SearchPage = () => {
               )}
             </div>
             {recentSearches.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-2 ">
                 {recentSearches.map((term, index) => (
                   <button
                     key={index}
                     onClick={() => handleSearch(term)}
-                    className="flex items-center gap-3 w-full p-3 text-left bg-white rounded-lg hover:bg-gray-50 transition-colors group"
+                    className="flex items-center gap-3 w-full p-3 text-left  bg-white rounded-lg hover:bg-gray-50 transition-colors group"
                   >
                     <Clock size={18} className="text-gray-400 flex-shrink-0" />
                     <span className="text-gray-700 flex-1 truncate">{term}</span>
