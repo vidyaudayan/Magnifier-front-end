@@ -171,10 +171,10 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { updateMetrics } from '../../features/user/userSlice';
 import { setUserDetails } from '../../features/user/userSlice';
+import { useSelector } from 'react-redux';
 
 
-
-const PostComposer = ({ user }) => {
+const PostComposer = ({  }) => {
   const [content, setContent] = useState('');
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -189,8 +189,10 @@ const PostComposer = ({ user }) => {
   const [metrics, setMetrics] = useState(null);
     const photoInputRef = useRef(null);
   const voiceNoteInputRef = useRef(null);
+  const user = useSelector(state => state.user.user);
   const navigate = useNavigate();
  const dispatch= useDispatch()
+   
  const disabled = false;
   const handleContentChange = (e) => {
     const text = e.target.value;
@@ -328,35 +330,74 @@ const PostComposer = ({ user }) => {
     }
   };
 
-  useEffect(() => {
-  
-          const fetchMetrics = async () => {
-              try {
-                  const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/usermatrics`, {
-                      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-                  }, { withCredentials: true });
-                  setMetrics(response.data);
-                  const { userName, profilePicture, walletAmount, totalLikes, totalDislikes, postCount } = response.data;
-  
-                  // Dispatch fetched metrics to Redux store
-                  dispatch(
-                      updateMetrics({
-                          walletAmount,
-                          totalLikes, totalDislikes,
-                          postCount, userName, profilePicture,
-                      })
-                  )
-                  const updatedProfilePic = `${response.data.user?.profilePic}?t=${Date.now()}`;
-                  setProfilePic(updatedProfilePic);
-                  dispatch(setUserDetails({ ...response.data.user, profilePic: updatedProfilePic }));
-  
-              } catch (error) {
-                  console.error("Error fetching metrics", error);
-              }
-          };
-          //dispatch(fetchMetrics());
-          fetchMetrics();
-      }, []);
+useEffect(() => {
+  const fetchMetrics = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Validate token exists
+      if (!token) {
+        console.error("No authentication token found");
+        return;
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/user/usermatrics`, // Fixed typo in endpoint
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+
+      if (response.data.success) {
+        const { user, posts, reactions } = response.data.data;
+        
+        // Update local state
+        setMetrics({
+          userName: user.username,
+          profilePicture: user.profilePic,
+          walletAmount: user.walletAmount,
+          totalLikes: reactions.likesGiven,
+          totalDislikes: reactions.dislikesGiven,
+          postCount: posts.count,
+          totalLikesReceived: posts.likesReceived,
+          totalDislikesReceived: posts.dislikesReceived,
+          totalImpressions: posts.impressions
+        });
+
+        // Update Redux store
+        dispatch(updateMetrics({
+          walletAmount: user.walletAmount,
+          totalLikes: reactions.likesGiven,
+          totalDislikes: reactions.dislikesGiven,
+          postCount: posts.count,
+          userName: user.username,
+          profilePicture: user.profilePic
+        }));
+
+        // Update profile picture with cache busting
+        const updatedProfilePic = `${user.profilePic}?t=${Date.now()}`;
+        setProfilePic(updatedProfilePic);
+        dispatch(setUserDetails({ 
+          ...response.data.data.user, 
+          profilePic: updatedProfilePic 
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+      if (error.response?.status === 401) {
+        // Handle unauthorized (e.g., redirect to login)
+        console.error("Session expired, please login again");
+        // Optionally: dispatch(logoutAction());
+      }
+    }
+  };
+
+  fetchMetrics();
+}, [dispatch]);
 
    useEffect(() => {
           const savedPost = JSON.parse(localStorage.getItem("pendingPost"));
@@ -370,7 +411,7 @@ const PostComposer = ({ user }) => {
   
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 mb-4">
+    <div className="bg-white dark:bg-slate-600 rounded-2xl shadow-sm border border-gray-200/50 mb-4">
     <div className="p-4">
       <div className="flex items-start space-x-3">
         {metrics?.profilePicture ? (
@@ -472,7 +513,7 @@ const PostComposer = ({ user }) => {
       {isExpanded && (
         <div className="flex items-center justify-between mt-4">
           <div className="flex-1 max-w-[200px]">
-            <label className="block text-sm ml-12 font-medium text-gray-700 mb-1">
+            {/*<label className="block text-sm ml-12 font-medium text-gray-700 mb-1">
               Display  post on top for
             </label>
             <select
@@ -485,7 +526,13 @@ const PostComposer = ({ user }) => {
               <option value="10800000">3 Hours</option>
               <option value="21600000">6 Hours</option>
               <option value="43200000">12 Hours</option>
-            </select>
+            </select>*/}
+            <button
+      onClick={() => setShowPopup(true)}
+      className="w-full p-2 ml-10 border dark:bg-slate-600 dark:text-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm bg-white hover:bg-gray-50"
+    >
+      {selectedDuration === '0' ? 'Pin your post' : `${getDurationLabel(selectedDuration)}`}
+    </button>
           </div>
           
           <button

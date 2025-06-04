@@ -84,6 +84,8 @@ import ElectoaiLearnmore from "./componenets/LearnMore/ElectoaiLearnmore.jsx";
 import VotermagnifierLearnmore from "./componenets/LearnMore/VotermagnifierLearnmore.jsx";
 import MediamagnifierLearnmore from "./componenets/LearnMore/MediamagnifierLearnmore.jsx";
 import Bulletin from "./componenets/Bulletin.jsx";
+import PricingNew from "./LivefeedPages/Paywallet.jsx";
+import Paywallet from "./LivefeedPages/Paywallet.jsx";
 
 
 
@@ -357,7 +359,7 @@ const router = createBrowserRouter([
          
           {
             path:"pricing",
-            element:<PricingPage/>
+            element:<Paywallet/>
           },
          
           {

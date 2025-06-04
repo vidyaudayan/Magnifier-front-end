@@ -317,7 +317,7 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen mt-10 bg-gray-50 dark:bg-gray-900">
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 dark:border-gray-700">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 dark:bg-slate-900 dark:border-gray-700">
         <div className="container mx-auto max-w-4xl px-4 py-3 mt-4 ">
           <div className="flex items-center gap-4">
             <button
