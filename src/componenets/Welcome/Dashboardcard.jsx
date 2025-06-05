@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,3 +31,4 @@ const DashboardCard = ({ type, state }) => {
 };
 
 export default DashboardCard;
+

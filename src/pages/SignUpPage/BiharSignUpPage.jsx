@@ -93,7 +93,7 @@ export const BiharSignUpPage = () => {
                 "Vikaspuri", "Vishwas Nagar", "Wazirpur"],
                 Bihar: [
                     "Adhaura", "Agiaon", "Alamnagar", "Amarpur", "Amour", "Amdabad", "Arah",
-                    "Araria", "Arwal", "Aurangabad", "Aurangabad", "Bagaha", "Bahadurganj",
+                    "Araria", "Arwal", "Aurangabad", "Bagaha", "Bahadurganj",
                     "Bajpatti", "Bakhtiarpur", "Banka", "Bankipur", "Banmankhi", "Barahat",
                     "Barari", "Barbigha", "Barhara", "Barh", "Barachatti", "Bariarpur",
                     "Bathnaha", "Baisi", "Belaganj", "Belhar", "Belsand", "Benipatti",
@@ -102,7 +102,7 @@ export const BiharSignUpPage = () => {
                     "Chenari", "Colgong", "Danapur", "Darauli", "Dehri", "Dhamdaha", "Dhaka",
                     "Digha", "Dumraon", "Fatuha", "Forbesganj", "Gaya", "Gaya Town",
                     "Ghosi", "Gobindpur", "Govindganj", "Gurua", "Hajipur", "Harsidhi", "Harlakhi",
-                    "Hisua", "Imamganj", "Islampur", "Jamui", "Jamui", "Jehanabad", "Jagdishpur",
+                    "Hisua", "Imamganj", "Islampur", "Jamui", "Jehanabad", "Jagdishpur",
                     "Jhanjharpur", "Jhajha", "Jokihat", "Kahalgaon", "Kalyanpur",
                     "Kasba", "Katihar", "Kargahar", "Karakat", "Kesaria", "Khajauli", "Kishanganj",
                     "Korha", "Kurtha", "Kutumba", " Lakhisarai", "Lauriya", "Laukaha", "Madhepura",
@@ -111,7 +111,7 @@ export const BiharSignUpPage = () => {
                     "Narkatia", "Narkatiaganj", "Narpatganj", "Nautan", "Nawada",
                     "Nirmali", "Nokha", "Paliganj", "Parihar", "Patliputra", "Patna Sahib",
                     "Phulparas", "Pirpainti", "Pipra", "Piro", "Pranpur", "Ramnagar",
-                    "Rafiganj", "Raghopur", "Rajauli", "Rampur", "Raniganj", "Raxaul", "Riga",
+                    "Rafiganj", "Raghopur", "Rajauli", "Rampur", "Raniganj", "Raxaul",
                     "Riga", "Rupauli", "Runnisaidpur", "Sandesh", "Saharsa", "Sasaram",
                     "Sheikhpura", "Sheohar", "Sherghati", "Shahpur", "Simri Bakhtiyarpur",
                     "Singheshwar", "Sitamarhi", "Sikandra", "Sikta", "Siwan", "Sugauli", "Sultanganj",
@@ -201,13 +201,13 @@ export const BiharSignUpPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <Button
+            {/* <Button
                     onClick={() => navigate("/")}
                     className="mb-6 flex bg-blue-900 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
                 >
                     <ArrowLeft className="h-4 w-4" />
                     Back to Home
-                </Button>
+                </Button> */}
             <div className="max-w-3xl mx-auto">
                
 

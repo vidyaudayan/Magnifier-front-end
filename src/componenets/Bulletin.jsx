@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { NavigationSection } from '../pages/BackgroundCopyOf/sections/NavigationSection/NavigationSection';
 import { FooterSection } from '../pages/BackgroundCopyOf/sections/FooterSection/FooterSection';
@@ -428,5 +429,6 @@ const Bulletin = () => {
     </div>
   );
 };
+
 
 export default Bulletin;

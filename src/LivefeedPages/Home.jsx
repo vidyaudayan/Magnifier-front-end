@@ -86,7 +86,9 @@ const Home = () => {
   }
 
   return (
+
     <div className="min-h-screen dark:bg-slate-800">
+
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row md:gap-6">
           {/* Main Feed */}
@@ -105,7 +107,11 @@ const Home = () => {
               />
 
               {/* Feed Header with Tabs */}
-                            <div className=' w-full  sticky top-0 bg-slate-50 text-slate-50 pb-4 text- z-30 dark:bg-slate-800 dark:text-slate-800'>h</div>
+
+
+              <div className='sticky top-0 bg-slate-50 text-slate-50 z-30 dark:bg-slate-900 dark:text-slate-900'></div>
+
+
              
                            <div className="sticky top-[120px] md:top-4 z-10 -mx-4 px-4 pb-4 ">
                 <FeedHeader activeTab={activeTab} onTabChange={setActiveTab} />

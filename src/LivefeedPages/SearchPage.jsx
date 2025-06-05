@@ -5,6 +5,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSearchQuery } from '../features/search/searchSlice';
+import PostCard from '../componenets/Livefeed/PostCard';
 import {
   Search as SearchIcon, ThumbsUp,
   ThumbsDown,MessageCircle,Share2,
@@ -23,6 +24,7 @@ const SearchPage = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
  const { posts } = useSelector((state) => state.user);
    const currentUser = useSelector((state) => state.user.user);
     const user = useSelector(state => state.user.user);
@@ -30,6 +32,7 @@ const SearchPage = () => {
     //const [comments, setComments] = useState(post.comments);
     const [commentsVisible, setCommentsVisible] = useState(false);
     const [displayCount, setDisplayCount] = useState(6);
+
   // Get query from URL and update Redux store
   useEffect(() => {
     const urlQuery = searchParams.get('query');
@@ -252,8 +255,10 @@ const SearchPage = () => {
                     No posts available. Create one!
                   </div>
                 )}
+
               </div>
   );
+
 
   const renderOtherResult = (result) => {
     switch (result.type) {
