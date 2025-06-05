@@ -108,10 +108,12 @@ const Home = () => {
 
               {/* Feed Header with Tabs */}
 
+
               <div className='sticky top-0 bg-slate-50 text-slate-50 z-30 dark:bg-slate-900 dark:text-slate-900'></div>
 
+
              
-              <div className="sticky top-[120px] md:top-4 z-10 -mx-4 px-4 pb-4 pt-2">
+                           <div className="sticky top-[120px] md:top-4 z-10 -mx-4 px-4 pb-4 ">
                 <FeedHeader activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
               

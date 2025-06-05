@@ -32,9 +32,56 @@ const Wallet = () => {
   const [transactions, setTransactions] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 const walletAmount = useSelector((state) => state.user.walletAmount);
-  useEffect(() => {
+ const [redeemAmount, setRedeemAmount] = useState('');
+useEffect(() => {
     fetchWalletData();
   }, []);
+
+  const handleWithdraw = async () => {
+  if (!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0) {
+    toast.error("Please enter a valid amount");
+    return;
+  }
+
+  const redeemPoints = parseInt(redeemAmount);
+  const { earnedPoints, rechargedPoints, totalPoints } = walletData;
+
+  if (redeemPoints > totalPoints) {
+    toast.error("You don't have enough points to redeem");
+    return;
+  }
+
+  setIsProcessing(true);
+  setIsButtonDisabled(true);
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/user/redeem`,
+      { points: redeemPoints },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (response.data.success) {
+      toast.success("Points redeemed successfully!");
+      fetchWalletData(); // Refresh wallet data
+      setShowWithdrawModal(false);
+      setRedeemAmount('');
+    } else {
+      throw new Error(response.data.message || "Redemption failed");
+    }
+  } catch (error) {
+    console.error("Redemption error:", error);
+    toast.error(error.response?.data?.message || "Points redemption failed");
+  } finally {
+    setIsProcessing(false);
+    setIsButtonDisabled(false);
+  }
+};
 
   const fetchWalletData = async () => {
     try {
@@ -147,12 +194,7 @@ const walletAmount = useSelector((state) => state.user.walletAmount);
   };
  
 
-  const handleWithdraw = async () => {
-    // Implement withdrawal logic
-    console.log('Initiating points withdrawal');
-    setShowWithdrawModal(false);
-  };
-
+ 
   const getStatusColor = (status) => {
     switch (status) {
       case 'success':
@@ -237,7 +279,7 @@ const walletAmount = useSelector((state) => state.user.walletAmount);
           Get More Points
         </button>
         <button
-          //onClick={() => setShowWithdrawModal(true)}
+          onClick={() => setShowWithdrawModal(true)}
           className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl py-3 font-medium hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
         >
           Redeem Points
@@ -342,59 +384,64 @@ const walletAmount = useSelector((state) => state.user.walletAmount);
       )}
 
       {/* Withdraw Modal */}
-      {showWithdrawModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <Award className="w-6 h-6 text-green-500" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Redeem Points
-              </h3>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center space-x-2 mb-4">
-                  <Coins className="w-5 h-5 text-yellow-500" />
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Available points for redemption: {walletData.earnedPoints}
-                  </p>
-                </div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Enter Points to Redeem
-                </label>
-                <div className="relative">
-                  <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="number"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    placeholder="Enter points"
-                    max={walletData.earnedPoints}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowWithdrawModal(false)}
-                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                >
-                  Cancel
-                </button>
-               <button
-  //onClick={handleWithdraw}
-  disabled={isButtonDisabled} 
-  className={`px-4 py-2 bg-gradient-to-r text-white rounded-lg ${
-    isButtonDisabled 
-      ? 'from-gray-400 to-gray-500 cursor-not-allowed' 
-      : 'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
-  }`}
->
-  Redeem Points
-</button>
-              </div>
-            </div>
+   {showWithdrawModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6">
+      <div className="flex items-center space-x-2 mb-4">
+        <Award className="w-6 h-6 text-green-500" />
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+          Redeem Points
+        </h3>
+      </div>
+      <div className="space-y-4">
+        <div>
+          <div className="flex items-center space-x-2 mb-4">
+            <Coins className="w-5 h-5 text-yellow-500" />
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Available points for redemption: {walletData.totalPoints}
+            </p>
+          </div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Enter Points to Redeem
+          </label>
+          <div className="relative">
+            <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="number"
+              value={redeemAmount}
+              onChange={(e) => setRedeemAmount(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="Enter points"
+              max={walletData.totalPoints}
+            />
           </div>
         </div>
-      )}
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={() => {
+              setShowWithdrawModal(false);
+              setRedeemAmount('');
+            }}
+            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleWithdraw}
+            disabled={isButtonDisabled || isProcessing}
+            className={`px-4 py-2 bg-gradient-to-r text-white rounded-lg ${
+              isButtonDisabled || isProcessing
+                ? 'from-gray-400 to-gray-500 cursor-not-allowed' 
+                : 'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+            }`}
+          >
+            {isProcessing ? 'Processing...' : 'Redeem Points'}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

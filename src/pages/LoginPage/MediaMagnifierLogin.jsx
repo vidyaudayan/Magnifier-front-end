@@ -70,14 +70,14 @@ export const MediaMagnifierLogin = () => {
         dispatch(setUserDetails(user));
       }
 
-      // ✅ New: Show toast if user is not subscribed
-     if (!user?.subscribed) {
-      toast({
-        title: "Subscription Required",
-        description: "You are not subscribed. Please subscribe to access full features.",
-        variant: "warning",
-      });
-    }
+    //   // ✅ New: Show toast if user is not subscribed
+    //  if (!user?.subscribed) {
+    //   toast({
+    //     title: "Subscription Required",
+    //     description: "You are not subscribed. Please subscribe to access full features.",
+    //     variant: "warning",
+    //   });
+    // }
 
       try {
         const walletResponse = await axios.post(
@@ -104,16 +104,29 @@ export const MediaMagnifierLogin = () => {
       reset();
       navigate("/dashboard/media");
     } catch (error) {
-      console.error("Error signing in:", error);
+    const message = error.response?.data?.message;
+    const reason = error.response?.data?.reason;
+
+    console.error("Error signing in:", error);
+
+    if (reason === "not_subscribed") {
       toast({
-        title: "Error",
-        description:
-          error.response?.data?.message || "An error occurred during sign-in.",
-        variant: "destructive",
+        title: "Subscription Required",
+        description: message || "You are not subscribed. Please subscribe.",
+        variant: "warning",
       });
-    } finally {
-      setIsLoading(false);
+
+      return navigate("/subscriptionflow");
     }
+
+    toast({
+      title: "Error",
+      description: message || "An error occurred during sign-in.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
   };
 
 
@@ -121,13 +134,13 @@ export const MediaMagnifierLogin = () => {
 
   return (
    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Button
+      {/* <Button
         onClick={() => navigate("/")}
         className="mb-6 flex bg-blue-900 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Home
-      </Button>
+      </Button> */}
 
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">

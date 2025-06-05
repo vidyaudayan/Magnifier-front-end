@@ -453,7 +453,7 @@ const handleReportPost = async () => {
     className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 -mt-1"
     onClick={() => setShowOptionsMenu(!showOptionsMenu)}
   >
-    <MoreHorizontal className="w-5 h-5" />
+    <MoreHorizontal className="w-5 h-5 mt-5" />
   </button>
   
   {showOptionsMenu && (
@@ -467,7 +467,7 @@ const handleReportPost = async () => {
             }}
             className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
           >
-            <Flag className="w-4 h-4 mr-2" />
+            <Flag className="w-4 h-4 mr-2 " />
             Report Post
           </button>
         )}

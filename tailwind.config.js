@@ -26,6 +26,9 @@ export default {
           '50%': { transform: 'translateY(-10px)' },
           '100%': { transform: 'translateY(0)' },
         },
+        screens: {
+        'custom': '1423px',
+      },
       },
   },
 },

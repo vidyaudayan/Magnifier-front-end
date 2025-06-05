@@ -29,7 +29,7 @@ export const BackgroundCopyOf = () => {
         </section>
 
         {/* State Selection Section */}
-        <StateSelectionSection />
+        {/* <StateSelectionSection /> */}
 
 
         {/* Services Section */}

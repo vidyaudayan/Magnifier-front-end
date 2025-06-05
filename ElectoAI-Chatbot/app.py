@@ -1,70 +1,3 @@
-# from flask import Flask, request, jsonify
-# from flask_cors import CORS
-# import uuid
-# import os
-# import google.generativeai as genai
-# from dotenv import load_dotenv
-
-# # Load environment variables
-# load_dotenv()
-# API_KEY = os.getenv("GOOGLE_API_KEY")
-
-# # Configure Gemini
-# genai.configure(api_key=API_KEY)
-# model = genai.GenerativeModel("gemini-2.0-flash")
-
-# app = Flask(__name__)
-# CORS(app)
-
-# # In-memory chat storage (optional)
-# chats = []
-
-# # 🎯 Create a new chat
-# @app.route("/api/chat/new", methods=["POST"])
-# def create_chat():
-#     chat_id = str(uuid.uuid4())
-#     chat = {
-#         "_id": chat_id,
-#         "latestMessage": "New chat created"
-#     }
-#     chats.append(chat)
-#     return jsonify(chat), 201
-
-# # 🤖 Generate response from Gemini
-# @app.route('/api/gemini', methods=['POST'])
-# def gemini_chat():
-#     user_input = request.json.get("input")
-#     username = request.json.get("username")
-#     state = request.json.get("state")
-
-#     if not user_input:
-#         return jsonify({"error": "No input provided"}), 400
-
-#     try:
-#         # Log user info (optional)
-#         print(f"[{username} from {state}] Prompt: {user_input}")
-
-#         # Generate Gemini response
-#         response = model.generate_content(user_input)
-#         reply = response.text
-
-#         return jsonify({"output": reply})
-#     except Exception as e:
-#         import traceback
-#         traceback.print_exc()
-#         return jsonify({"error": str(e)}), 500
-
-# # Health check route
-# @app.route("/", methods=["GET"])
-# def index():
-#     return "Gemini Chatbot Backend is running"
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
-
-
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
@@ -72,15 +5,22 @@ from datetime import datetime
 import re
 import uuid
 import os
-import time
-from collections import defaultdict
 from google.cloud import storage
 from rapidfuzz import process, fuzz
-from vertexai.preview.generative_models import GenerativeModel
-import vertexai
+import requests
 from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone
 from dotenv import load_dotenv
+from pymongo import MongoClient
+import google.generativeai as genai
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,  # or WARNING/ERROR depending on verbosity you want
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Load environment
 load_dotenv()
@@ -92,38 +32,47 @@ CORS(app)
 # Environment variables
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
-PROJECT_ID = os.getenv("PROJECT_ID")
-LOCATION = os.getenv("LOCATION")
+MONGO_URI = os.getenv("MONGO_URI")
+# URLs stored in environment variables
+NEWS_URL = os.getenv("NEWS_JSON_URL")
+ELECTION_URL = os.getenv("ELECTION_JSON_URL")
 
 # Check environment setup
-if not all([PINECONE_API_KEY, PINECONE_INDEX_NAME, PROJECT_ID, LOCATION]):
+if not all([PINECONE_API_KEY, PINECONE_INDEX_NAME, MONGO_URI, NEWS_URL, ELECTION_URL]):
     raise RuntimeError("Missing one or more required environment variables.")
 
+# MongoDB setup
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client["electoai"]
+chat_collection = db["chat_history"]
+
 # Services init
-client = storage.Client()
+
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX_NAME)
-vertexai.init(project=PROJECT_ID, location=LOCATION)
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  # assumes it's set in your env
+genai.configure(api_key=GOOGLE_API_KEY)
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-gemini = GenerativeModel("gemini-2.0-flash-001")
+question_gemini = genai.GenerativeModel("gemini-1.5-flash")
+answer_gemini = genai.GenerativeModel("gemini-2.0-flash")
 
-# Session memory
-user_sessions = defaultdict(lambda: {"history": [], "last_active": time.time()})
+
 MAX_HISTORY = 5
-SESSION_TIMEOUT = 3600  # 1 hour
 
 # Load GCS data
-def load_json_from_bucket(bucket_name, file_name):
+# Utility to load public JSON from a URL
+def load_public_json_from_url(url):
     try:
-        bucket = client.bucket(bucket_name)
-        blob = bucket.blob(file_name)
-        return json.loads(blob.download_as_text())
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
     except Exception as e:
-        print(f"❌ Error loading file {file_name}: {e}")
+        logger.error(f"❌ Error loading from URL {url}: {e}")
         return []
 
-news_data = load_json_from_bucket("electoai-bucket", "daily_summary.json")
-election_data = load_json_from_bucket("electoai-bucket", "election_data.json")
+# Load data from public URLs
+news_data = load_public_json_from_url(NEWS_URL)
+election_data = load_public_json_from_url(ELECTION_URL)
 
 # Utility
 def normalize(text):
@@ -135,6 +84,22 @@ def is_topic_match(topics, text):
 def generate_embedding(text):
     return embedding_model.encode(text).tolist()
 
+# MongoDB chat history functions
+def get_chat_history(username):
+    doc = chat_collection.find_one({"username": username})
+    return doc["history"] if doc else []
+
+def update_chat_history(username, question, answer):
+    history = get_chat_history(username)
+    history.append({"question": question, "answer": answer})
+    if len(history) > MAX_HISTORY:
+        history = history[-MAX_HISTORY:]
+    chat_collection.update_one(
+        {"username": username},
+        {"$set": {"history": history}},
+        upsert=True
+    )
+
 # Query Parsing
 def parse_query_with_gemini(query, history, user_state):
     today = datetime.today().strftime("%Y-%m-%d")
@@ -143,12 +108,13 @@ def parse_query_with_gemini(query, history, user_state):
     Today's date is {today}.
     Use the past questions for context:
     {past_question}
-    - if just news or party mentioned use user state: {user_state} (dont use with topics)
+    - if just news or party mentioned use user state: {user_state} (dont use with *topics*)
 
     From the following query, extract:
     1. keys (like bihar, delhi, west bengal, BJP_Bihar, Delhi, AITC_West Bengal, Never mind if it is uppercase or lower case),
     - Never use anything other than party/state as key
-    2. topics (like Sita temple, Amit Shah),
+    - either state or party_state (not party alone)
+    2. topics (like Sita temple, Amit Shah), (use the entire question for topic)
     3. date_range: ["YYYY-MM-DD", "YYYY-MM-DD"]
     - recent/latest etc.. use nearest 4 days
 
@@ -167,13 +133,17 @@ def parse_query_with_gemini(query, history, user_state):
 
     Query: "{query}"
     """
-    res = gemini.generate_content(prompt)
-    print("🔍 Gemini parse raw output:", res.text)
+
+    res = question_gemini.generate_content(prompt)
+
     try:
-        json_text = re.sub(r"json|", "", res.text).strip()
+        match = re.search(r'\{.*\}', res.text, re.DOTALL)
+        if not match:
+            raise ValueError("No JSON object found in the response.")
+        json_text = match.group(0)
         return json.loads(json_text)
     except Exception as e:
-        print("❌ JSON parse error:", e)
+        logger.error("\u274c JSON parse error:", e)
         return None
 
 # Answer Generator
@@ -206,7 +176,7 @@ def answer_with_gemini(user_query, results, history):
 
     Reply to the user accordingly:
     """
-    res = gemini.generate_content(prompt)
+    res = answer_gemini.generate_content(prompt)
     return res.text.strip()
 
 # Search Handlers
@@ -225,7 +195,7 @@ def search_by_key_and_date(data, keys, date_range, topics):
         matches.sort(key=lambda x: x[1], reverse=True)
         return [r[0] for r in matches[:10]]
     except Exception as e:
-        print("❌ Error in search_by_key_and_date:", e)
+        logger.error("\u274c Error in search_by_key_and_date:", e)
         return []
 
 def topic_search_pinecone(topics, top_k=10):
@@ -244,7 +214,7 @@ def topic_search_pinecone(topics, top_k=10):
             } for m in sorted_matches
         ]
     except Exception as e:
-        print("❌ Pinecone search error:", e)
+        logger.error("\u274c Pinecone search error:", e)
         return []
 
 def fetch_data_by_multiple_years_constituencies(data, year, constituency_query):
@@ -256,7 +226,7 @@ def fetch_data_by_multiple_years_constituencies(data, year, constituency_query):
             return [row for row in data if row["year"] == int(year) and row["constituency"] == best], best
         return [], constituency_query
     except Exception as e:
-        print("❌ Constituency match error:", e)
+        logger.error("\u274c Constituency match error:", e)
         return [], constituency_query
 
 def search_election_results(data, constituencies, years):
@@ -276,11 +246,16 @@ def search_data(query, chat_history, user_state):
     parsed = parse_query_with_gemini(query, chat_history, user_state)
     if not parsed:
         return None, None
+
     keys = parsed.get("keys", [])
     topics = parsed.get("topics", [])
     date_range = parsed.get("date_range", [])
     constituencies = parsed.get("constituency", [])
     years = parsed.get("year", [])
+
+    # 🛑 Enforce rule: if keys are used, discard topics
+    if keys:
+        topics = []
 
     if constituencies or years:
         return search_election_results(election_data, constituencies, years), "election"
@@ -297,51 +272,37 @@ def generate_from_gemini():
     try:
         data = request.get_json()
         user_query = data.get('input', '')
-        username = request.json.get("username")
-        user_state = request.json.get("state")
-        print(f"🧑 User: {username}, 📍 State: {user_state}")
+        user_state = data.get("state")
+        username = data.get("username")
+        session_id = data.get("session_id") or str(uuid.uuid4())
 
-        if not username:
-            return jsonify({'error': 'Missing user_id'}), 400
-
-        # Session cleanup
-        current_time = time.time()
-        for uid in list(user_sessions.keys()):
-            if current_time - user_sessions[uid]["last_active"] > SESSION_TIMEOUT:
-                del user_sessions[uid]
-
-        # Get session
-        session = user_sessions[username]
-        chat_history = session["history"]
-        session["last_active"] = current_time
+        # Load chat history from MongoDB
+        chat_history = get_chat_history(username)
 
         # Run query
         search_results, result_type = search_data(user_query, chat_history, user_state)
         answer = answer_with_gemini(user_query, search_results, chat_history)
 
-        # Store
-        chat_history.append({
-            "question": user_query,
-            "answer": {"text": answer if result_type != "election" else answer + "\n\nElection Results:\n" + json.dumps(search_results, indent=2, ensure_ascii=False)}
-        })
-        if len(chat_history) > MAX_HISTORY:
-            chat_history.pop(0)
+        # Format answer
+        full_answer = answer if result_type != "election" else answer + "\n\nElection Results:\n" + json.dumps(search_results, indent=2, ensure_ascii=False)
+
+        # Update chat history in MongoDB
+        update_chat_history(username, user_query, full_answer)
 
         return jsonify({
             'output': answer,
-            'search_results': search_results if result_type == "election" else None
+            'search_results': search_results if result_type == "election" else None,
+            'session_id': session_id
         })
+
     except Exception as e:
-        print("❌ API error:", e)
+        print("\u274c API error:", e)
         return jsonify({'error': 'Something went wrong'}), 500
 
 # Health check
 @app.route('/', methods=['GET'])
 def running_status():
-    return "ElectoAI Gemini Backend is running!"
+    return "ElectoAI Gemini Backend is running with MongoDB!"
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
-
-
-print("HEllo World")
+    app.run(debug=True, port=5000,  use_reloader=False)

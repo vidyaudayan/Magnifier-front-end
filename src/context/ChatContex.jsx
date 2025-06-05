@@ -5,6 +5,7 @@ import { server } from "../main";
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
+   const ElectoAI = import.meta.env.VITE_ELECTOAI_URL;
   const [messages, setMessages] = useState([]);
   const [prompt, setPrompt] = useState("");
   const [newRequestLoading, setNewRequestLoading] = useState(false);
@@ -44,7 +45,7 @@ export const ChatProvider = ({ children }) => {
     setPrompt("");
 
     try {
-      const response = await axios.post("http://localhost:5000/api/gemini", {
+      const response = await axios.post(ElectoAI, {
         input: currentPrompt,
         username: userInfo.username,
         state: userInfo.state,
