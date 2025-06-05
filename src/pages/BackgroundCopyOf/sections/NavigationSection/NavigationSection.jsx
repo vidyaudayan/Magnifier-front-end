@@ -63,7 +63,7 @@ export const NavigationSection = () => {
       });
     } else {
       // Fallback to regular navigation if section not found
-      navigate("/signup");
+      navigate("/stateselection");
     }
   };
 

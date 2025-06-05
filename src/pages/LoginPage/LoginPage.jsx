@@ -149,13 +149,13 @@ console.log('Dispatched user data:', user);
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
 
-      <Button
+      {/* <Button
         onClick={() => navigate("/")}
         className="mb-6 flex bg-blue-900 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Home
-      </Button>
+      </Button> */}
 
       <div className="max-w-md mx-auto">
 

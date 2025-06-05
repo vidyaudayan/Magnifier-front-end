@@ -88,8 +88,13 @@ import { MediaMagnifierLogin } from "./pages/LoginPage/MediaMagnifierLogin.jsx";
 import { ElectoAILogin } from "./pages/LoginPage/ElectoAILogin.jsx";
 import Subscription from "./componenets/Subscription.jsx";
 import { ChatProvider } from "./context/ChatContex.jsx";
+import { SubscriptionPage } from "./pages/SubscriptionSection/SubscriptionPage.jsx";
+import { SubscriptionFlow } from "./componenets/SubscriptionFlow.jsx";
+import { VoterSubscriptionFlow } from "./componenets/VoterSubscriptionFlow.jsx";
+import { StateSelectionSection } from "./pages/BackgroundCopyOf/sections/StateSelectionSection/StateSelectionSection.jsx";
+import Paywallet from "./LivefeedPages/PayWallet.jsx";
 
-export const server = "http://localhost:5000"
+export const server = "http://ec2-43-204-130-170.ap-south-1.compute.amazonaws.com:5000"
 
 
 const router = createBrowserRouter([
@@ -149,6 +154,22 @@ const router = createBrowserRouter([
       {
         path: "/mediamagnifierlogin",
         element: <MediaMagnifierLogin />,
+      },
+      {
+        path: "/subscriptionpage",
+        element: <SubscriptionPage />,
+      },
+      {
+        path: "/subscriptionflow",
+        element: <SubscriptionFlow />,
+      },
+      {
+        path: "/votersubscriptionflow",
+        element: <VoterSubscriptionFlow />,
+      },
+      {
+        path: "/stateselection",
+        element: <StateSelectionSection />,
       },
       {
         path: "/electoailogin",
@@ -376,6 +397,10 @@ const router = createBrowserRouter([
           {
             path: "search",
             element: <SearchPage />
+          },
+          {
+            path: "pricing",
+            element: <Paywallet />
           },
 
           {

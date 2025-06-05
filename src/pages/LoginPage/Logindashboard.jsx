@@ -40,92 +40,95 @@ export const LoginDashboard = () => {
     },
   });
 
-  const onSubmit = async (data) => {
-    setIsLoading(true);
+ const onSubmit = async (data) => {
+  setIsLoading(true);
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/user/login`,
+      {
+        username: data.username,
+        password: data.password,
+        appName: "voterMagnifier",
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+    const { token, user } = response.data;
+
+    if (data.rememberMe) {
+      localStorage.setItem("rememberMe", "true");
+    }
+
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+
+    if (user && user.id && user.username) {
+      dispatch(setUserDetails(user));
+    }
+
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/login`,
+      const walletResponse = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/wallet`,
+        { withCredentials: true },
         {
-          username: data.username,
-          password: data.password,
-          appName: "voterMagnifier",
-        },
-        {
-          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-
-      const { token, user } = response.data;
-
-      if (data.rememberMe) {
-        localStorage.setItem("rememberMe", "true");
-      }
-
-      if (token) {
-        localStorage.setItem("token", token);
-      }
-
-      if (user && user.id && user.username) {
-        dispatch(setUserDetails(user));
-      }
-
-      // ✅ New: Show toast if user is not subscribed
-      if (!user?.subscribed) {
-        toast({
-          title: "Subscription Required",
-          description: "You are not subscribed. Please subscribe to access full features.",
-          variant: "warning",
-        });
-     
-      }
-      
-
-      try {
-        const walletResponse = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/user/wallet`,
-          { withCredentials: true },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const { walletAmount } = walletResponse.data;
-        console.log("Wallet Initialized:", walletAmount);
-      } catch (walletError) {
-        console.error("Error initializing wallet:", walletError);
-      }
-
-      toast({
-        title: "Success",
-        description: "You are logged in",
-        variant: "default",
-      });
-
-      reset();
-      navigate("/dashboard/voter");
-    } catch (error) {
-      console.error("Error signing in:", error);
-      toast({
-        title: "Error",
-        description:
-          error.response?.data?.message || "An error occurred during sign-in.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      const { walletAmount } = walletResponse.data;
+      console.log("Wallet Initialized:", walletAmount);
+    } catch (walletError) {
+      console.error("Error initializing wallet:", walletError);
     }
-  };
+
+    toast({
+      title: "Success",
+      description: "You are logged in",
+      variant: "default",
+    });
+
+    reset();
+    navigate("/dashboard/voter");
+  } catch (error) {
+    const message = error.response?.data?.message;
+    const reason = error.response?.data?.reason;
+
+    console.error("Error signing in:", error);
+
+    if (reason === "not_subscribed") {
+      toast({
+        title: "Subscription Required",
+        description: message || "You are not subscribed. Please subscribe.",
+        variant: "warning",
+      });
+
+      return navigate("/votersubscriptionflow");
+    }
+
+    toast({
+      title: "Error",
+      description: message || "An error occurred during sign-in.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Button
+      {/* <Button
         onClick={() => navigate("/")}
         className="mb-6 flex bg-blue-900 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Home
-      </Button>
+      </Button> */}
 
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
