@@ -1,3 +1,4 @@
+
 import React from 'react'
 import logo from '../../assets/Images/logo.jpg';  // <-- Import your logo here
 import { FooterSection } from '../../pages/BackgroundCopyOf/sections/FooterSection/FooterSection';
@@ -40,5 +41,6 @@ smarter, evidence-based decisions and build stronger connections with your elect
         </div>
   )
 }
+
 
 export default VotermagnifierLearnmore

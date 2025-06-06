@@ -16,7 +16,9 @@ export const DashboardSection = () => {
     <section id="services" className="scroll-mt-[100px] md:scroll-mt-[84px] mt-20 w-full">
       <div className="flex flex-col items-center mb-12 px-4 sm:px-6 lg:px-8">
         {/* Heading */}
+
         {/* <div className="flex items-center justify-center mb-4">
+
           <div className="w-2 h-2 bg-[#578cff] rounded-full mr-4"></div>
           <span className="text-4xl text-[#292929] font-normal font-['Helvetica_Neue-Regular']">
             Services
