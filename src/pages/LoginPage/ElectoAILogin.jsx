@@ -12,6 +12,8 @@ import { useToast } from "../../componenets/Welcome/use-toast";
 import { Toaster } from "../../componenets/Welcome/toaster";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../../features/user/userSlice";
+import LoginImage from '../../assets/Images/LoginImage.png';
+
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -45,11 +47,7 @@ export const ElectoAILogin = () => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/user/login`,
-        {
-          username: data.username,
-          password: data.password,
-          appName: "voterMagnifier",
-        },
+      
         {
           withCredentials: true,
         }
@@ -115,128 +113,109 @@ export const ElectoAILogin = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      {/* <Button
-        onClick={() => navigate("/")}
-        className="mb-6 flex bg-blue-900 items-center gap-2 hover:bg-white hover:text-blue-900 border hover:border-slate-300"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Home
-      </Button> */}
-
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Please enter your credentials to continue
-          </p>
-        </div>
-
-        <Card className="rounded-lg shadow-lg">
-          <CardContent className="p-8">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  {...register("username")}
-                  className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#578cff] focus:border-transparent"
-                  placeholder="Enter your username"
-                />
-                {errors.username && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.username.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    {...register("password")}
-                    className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#578cff] focus:border-transparent"
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Checkbox
-                    id="rememberMe"
-                    checked={watch("rememberMe")}
-                    onCheckedChange={(checked) =>
-                      setValue("rememberMe", !!checked)
-                    }
-                  />
-                  <label
-                    htmlFor="rememberMe"
-                    className="ml-2 text-sm text-gray-600"
-                  >
-                    Remember me
-                  </label>
-                </div>
-                <button
-                  type="button"
-                  className="text-sm text-[#578cff] hover:text-[#4171ff] font-medium"
-                  onClick={() => navigate("/forgot-password")}
-                >
-                  Forgot password?
-                </button>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-11 rounded-[29px] font-medium text-white text-sm tracking-[-0.14px] bg-blue-600 disabled:opacity-50"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  "Login"
-                )}
-              </Button>
-
-              <div className="text-center">
-                <p className="text-sm text-gray-600">
-                  Don't have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => navigate("/")}
-                    className="text-[#578cff] hover:text-[#4171ff] font-medium"
-                  >
-                    Sign up
-                  </button>
-                </p>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-      <Toaster />
-    </div>
-  );
-};
+ return (
+     <div className="min-h-screen flex items-center justify-center bg-[#f5f8ff] px-4 py-8 sm:py-0">
+       {/* Main container - column on mobile, row on large screens */}
+       <div className="flex flex-col lg:flex-row bg-white shadow-xl rounded-3xl overflow-hidden w-full max-w-5xl">
+         {/* Image - Top on mobile, right side on desktop */}
+         <div className="w-full lg:w-1/2 bg-[#f7f9fc] p-6 flex items-center justify-center order-1 lg:order-2">
+           <img
+             src={LoginImage}
+             alt="Login Illustration"
+             className="w-full max-w-md max-h-64 lg:max-h-[450px] object-contain"
+           />
+         </div>
+ 
+         {/* Form - Bottom on mobile, left side on desktop */}
+         <div className="w-full lg:w-1/2 p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center order-2 lg:order-1">
+           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Login</h1>
+           <p className="text-gray-600 text-base mb-6">Access your account</p>
+ 
+           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+             {/* Username */}
+             <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+               <input
+                 type="text"
+                 {...register("username")}
+                 className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                 placeholder="Enter your username"
+               />
+               {errors.username && (
+                 <p className="text-sm text-red-600 mt-1">{errors.username.message}</p>
+               )}
+             </div>
+ 
+             {/* Password */}
+             <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+               <div className="relative">
+                 <input
+                   type={showPassword ? "text" : "password"}
+                   {...register("password")}
+                   className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Enter your password"
+                 />
+                 <button
+                   type="button"
+                   onClick={() => setShowPassword(!showPassword)}
+                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                 >
+                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                 </button>
+               </div>
+               {errors.password && (
+                 <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
+               )}
+             </div>
+ 
+             {/* Remember me + Forgot */}
+             <div className="flex items-center justify-between">
+               <div className="flex items-center">
+                 <Checkbox
+                   id="rememberMe"
+                   checked={watch("rememberMe")}
+                   onCheckedChange={(checked) => setValue("rememberMe", !!checked)}
+                 />
+                 <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-600">
+                   Remember me
+                 </label>
+               </div>
+               <button
+                 type="button"
+                 onClick={() => navigate("/forgot-password")}
+                 className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+               >
+                 Forgot password?
+               </button>
+             </div>
+ 
+             {/* Submit */}
+             <Button
+               type="submit"
+               disabled={isLoading}
+               className="w-full h-11 rounded-xl font-semibold text-white text-sm bg-blue-600 disabled:opacity-50"
+             >
+               {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Login"}
+             </Button>
+ 
+             {/* Sign up */}
+             <div className="text-center">
+               <p className="text-sm text-gray-600">
+                 Don&apos;t have an account?{" "}
+                 <button
+                   type="button"
+                   onClick={() => navigate("/")}
+                   className="text-blue-600 hover:text-blue-800 font-medium"
+                 >
+                   Sign up
+                 </button>
+               </p>
+             </div>
+           </form>
+         </div>
+       </div>
+       <Toaster />
+     </div>
+   );
+ };

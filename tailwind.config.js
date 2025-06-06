@@ -2,14 +2,17 @@
 export default {
   darkMode: 'class',
   content: [
-     "./index.html",
+    "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
+      screens: {
+        custom: '1423px', // 👈 this is now in the correct place
+      },
       animation: {
-        pulse: 'pulse 1s infinite', // Animation that repeats infinitely
-        bounce: 'bounce 1s infinite', // You can use bounce or any other animation you prefer
+        pulse: 'pulse 1s infinite',
+        bounce: 'bounce 1s infinite',
         fadeIn: "fadeIn 1.5s ease-in-out",
       },
       keyframes: {
@@ -26,12 +29,8 @@ export default {
           '50%': { transform: 'translateY(-10px)' },
           '100%': { transform: 'translateY(0)' },
         },
-        screens: {
-        'custom': '1423px',
       },
-      },
+    },
   },
-},
   plugins: [],
-}
-
+};

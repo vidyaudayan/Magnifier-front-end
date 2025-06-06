@@ -411,7 +411,7 @@ useEffect(() => {
   
 
   return (
-    <div className="bg-white dark:bg-slate-600 rounded-2xl shadow-sm border border-gray-200/50 mb-4">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200/50 mb-4">
     <div className="p-4">
       <div className="flex items-start space-x-3">
         {metrics?.profilePicture ? (
