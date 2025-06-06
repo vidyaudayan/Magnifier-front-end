@@ -310,6 +310,7 @@ const ProfileNew = () => {
 
   const handleReaction = async (postId, reactionType) => {
     try {
+      const token = localStorage.getItem('token');
       const url = reactionType === "like"
         ? `${import.meta.env.VITE_BASE_URL}/post/${postId}/like`
         : `${import.meta.env.VITE_BASE_URL}/post/${postId}/dislike`;
@@ -719,22 +720,26 @@ const ProfileNew = () => {
 
       {/* Profile Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative -mt-16 sm:-mt-20">
+        {/* CHANGED: Increased negative margin to lift the avatar higher */}
+        <div className="relative -mt-20 sm:-mt-24 md:-mt-28">
           <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-end">
             <div className="relative">
+              {/* CHANGED: Made avatar larger on all screens */}
               <img
                 src={user?.profilePic ? `${user.profilePic}?${Date.now()}` : "/userProfile.avif"}
                 alt={user?.username}
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-4 border-white dark:border-gray-800 object-cover"
+                className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full border-4 border-white dark:border-gray-800 object-cover"
                 onError={(e) => { e.target.src = "/default-profile.png"; }}
               />
-              <div className="absolute -bottom-1 -right-1">
+              {/* CHANGED: Adjusted edit button position */}
+              <div className="absolute -bottom-2 -right-2">
                 <div className="relative profile-pic-dropdown-container">
+                  {/* CHANGED: Made edit button larger */}
                   <button
                     onClick={() => setShowProfilePicDropdown(!showProfilePicDropdown)}
-                    className="p-1 sm:p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600"
+                    className="p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600"
                   >
-                    <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Edit3 className="w-4 h-4" />
                   </button>
                   {showProfilePicDropdown && (
                     <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
