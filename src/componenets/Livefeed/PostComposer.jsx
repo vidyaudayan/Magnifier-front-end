@@ -164,7 +164,7 @@ export default PostComposer;*/}
 
 
 import React, { useState, useRef,useEffect } from 'react';
-import { Image, Mic, X, Globe2 } from 'lucide-react';
+import { Image, Mic, X, Globe2,Pin} from 'lucide-react';
 import axios from 'axios';
 import { toast } from "react-toastify";
 import { useNavigate } from 'react-router-dom';
@@ -512,7 +512,8 @@ useEffect(() => {
       {/* Duration and Post button row - now at the bottom */}
       {isExpanded && (
         <div className="flex items-center justify-between mt-4">
-          <div className="flex-1 max-w-[200px]">
+          <div className="flex-1  max-w-[200px]">
+              
             {/*<label className="block text-sm ml-12 font-medium text-gray-700 mb-1">
               Display  post on top for
             </label>
@@ -528,11 +529,12 @@ useEffect(() => {
               <option value="43200000">12 Hours</option>
             </select>*/}
             <button
-      onClick={() => setShowPopup(true)}
-      className="w-full p-2 ml-10 border dark:bg-slate-600 dark:text-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm bg-white hover:bg-gray-50"
-    >
-      {selectedDuration === '0' ? 'Pin your post' : `${getDurationLabel(selectedDuration)}`}
-    </button>
+  onClick={() => setShowPopup(true)}
+  className="w-full p-2 ml-10 border dark:bg-slate-600 dark:text-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm bg-white hover:bg-gray-50 flex items-center justify-center gap-2"
+>
+  <Pin className="w-4 h-4" />
+  <span>{selectedDuration === '0' ? 'Pin your post' : `${getDurationLabel(selectedDuration)}`}</span>
+</button>
           </div>
           
           <button

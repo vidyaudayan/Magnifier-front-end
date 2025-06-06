@@ -18,7 +18,7 @@ import NavbarLanding from "../componenets/NavbarLanding.jsx";
 
 const socket = io("http://localhost:3000");
 
-export default function PricingNew() {
+export default function Paywallet() {
   const [selectedDuration, setSelectedDuration] = useState("");
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -29,10 +29,39 @@ export default function PricingNew() {
   const [confirmedSlot, setConfirmedSlot] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [walletBalance, setWalletBalance] = useState(0);
+  //const [walletBalance, setWalletBalance] = useState(0);
+  const [walletBalance, setWalletBalance] = useState({
+  total: 0,
+  recharged: 0,
+  earned: 0
+});
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
-
-  useEffect(() => {
+const [showAuthModal, setShowAuthModal] = useState(false);
+const [username, setUsername] = useState('');
+const [password, setPassword] = useState('');
+const [showInsufficientBalanceModal, setShowInsufficientBalanceModal] = useState(false);
+ 
+const [showSuccessModal, setShowSuccessModal] = useState(false);
+const [successDetails, setSuccessDetails] = useState({
+  date: '',
+  time: '',
+  amount: 0,
+  newBalance: 0
+});
+const [selectedDate, setSelectedDate] = useState(DateTime.now().toISODate());
+const [weekDates, setWeekDates] = useState([]);
+useEffect(() => {
+  // Generate dates for the current week
+  const today = DateTime.now();
+  const dates = [];
+  
+  for (let i = 0; i < 7; i++) {
+    dates.push(today.plus({ days: i }).toISODate());
+  }
+  
+  setWeekDates(dates);
+}, []);
+useEffect(() => {
     const fetchWalletBalance = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -42,7 +71,16 @@ export default function PricingNew() {
             headers: { Authorization: `Bearer ${token}` }
           }
         );
-        setWalletBalance(response.data.totalPoints);
+        //setWalletBalance(response.data.totalPoints);
+     console.log('Wallet balance response:', response.data);
+        setWalletBalance({
+        total: response.data.totalPoints,
+        recharged: response.data.rechargedPoints,
+       earned: response.data.earnedPoints
+       //total: response.data.newBalance,
+  //recharged: user.rechargedPoints - response.data.deductedFromRecharged,
+  //earned: user.earnedPoints - response.data.deductedFromEarned
+      });
       } catch (error) {
         console.error("Error fetching wallet balance:", error);
       }
@@ -94,29 +132,37 @@ export default function PricingNew() {
     };
   }, [selectedDuration]);
 
+ 
   const fetchAvailableSlots = async (duration) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
-        {
-          params: { 
-            duration,
-            _: Date.now()
-          }
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
+      {
+        params: { 
+          duration,
+          date: selectedDate, // Make sure to send selectedDate
+          _: Date.now()
         }
-      );
-      
-      const formattedSlots = response.data.map(slot => ({
-        ...slot,
-        displayTime: formatSlotTime(slot.startHour, slot.endHour)
-      })).sort((a, b) => a.startHour - b.startHour);
-      
-      setAvailableSlots(formattedSlots);
-    } catch (error) {
-      console.error("Slot fetch error:", error);
-      toast.error("Failed to load available slots");
-    }
-  };
+      }
+    );
+    
+    // Additional client-side filtering for safety
+    const now = new Date();
+    const availableSlots = response.data.filter(slot => 
+      !slot.booked || (slot.expiresAt && new Date(slot.expiresAt) < now)
+    );
+
+    const formattedSlots = availableSlots.map(slot => ({
+      ...slot,
+      displayTime: formatSlotTime(slot.startHour, slot.endHour)
+    })).sort((a, b) => a.startHour - b.startHour);
+    
+    setAvailableSlots(formattedSlots);
+  } catch (error) {
+    console.error("Slot fetch error:", error);
+    toast.error("Failed to load available slots");
+  }
+};
 
   const formatSlotTime = (start, end) => {
     const startHour = start % 12 || 12;
@@ -148,7 +194,7 @@ export default function PricingNew() {
           startHour: slot.startHour,
           endHour: slot.endHour,
           duration: selectedDuration,
-          postId: pendingPost.draftId
+          postId: pendingPost.draftId,selectedDate 
         },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -157,20 +203,25 @@ export default function PricingNew() {
   
       if (response.data.success) {
         toast.success("Slot reserved!");
-        setConfirmedSlot(slot);
+        setConfirmedSlot({
+        ...slot,
+        date: selectedDate
+      });
         setShowConfirmationModal(true);
         socket.emit("slotBooked");
      
         const istZone = 'Asia/Kolkata';
+        const selectedDateTime = DateTime.fromISO(selectedDate).setZone(istZone);
         const now = DateTime.now().setZone(istZone);
 
-        let startIST = now.set({ hour: slot.startHour, minute: 0, second: 0, millisecond: 0 });
-        let endIST = now.set({ hour: slot.endHour, minute: 0, second: 0, millisecond: 0 });
-
-        if (startIST < now) {
+        //let startIST = now.set({ hour: slot.startHour, minute: 0, second: 0, millisecond: 0 });
+        //let endIST = now.set({ hour: slot.endHour, minute: 0, second: 0, millisecond: 0 });
+ let startIST = selectedDateTime.set({ hour: slot.startHour, minute: 0, second: 0, millisecond: 0 });
+      let endIST = selectedDateTime.set({ hour: slot.endHour, minute: 0, second: 0, millisecond: 0 });
+        {/*if (startIST < now) {
           startIST = startIST.plus({ days: 1 });
           endIST = endIST.plus({ days: 1 });
-        }
+        }*/}
 
         const stickyStartUTC = startIST.toUTC().toISO();
         const stickyEndUTC = endIST.toUTC().toISO();
@@ -206,11 +257,11 @@ export default function PricingNew() {
   
       const amount = pricing[duration] || 0;
       
-      if (walletBalance >= amount) {
-        setShowPaymentOptions(true);
-      } else {
-        await proceedToRazorpayPayment(duration, confirmedSlot);
-      }
+     if (walletBalance.total >= amount) {
+      setShowAuthModal(true);
+    } else {
+      setShowInsufficientBalanceModal(true);
+    }
     } catch (error) {
       console.error("Error confirming booking:", error);
       toast.error("Failed to initiate payment.");
@@ -319,7 +370,7 @@ export default function PricingNew() {
     }
   };
 
-  const initiateRazorpayPayment = async (paymentDetails) => {
+  {/*const initiateRazorpayPayment = async (paymentDetails) => {
     setIsProcessing(true);
     const token = localStorage.getItem('token');
     
@@ -454,35 +505,35 @@ export default function PricingNew() {
     } catch (error) {
       console.error("Failed to notify backend:", error);
     }
-  };
+  };*/}
 
   const pricingPlans = [
     {
       duration: 1,
       label: "1 Hour",
-      price: "₹30",
+      price: "30 Points",
       description: "Short-term visibility boost",
       icon: Clock
     },
     {
       duration: 3,
       label: "3 Hours",
-      price: "₹90",
+      price: "90 Points",
       description: "Extended visibility period",
       icon: Clock
     },
     {
       duration: 6,
       label: "6 Hours",
-      price: "₹180",
-      description: "Half-day prominence",
+      price: "180 Points",
+      description: "Stand out for 6 hours",
       icon: Clock
     },
     {
       duration: 12,
       label: "12 Hours",
-      price: "₹360",
-      description: "Full-day featured placement",
+      price: "360 Points",
+      description: "Showcase your posts with premium placement",
       icon: Clock
     }
   ];
@@ -603,6 +654,23 @@ export default function PricingNew() {
             <h3 className="text-lg font-semibold mb-4 dark:text-white">
               Available {selectedDuration}-hour Slots
             </h3>
+            <h3 className="pb-3 font-semibold">Select date</h3>
+            {/* Date Selection */}
+      <div className="flex overflow-x-auto gap-2 mb-4 pb-2">
+
+        {weekDates.map(date => (
+          <button
+            key={date}
+            className={`px-4 py-2 rounded-lg ${selectedDate === date 
+              ? 'bg-blue-500 text-white' 
+              : 'bg-gray-200 dark:bg-gray-700'}`}
+            onClick={() => setSelectedDate(date)}
+          >
+            {DateTime.fromISO(date).toFormat('EEE, dd MMM')}
+          </button>
+        ))}
+      </div>
+      
             
             {availableSlots.length === 0 ? (
               <p className="text-gray-500 dark:text-gray-400">No available slots for this duration.</p>
@@ -632,107 +700,410 @@ export default function PricingNew() {
         </div>
       )}
 
-      {/* Confirmation Modal */}
-      {showConfirmationModal && (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg relative w-full max-w-md">
-        <div className="text-center">
-          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2 dark:text-white">Confirm Your Booking</h3>
-          <div className="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
-            <p className="dark:text-gray-300">
-              <span className="font-semibold">Slot:</span> {confirmedSlot.startHour % 12 || 12}:00 {confirmedSlot.startHour < 12 ? 'AM' : 'PM'} - {confirmedSlot.endHour % 12 || 12}:00 {confirmedSlot.endHour < 12 ? 'AM' : 'PM'}
-            </p>
-            <p className="dark:text-gray-300">
-              <span className="font-semibold">Duration:</span> {selectedDuration} hour{selectedDuration > 1 ? 's' : ''}
-            </p>
-            <p className="text-lg font-bold dark:text-white mt-2">
-              Total Amount: ₹{selectedDuration === 1 ? 30 : 
-                              selectedDuration === 3 ? 90 : 
-                              selectedDuration === 6 ? 180 : 
-                              selectedDuration === 12 ? 360 : 0}
-            </p>
-            <p className="text-sm mt-2 dark:text-gray-300">
-              <WalletIcon className="inline w-4 h-4 mr-1" />
-              Wallet Balance: ₹{walletBalance}
-            </p>
-          </div>
+   
+     {/* Confirmation Modal */}
+{showConfirmationModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg relative w-full max-w-md">
+      <div className="text-center">
+        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold mb-2 dark:text-white">Confirm Your Booking</h3>
+        <div className="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
+          <p className="dark:text-gray-300">
+            <span className="font-semibold">Slot:</span> {confirmedSlot.startHour % 12 || 12}:00 {confirmedSlot.startHour < 12 ? 'AM' : 'PM'} - {confirmedSlot.endHour % 12 || 12}:00 {confirmedSlot.endHour < 12 ? 'AM' : 'PM'}
+          </p>
+          <p className="dark:text-gray-300">
+            <span className="font-semibold">Duration:</span> {selectedDuration} hour{selectedDuration > 1 ? 's' : ''}
+          </p>
+          <p className="text-lg font-bold dark:text-white mt-2">
+            Total Amount: ₹{selectedDuration === 1 ? 30 : 
+                            selectedDuration === 3 ? 90 : 
+                            selectedDuration === 6 ? 180 : 
+                            selectedDuration === 12 ? 360 : 0}
+          </p>
+          <p className="text-sm mt-2 dark:text-gray-300">
+            <WalletIcon className="inline w-4 h-4 mr-1" />
+            Wallet Balance: ₹{walletBalance.total}
+          </p>
         </div>
-        
-        {!showPaymentOptions ? (
-          <div className="flex justify-between mt-6">
-            <button
-              className="bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
-              onClick={() => setShowConfirmationModal(false)}
-              disabled={isProcessing}
-            >
-              Cancel
-            </button>
-            <button
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
-              onClick={handleConfirmBooking}
-              disabled={isProcessing}
-            >
-              {isProcessing ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Continue to Payment
-                </>
-              )}
-            </button>
-          </div>
-        ) : (
-          <div className="mt-6 space-y-3">
-            <h4 className="font-medium text-gray-900 dark:text-white mb-2">Select Payment Method</h4>
-            
-            <button
-              onClick={handleWalletPayment}
-              className="w-full flex items-center justify-between p-4 bg-blue-50 dark:bg-gray-700 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition-colors"
-              disabled={isProcessing}
-            >
-              <div className="flex items-center">
-                <WalletIcon className="w-5 h-5 text-blue-500 mr-3" />
-                <span className="font-medium">Pay from Wallet</span>
-              </div>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                Balance: ₹{walletBalance}
-              </span>
-            </button>
-            
-            <button
-              onClick={() => proceedToRazorpayPayment(selectedDuration, confirmedSlot)}
-              className="w-full flex items-center justify-between p-4 bg-blue-50 dark:bg-gray-700 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition-colors"
-              disabled={isProcessing}
-            >
-              <div className="flex items-center">
-                <CreditCard className="w-5 h-5 text-purple-500 mr-3" />
-                <span className="font-medium">Pay with Razorpay</span>
-              </div>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                Credit/Debit Card, UPI, NetBanking
-              </span>
-            </button>
-            
-            <button
-              onClick={() => setShowPaymentOptions(false)}
-              className="mt-2 text-sm text-blue-500 dark:text-blue-400 hover:underline"
-            >
-              Back
-            </button>
-          </div>
-        )}
+      </div>
+      
+      <div className="flex justify-between mt-6">
+        <button
+          className="bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
+          onClick={() => setShowConfirmationModal(false)}
+          disabled={isProcessing}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
+          onClick={handleConfirmBooking}
+          disabled={isProcessing}
+        >
+          {isProcessing ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processing...
+            </>
+          ) : (
+            <>
+              <CreditCard className="w-4 h-4 mr-2" />
+              Continue 
+            </>
+          )}
+        </button>
       </div>
     </div>
-  )}
+  </div>
+)}
+
+{/* Authentication Modal */}
+{showAuthModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+      <h3 className="text-lg font-semibold mb-4 dark:text-white">Confirm Payment</h3>
+      <p className="mb-4 dark:text-gray-300">Please enter your credentials to confirm the payment.</p>
       
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            placeholder="Enter your username"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            placeholder="Enter your password"
+          />
+        </div>
+      </div>
+      
+      <div className="flex justify-between mt-6">
+        
+        <button
+  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+  onClick={async () => {
+    try {
+      setIsProcessing(true);
+      const duration = Number(selectedDuration);
+      const pricing = { 1: 30, 3: 90, 6: 180, 12: 360 };
+      const amount = pricing[duration] || 0;
+      
+      const token = localStorage.getItem('token');
+      const pendingPost = JSON.parse(localStorage.getItem('pendingPost'));
+      
+      if (!pendingPost?.draftId) {
+        toast.error("No draft post found");
+        return;
+      }
+
+      // Verify credentials first
+      const authResponse = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/verify-credentials`,
+        { username, password },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (!authResponse.data.valid) {
+        throw new Error("Invalid credentials");
+      }
+
+      // Calculate UTC dates for the slot
+      const istZone = 'Asia/Kolkata';
+      const now = DateTime.now().setZone(istZone);
+      let startIST = now.set({ 
+        hour: confirmedSlot.startHour, 
+        minute: 0, 
+        second: 0, 
+        millisecond: 0 
+      });
+      let endIST = now.set({ 
+        hour: confirmedSlot.endHour, 
+        minute: 0, 
+        second: 0, 
+        millisecond: 0 
+      });
+
+      if (startIST < now) {
+        startIST = startIST.plus({ days: 1 });
+        endIST = endIST.plus({ days: 1 });
+      }
+
+      const stickyStartUTC = startIST.toUTC().toISO();
+      const stickyEndUTC = endIST.toUTC().toISO();
+
+      // Process payment with deduction logic
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/pay-from-wallet`,
+        {
+          postId: pendingPost.draftId,
+          amount,
+          duration,
+          startHour: confirmedSlot.startHour,
+          endHour: confirmedSlot.endHour,
+          stickyStartUTC,
+          stickyEndUTC
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        // Update local wallet balance state based on deduction breakdown
+       {/* setWalletBalance(prev => ({
+          total: paymentResponse.data.newBalance,
+          recharged: prev.recharged - paymentResponse.data.deductedFromRecharged,
+          earned: prev.earned - paymentResponse.data.deductedFromEarned
+        }));*/}
+         setWalletBalance({
+        total: Number(response.data.newBalance),
+        recharged: Number(walletBalance.recharged) - Number(response.data.deductedFromRecharged),
+        earned: Number(walletBalance.earned) - Number(response.data.deductedFromEarned)
+      });
+
+        // Show success details
+        setSuccessDetails({
+          date: startIST.toFormat('dd/MM/yyyy'),
+          time: startIST.toFormat('hh:mm a'),
+          //amount,
+          //newBalance: paymentResponse.data.newBalance,
+          //deductedFromRecharged: paymentResponse.data.deductedFromRecharged,
+          //deductedFromEarned: paymentResponse.data.deductedFromEarned
+        amount: Number(amount),
+        newBalance: Number(response.data.newBalance),
+        deductedFromRecharged: Number(response.data.deductedFromRecharged),
+        deductedFromEarned: Number(response.data.deductedFromEarned)
+        
+        });
+
+        // Close modals and show success
+        setShowAuthModal(false);
+        setShowConfirmationModal(false);
+        setShowSuccessModal(true);
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error(error.response?.data?.error || "Payment failed");
+    } finally {
+      setIsProcessing(false);
+    }
+  }}
+  disabled={isProcessing || !username || !password}
+>
+  {isProcessing ? (
+    <>
+      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Processing...
+    </>
+  ) : (
+    'Cancel'
+  )}
+</button>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+         onClick={async () => {
+  try {
+    setIsProcessing(true);
+    const duration = Number(selectedDuration);
+    const pricing = { 1: 30, 3: 90, 6: 180, 12: 360 };
+    const amount = pricing[duration] || 0;
+    
+    const token = localStorage.getItem('token');
+    const pendingPost = JSON.parse(localStorage.getItem('pendingPost'));
+    
+    if (!pendingPost?.draftId) {
+      toast.error("No draft post found");
+      return;
+    }
+
+    // Verify credentials first
+    const authResponse = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/user/verify-credentials`,
+      { username, password },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (!authResponse.data.valid) {
+      throw new Error("Invalid credentials");
+    }
+
+    // Calculate UTC dates for the slot
+    const istZone = 'Asia/Kolkata';
+    const now = DateTime.now().setZone(istZone);
+
+    let startIST = now.set({ hour: confirmedSlot.startHour, minute: 0, second: 0, millisecond: 0 });
+    let endIST = now.set({ hour: confirmedSlot.endHour, minute: 0, second: 0, millisecond: 0 });
+
+    if (startIST < now) {
+      startIST = startIST.plus({ days: 1 });
+      endIST = endIST.plus({ days: 1 });
+    }
+
+    const stickyStartUTC = startIST.toUTC().toISO();
+    const stickyEndUTC = endIST.toUTC().toISO();
+
+    // Format date/time for success message
+    const date = startIST.toFormat('dd/MM/yyyy');
+    const time = startIST.toFormat('hh:mm a');
+
+    // Process payment
+    const paymentResponse = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/user/pay-from-wallet`,
+      {
+        postId: pendingPost.draftId,
+        amount,
+        duration,
+        startHour: confirmedSlot.startHour,
+        endHour: confirmedSlot.endHour,
+        stickyStartUTC,
+        stickyEndUTC
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (paymentResponse.data.success) {
+       setSuccessDetails({
+    date: startIST.toFormat('dd/MM/yyyy'),
+    time: startIST.toFormat('hh:mm a'),
+    amount,
+    newBalance: walletBalance - amount
+  });
+  setWalletBalance(walletBalance - amount);
+  setShowAuthModal(false);
+  setShowConfirmationModal(false);
+  setShowSuccessModal(true);
+    }
+  } catch (error) {
+    console.error("Payment error:", error);
+    toast.error(error.response?.data?.error || "Payment failed");
+  } finally {
+    setIsProcessing(false);
+  }
+}}
+          disabled={isProcessing || !username || !password}
+        >
+          {isProcessing ? 'Processing...' : 'Confirm'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* Success Modal */}
+{/*{showSuccessModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+      <div className="text-center">
+        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold mb-2 dark:text-white">Payment Successful!</h3>
+        
+        <div className="bg-green-50 dark:bg-gray-700 p-4 rounded-lg mb-4 text-left">
+          <p className="dark:text-gray-300 mb-2">
+            <span className="font-semibold">Post will be pinned on:</span> {successDetails.date} at {successDetails.time}
+          </p>
+          <p className="dark:text-gray-300 mb-2">
+            <span className="font-semibold">Amount deducted:</span> ₹{successDetails.amount}
+          </p>
+          <p className="dark:text-gray-300">
+            <WalletIcon className="inline w-4 h-4 mr-1" />
+            <span className="font-semibold">New wallet balance:</span> ₹{successDetails.newBalance}
+          </p>
+        </div>
+        
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4"
+          onClick={() => {
+            setShowSuccessModal(false);
+            // Optional: Redirect or perform other actions
+          }}
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+)}*/}
+
+
+{showSuccessModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+      <div className="text-center">
+        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold mb-2 dark:text-white">Payment Successful!</h3>
+        
+        <div className="bg-green-50 dark:bg-gray-700 p-4 rounded-lg mb-4 text-left">
+          <p className="dark:text-gray-300 mb-2">
+            <span className="font-semibold">Post will be pinned on:</span> {successDetails.date} at {successDetails.time}
+          </p>
+          <p className="dark:text-gray-300 mb-2">
+            <span className="font-semibold">Total amount deducted:</span> ₹{successDetails.amount.toFixed(2)}
+          </p>
+          <p className="dark:text-gray-300 mb-1">
+            <span className="font-semibold">From recharged balance:</span> ₹{successDetails.deductedFromRecharged.toFixed(2)}
+          </p>
+          <p className="dark:text-gray-300 mb-1">
+            <span className="font-semibold">From earned balance:</span> ₹{successDetails.deductedFromEarned.toFixed(2)}
+          </p>
+          <p className="dark:text-gray-300 mt-2">
+            <WalletIcon className="inline w-4 h-4 mr-1" />
+            <span className="font-semibold">New wallet balance:</span> ₹{successDetails.newBalance.toFixed(2)}
+          </p>
+        </div>
+        
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4"
+          onClick={() => {
+            setShowSuccessModal(false);
+            navigate('/livefeed'); // or wherever appropriate
+          }}
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{/* Insufficient Balance Modal */}
+{showInsufficientBalanceModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md text-center">
+      <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+      <h3 className="text-lg font-semibold mb-2 dark:text-white">Insufficient Balance</h3>
+      <p className="mb-4 dark:text-gray-300">
+        You don't have enough points in your wallet to complete this transaction.
+        Please recharge your wallet to continue.
+      </p>
+      <div className="flex justify-center">
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onClick={() => {
+            setShowInsufficientBalanceModal(false);
+            setShowConfirmationModal(false);
+            navigate('/livefeed/wallet');
+          }}
+        >
+          Go to Wallet
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
  )
        
