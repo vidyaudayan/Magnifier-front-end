@@ -53,7 +53,7 @@ export const HeaderSection = () => {
       firstPart: "India's",
       // icon: "/yar0hfd2ii54lrlguj1splmjos0-svg.svg", // Not used now
       secondPart: "First",
-      thirdPart: "Politic-Tech Platform",
+      thirdPart: "Civic-Tech Platform",
     },
     subtitle: [
       "Turn conversations into powerful insights with real-",
@@ -88,11 +88,11 @@ export const HeaderSection = () => {
         <div className="relative w-full max-w-5xl">
           <div className="flex flex-col items-center text-center">
             {/* Fixed h3 with Indian flag icon */}
-            <h3 className="mb-4 text-black font-medium flex items-center gap-2">
-              Made in India
-              <IndiaFlagIcon />
+           <h3 className="mb-4 text-black font-medium flex items-center gap-2 bg-white shadow-md px-4 py-2 rounded">
+  Made in India
+  <IndiaFlagIcon />
+</h3>
 
-            </h3>
 
             <div className="flex flex-wrap items-center justify-center gap-2 md:gap-5 mb-2 md:mb-4">
               <h1 className="text-3xl pr-2 sm:text-4xl md:text-[58px] text-[#0c0c0c] tracking-[-1px] md:tracking-[-1.74px] leading-tight md:leading-[58px] font-normal [font-family:'Helvetica_Neue-Regular',Helvetica]">
