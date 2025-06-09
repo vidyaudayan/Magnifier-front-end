@@ -12,7 +12,7 @@ import {
   MessageSquare, Users, FileText, Hash, Newspaper, Clock, TrendingUp, ArrowLeft
 } from 'lucide-react';
 import { getRecentSearches, addRecentSearch, clearRecentSearches } from "../utils/searchHistory"
-import PostCard from '../componenets/Livefeed/PostCard';
+//import PostCard from '../componenets/Livefeed/PostCard';
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
