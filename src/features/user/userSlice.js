@@ -23,11 +23,9 @@ export const userSlice = createSlice({
     totalDislikes: 0,
     postCount: 0,
     posts: [],
-
-     availableStates: [],
-     rechargedPoints: 0, // ✅ add this
-  earnedPoints: 0 
-
+    availableStates: [],
+    rechargedPoints: 0,
+    earnedPoints: 0
   },
   reducers: {
     setUserDetails: (state, action) => {
@@ -39,12 +37,10 @@ export const userSlice = createSlice({
         ...user,
         _id: user.id || user._id,
         username: user.username || user.userName || '',
-
-        profilePic: user.profilePic || user.profilePicture || '',state: user.state || '',
-        //walletAmount: user.walletAmount || 0, state: user.state || '',
-     rechargedPoints: user.rechargedPoints || 0,
-  warnedPoints: user.warnedPoints || 0,
-
+        profilePic: user.profilePic || user.profilePicture || '',
+        state: user.state || '',
+        rechargedPoints: user.rechargedPoints || 0,
+        warnedPoints: user.warnedPoints || 0,
       };
 
       localStorage.setItem('user', JSON.stringify(state.user));
@@ -68,28 +64,25 @@ export const userSlice = createSlice({
       }
     },
 
-
     setPoints: (state, action) => {
-  const { rechargedPoints, earnedPoints } = action.payload;
+      const { rechargedPoints, earnedPoints } = action.payload;
 
-  state.rechargedPoints = rechargedPoints || 0;
-  state.earnedPoints = earnedPoints || 0;
+      state.rechargedPoints = rechargedPoints || 0;
+      state.earnedPoints = earnedPoints || 0;
 
-  // Also save to user object if needed
-  if (state.user) {
-    state.user.rechargedPoints = rechargedPoints || 0;
-    state.user.earnedPoints = earnedPoints || 0;
-    localStorage.setItem('user', JSON.stringify(state.user));
-  }
+      if (state.user) {
+        state.user.rechargedPoints = rechargedPoints || 0;
+        state.user.earnedPoints = earnedPoints || 0;
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
 
-  console.log("Recharged:", rechargedPoints, "Warned:", earnedPoints);
-},
+      console.log("Recharged:", rechargedPoints, "Earned:", earnedPoints);
+    },
 
-     updateWalletData: (state, action) => {
+    updateWalletData: (state, action) => {
       const { walletAmount } = action.payload;
       state.walletAmount = walletAmount;
 
-      // Also update wallet in user object if available
       if (state.user) {
         state.user.walletAmount = walletAmount;
         localStorage.setItem('user', JSON.stringify(state.user));
@@ -97,8 +90,6 @@ export const userSlice = createSlice({
 
       console.log("Wallet updated:", walletAmount);
     },
-
-    
 
     updateMetrics: (state, action) => {
       const { userName, profilePic, walletAmount, totalLikes, totalDislikes, postCount } = action.payload;
@@ -173,12 +164,7 @@ export const userSlice = createSlice({
       state.posts = [...stickyPosts, ...normalPosts];
     },
 
-
-  // Final post list: sticky posts first, then the rest
-  state.posts = [...stickyPosts, ...normalPosts];
-},
-setAvailableStates: (state, action) => {
-
+    setAvailableStates: (state, action) => {
       state.availableStates = action.payload || [];
       console.log('Available states updated:', state.availableStates);
     },
@@ -197,22 +183,26 @@ setAvailableStates: (state, action) => {
       state.totalLikes = 0;
       state.totalDislikes = 0;
       state.postCount = 0;
-
-      state.posts = []; // Clear posts as well
-        state.availableStates = [];
-
+      state.posts = [];
+      state.availableStates = [];
       console.log('User logged out');
     },
   },
 });
 
-
- 
-export const {setPosts ,setUserDetails, clearUserDetails, setProfilePicture,updateMetrics, updatePostReaction,setCoverPicture,updatePostComments ,setLoading, updateWalletData,setPoints} = userSlice.actions;
+export const {
+  setPosts,
+  setUserDetails,
+  clearUserDetails,
+  setProfilePicture,
+  updateMetrics,
+  updatePostReaction,
+  setCoverPicture,
+  updatePostComments,
+  setLoading,
+  updateWalletData,
+  setPoints,
+  setAvailableStates
+} = userSlice.actions;
 
 export default userSlice.reducer;
-
-
-
-
-
