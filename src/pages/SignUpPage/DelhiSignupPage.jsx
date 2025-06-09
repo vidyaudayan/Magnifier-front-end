@@ -75,7 +75,7 @@ export const DelhiSignUpPage = () => {
  
     const [vidhanSabhaOptions, setVidhanSabhaOptions] = useState([]);
 
-    // Populate constituency options based on state
+    
     useEffect(() => {
         const stateConstituencies = {
             Delhi: [
