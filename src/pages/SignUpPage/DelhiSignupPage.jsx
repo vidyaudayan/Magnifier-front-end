@@ -72,7 +72,7 @@ export const DelhiSignUpPage = () => {
     const dispatch = useDispatch();
     const state = new URLSearchParams(location.search).get("state") || "Delhi";
 
-    // Vidhan Sabha options
+ 
     const [vidhanSabhaOptions, setVidhanSabhaOptions] = useState([]);
 
     // Populate constituency options based on state
