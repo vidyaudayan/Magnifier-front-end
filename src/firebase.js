@@ -19,8 +19,8 @@
 
 
 // firebase.js
-import { initializeApp } from 'firebase/app';
-import { getAuth ,RecaptchaVerifier } from 'firebase/auth';
+//import { initializeApp } from 'firebase/app';
+//import { getAuth ,RecaptchaVerifier } from 'firebase/auth';
 
 
 // const firebaseConfig = {
@@ -38,4 +38,4 @@ import { getAuth ,RecaptchaVerifier } from 'firebase/auth';
 
 
 
-export { auth,RecaptchaVerifier  };
+//export { auth,RecaptchaVerifier  };
