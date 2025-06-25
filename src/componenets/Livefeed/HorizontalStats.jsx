@@ -2,41 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { FileText,MessageSquare,ThumbsUp,ThumbsDown,Eye,Wallet,ChevronLeft, ChevronRight} from 'lucide-react';
+import {useLanguage} from "../../context/LanguageContext.jsx"
 
 export const HorizontalStats = ({ posts, user }) => {
     const [scrollPosition, setScrollPosition] = useState(0);
     const statsRef = useRef(null);
-  const rechargedPoints = useSelector((state) => state.user.rechargedPoints);
+   const { t } = useLanguage();
+    const rechargedPoints = useSelector((state) => state.user.rechargedPoints);
   const earnedPoints = useSelector((state) => state.user.earnedPoints);
     const stats = [
       {
         icon: <FileText className="w-5 h-5 text-blue-500" />,
-        label: "Posts",
+          label: t('posts'),
         value: posts.length
       },
       {
         icon: <MessageSquare className="w-5 h-5 text-green-500" />,
-        label: "Comments",
+       label: t('comments'),
         value: posts.reduce((sum, post) => sum + (post.comments?.length || 0), 0)
       },
       {
         icon: <ThumbsUp className="w-5 h-5 text-blue-500" />,
-        label: "Likes",
+       label: t('likes'), 
         value: posts.reduce((sum, post) => sum + (post.likes || 0), 0)
       },
       {
         icon: <ThumbsDown className="w-5 h-5 text-red-500" />,
-        label: "Dislikes",
+        label: t('dislikes'),
         value: posts.reduce((sum, post) => sum + (post.dislikes || 0), 0)
       },
       {
         icon: <Eye className="w-5 h-5 text-purple-500" />,
-        label: "Impressions",
+        label: t('impressions'),
         value: posts.reduce((sum, post) => sum + (post.impressions || 0), 0)
       },
       {
         icon: <Wallet className="w-5 h-5 text-yellow-500" />,
-        label: "Wallet",
+        label: t('wallet'),
         value:  rechargedPoints+ earnedPoints
       }
     ];

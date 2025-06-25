@@ -132,7 +132,29 @@ useEffect(() => {
     };
   }, [selectedDuration]);
 
- 
+  {/*const fetchAvailableSlots = async (duration) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/admin/available-slots`,
+        {
+          params: { 
+            duration,  date: selectedDate, 
+            _: Date.now()
+          }
+        }
+      );
+      
+      const formattedSlots = response.data.map(slot => ({
+        ...slot,
+        displayTime: formatSlotTime(slot.startHour, slot.endHour)
+      })).sort((a, b) => a.startHour - b.startHour);
+      
+      setAvailableSlots(formattedSlots);
+    } catch (error) {
+      console.error("Slot fetch error:", error);
+      toast.error("Failed to load available slots");
+    }
+  };*/}
   const fetchAvailableSlots = async (duration) => {
   try {
     const response = await axios.get(
@@ -178,7 +200,7 @@ useEffect(() => {
     setShowSlotModal(true);
   };
 
-  const handleSlotSelection = async (slot) => {
+  {/*const handleSlotSelection = async (slot) => {
     try {
       const token = localStorage.getItem('token');
       const pendingPost = JSON.parse(localStorage.getItem('pendingPost'));
@@ -218,10 +240,7 @@ useEffect(() => {
         //let endIST = now.set({ hour: slot.endHour, minute: 0, second: 0, millisecond: 0 });
  let startIST = selectedDateTime.set({ hour: slot.startHour, minute: 0, second: 0, millisecond: 0 });
       let endIST = selectedDateTime.set({ hour: slot.endHour, minute: 0, second: 0, millisecond: 0 });
-        {/*if (startIST < now) {
-          startIST = startIST.plus({ days: 1 });
-          endIST = endIST.plus({ days: 1 });
-        }*/}
+
 
         const stickyStartUTC = startIST.toUTC().toISO();
         const stickyEndUTC = endIST.toUTC().toISO();
@@ -243,30 +262,64 @@ useEffect(() => {
       console.error("Booking error:", error);
       toast.error(error.response?.data?.error || "Booking failed");
     }
-  };
+  };*/}
+  const handleSlotSelection = async (slot) => {
+  try {
+    const duration = Number(selectedDuration);
+    const pricing = {
+      1: 30,
+      3: 90,
+      6: 180,
+      12: 360,
+    };
+    const amount = pricing[duration] || 0;
+    
+    // Check balance first
+    if (walletBalance.total < amount) {
+      setShowInsufficientBalanceModal(true);
+      return;
+    }
+
+    // Set the confirmed slot and show confirmation modal
+    setConfirmedSlot({
+      ...slot,
+      date: selectedDate
+    });
+    setShowConfirmationModal(true);
+    
+    // Rest of your existing code...
+  } catch (error) {
+    console.error("Booking error:", error);
+    toast.error(error.response?.data?.error || "Booking failed");
+  }
+};
+
+
 
   const handleConfirmBooking = async () => {
-    try {
-      const duration = Number(selectedDuration);
-      const pricing = {
-        1: 30,
-        3: 90,
-        6: 180,
-        12: 360,
-      };
-  
-      const amount = pricing[duration] || 0;
-      
-     if (walletBalance.total >= amount) {
-      setShowAuthModal(true);
+  try {
+    const duration = Number(selectedDuration);
+    const pricing = {
+      1: 30,
+      3: 90,
+      6: 180,
+      12: 360,
+    };
+    
+    const amount = pricing[duration] || 0;
+    
+    // Check wallet balance
+    if (walletBalance.total >= amount) {
+      setShowConfirmationModal(true); // Show confirmation modal if enough balance
     } else {
-      setShowInsufficientBalanceModal(true);
+      setShowInsufficientBalanceModal(true); // Show insufficient balance modal
+      setShowConfirmationModal(false); // Ensure confirmation modal is closed
     }
-    } catch (error) {
-      console.error("Error confirming booking:", error);
-      toast.error("Failed to initiate payment.");
-    }
-  };
+  } catch (error) {
+    console.error("Error confirming booking:", error);
+    toast.error("Failed to check wallet balance.");
+  }
+};
 
   const proceedToRazorpayPayment = async (duration, slot) => {
     try {
@@ -547,7 +600,7 @@ useEffect(() => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-            Pin Post Pricing
+            Pin Post Pricin
           </h1>
           <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
             Choose the perfect duration to boost your post's visibility
@@ -570,7 +623,13 @@ useEffect(() => {
               <div
                 key={plan.duration}
                 className="p-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
-                onClick={() => handleDurationChange(plan.duration)}
+                //onClick={() => handleDurationChange(plan.duration)}
+                 onClick={() => {
+      setSelectedDuration(plan.duration);
+      //handleConfirmBooking(); // Call the function here
+     setShowSlotModal(true); // Show slot selection modal first
+  fetchAvailableSlots(plan.duration)
+    }}
               >
                 <div className="flex items-center space-x-4">
                   <plan.icon className="w-5 h-5 text-blue-500" />
@@ -648,112 +707,272 @@ useEffect(() => {
       </div>
 
       {/* Slot Selection Modal */}
-      {showSlotModal && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4">
-            <h3 className="text-lg font-semibold mb-4 dark:text-white">
-              Available {selectedDuration}-hour Slots
-            </h3>
-            <h3 className="pb-3 font-semibold">Select date</h3>
-            {/* Date Selection */}
-      <div className="flex overflow-x-auto gap-2 mb-4 pb-2">
-
-        {weekDates.map(date => (
-          <button
-            key={date}
-            className={`px-4 py-2 rounded-lg ${selectedDate === date 
-              ? 'bg-blue-500 text-white' 
-              : 'bg-gray-200 dark:bg-gray-700'}`}
-            onClick={() => setSelectedDate(date)}
-          >
-            {DateTime.fromISO(date).toFormat('EEE, dd MMM')}
-          </button>
-        ))}
+    {showSlotModal && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold dark:text-white">
+          Select Time Slot
+        </h3>
+        <button 
+          onClick={() => setShowSlotModal(false)}
+          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        >
+          <XCircle className="w-6 h-6" />
+        </button>
       </div>
       
-            
-            {availableSlots.length === 0 ? (
-              <p className="text-gray-500 dark:text-gray-400">No available slots for this duration.</p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                {availableSlots.map((slot, index) => (
-                  <button
-                    key={index}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-                    onClick={() => handleSlotSelection(slot)}
-                  >
-                    {slot.displayTime}
-                  </button>
-                ))}
-              </div>
-            )}
-            
-            <div className="mt-6 flex justify-end">
-              <button
-                className="bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
-                onClick={() => setShowSlotModal(false)}
-              >
-                Close
-              </button>
+      {/* Step 1: Date Selection */}
+      <div className="mb-4">
+        <h3 className="text-sm font-medium mb-2 dark:text-gray-300">Select date</h3>
+        <div className="flex overflow-x-auto gap-2 pb-2">
+          {weekDates.map(date => (
+            <button
+              key={date}
+              className={`px-4 py-2 rounded-lg text-sm min-w-[120px] ${
+                selectedDate === date
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 dark:bg-gray-700 dark:text-gray-300'
+              }`}
+              onClick={() => {
+                setSelectedDate(date);
+                setSelectedSlot(null);
+              }}
+            >
+              {DateTime.fromISO(date).toFormat('EEE, dd MMM')}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Step 2: Time Slots with scrollable container */}
+      {selectedDate && (
+        <div className="mb-4 flex-1 overflow-y-auto">
+          <h3 className="text-sm font-medium mb-2 dark:text-gray-300">
+            Available Time Slots for {DateTime.fromISO(selectedDate).toFormat('EEE, dd MMM')}
+          </h3>
+          {availableSlots.length === 0 ? (
+            <p className="text-gray-500 dark:text-gray-400 py-4">
+              No available slots for this duration on the selected date.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pr-2">
+              {availableSlots.map((slot, index) => (
+                <button
+                  key={index}
+                  className={`px-4 py-3 rounded-lg border ${
+                    selectedSlot?.startHour === slot.startHour
+                      ? 'bg-blue-500 text-white border-blue-500'
+                      : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600'
+                  } transition-colors`}
+                  onClick={() => setSelectedSlot(slot)}
+                >
+                  {slot.displayTime}
+                </button>
+              ))}
             </div>
-          </div>
+          )}
         </div>
       )}
+      
+      {/* Continue Button */}
+      <button
+        className={`w-full py-3 rounded-lg mt-4 ${
+          selectedSlot
+            ? 'bg-blue-500 hover:bg-blue-600 text-white'
+            : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+        } transition-colors`}
+        disabled={!selectedSlot}
+        onClick={() => {
+          setShowSlotModal(false);
+          handleSlotSelection(selectedSlot); 
+        }}
+      >
+        Continue
+      </button>
+    </div>
+  </div>
+)}
 
    
      {/* Confirmation Modal */}
 {showConfirmationModal && (
   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg relative w-full max-w-md">
-      <div className="text-center">
-        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-2 dark:text-white">Confirm Your Booking</h3>
-        <div className="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
-          <p className="dark:text-gray-300">
-            <span className="font-semibold">Slot:</span> {confirmedSlot.startHour % 12 || 12}:00 {confirmedSlot.startHour < 12 ? 'AM' : 'PM'} - {confirmedSlot.endHour % 12 || 12}:00 {confirmedSlot.endHour < 12 ? 'AM' : 'PM'}
-          </p>
-          <p className="dark:text-gray-300">
-            <span className="font-semibold">Duration:</span> {selectedDuration} hour{selectedDuration > 1 ? 's' : ''}
-          </p>
-          <p className="text-lg font-bold dark:text-white mt-2">
-            Total Amount: ₹{selectedDuration === 1 ? 30 : 
-                            selectedDuration === 3 ? 90 : 
-                            selectedDuration === 6 ? 180 : 
-                            selectedDuration === 12 ? 360 : 0}
-          </p>
-          <p className="text-sm mt-2 dark:text-gray-300">
-            <WalletIcon className="inline w-4 h-4 mr-1" />
-            Wallet Balance: ₹{walletBalance.total}
-          </p>
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold dark:text-white">Confirm Payment</h3>
+        <button 
+          onClick={() => setShowConfirmationModal(false)}
+          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        >
+          <XCircle className="w-6 h-6" />
+        </button>
+      </div>
+      
+      <div className="space-y-4 mb-6">
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Slot:</p>
+              <p className="font-medium dark:text-white">
+                {confirmedSlot ? 
+                  `${confirmedSlot.startHour % 12 || 12}:00 ${confirmedSlot.startHour < 12 ? 'AM' : 'PM'} - 
+                   ${confirmedSlot.endHour % 12 || 12}:00 ${confirmedSlot.endHour < 12 ? 'AM' : 'PM'}`
+                  : 'No slot selected'}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Duration:</p>
+              <p className="font-medium dark:text-white">{selectedDuration} Hours</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Wallet Balance:</p>
+              <p className="font-medium dark:text-white">₹{walletBalance.total}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Total Amount:</p>
+              <p className="font-medium dark:text-white">
+                ₹{selectedDuration === 1 ? 30 : 
+                  selectedDuration === 3 ? 90 : 
+                  selectedDuration === 6 ? 180 : 
+                  selectedDuration === 12 ? 360 : 0}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="Enter your username"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="Enter your password"
+            />
+          </div>
         </div>
       </div>
       
-      <div className="flex justify-between mt-6">
+      <div className="flex justify-between gap-4">
         <button
-          className="bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
+          className="flex-1 bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
           onClick={() => setShowConfirmationModal(false)}
           disabled={isProcessing}
         >
           Cancel
         </button>
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
-          onClick={handleConfirmBooking}
-          disabled={isProcessing}
+          className="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-blue-400 disabled:cursor-not-allowed"
+          onClick={async () => {
+            try {
+              setIsProcessing(true);
+              const duration = Number(selectedDuration);
+              const pricing = { 1: 30, 3: 90, 6: 180, 12: 360 };
+              const amount = pricing[duration] || 0;
+              
+              const token = localStorage.getItem('token');
+              const pendingPost = JSON.parse(localStorage.getItem('pendingPost'));
+              
+              if (!pendingPost?.draftId) {
+                toast.error("No draft post found");
+                return;
+              }
+
+              // Verify credentials
+              const authResponse = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}/user/verify-credentials`,
+                { username, password },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+
+              if (!authResponse.data.valid) {
+                throw new Error("Invalid credentials");
+              }
+
+              // Calculate UTC dates
+              const istZone = 'Asia/Kolkata';
+              const selectedDateTime = DateTime.fromISO(selectedDate).setZone(istZone);
+              
+              let startIST = selectedDateTime.set({ 
+                hour: confirmedSlot.startHour, 
+                minute: 0, 
+                second: 0, 
+                millisecond: 0 
+              });
+              let endIST = selectedDateTime.set({ 
+                hour: confirmedSlot.endHour, 
+                minute: 0, 
+                second: 0, 
+                millisecond: 0 
+              });
+
+              const stickyStartUTC = startIST.toUTC().toISO();
+              const stickyEndUTC = endIST.toUTC().toISO();
+
+              // Process payment
+              const paymentResponse = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}/user/pay-from-wallet`,
+                {
+                  postId: pendingPost.draftId,
+                  amount,
+                  duration,
+                  startHour: confirmedSlot.startHour,
+                  endHour: confirmedSlot.endHour,
+                  stickyStartUTC,
+                  stickyEndUTC
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+
+              if (paymentResponse.data.success) {
+                setSuccessDetails({
+                  date: startIST.toFormat('EEE, dd/MM/yyyy'),
+                  time: `${startIST.toFormat('hh:mm a')} - ${endIST.toFormat('hh:mm a')}`,
+                  duration: selectedDuration,
+                  amount,
+                  newBalance: paymentResponse.data.newBalance
+                });
+                
+                setWalletBalance({
+                  total: paymentResponse.data.newBalance,
+                  recharged: walletBalance.recharged - paymentResponse.data.deductedFromRecharged,
+                  earned: walletBalance.earned - paymentResponse.data.deductedFromEarned
+                });
+                
+                setShowConfirmationModal(false);
+                setShowSuccessModal(true);
+              }
+            } catch (error) {
+              console.error("Payment error:", error);
+              toast.error(error.response?.data?.error || "Payment failed");
+            } finally {
+              setIsProcessing(false);
+            }
+          }}
+          disabled={isProcessing || !username || !password}
         >
           {isProcessing ? (
             <>
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               Processing...
             </>
           ) : (
-            <>
-              <CreditCard className="w-4 h-4 mr-2" />
-              Continue 
-            </>
+            'Confirm Payment'
           )}
         </button>
       </div>
@@ -761,321 +980,41 @@ useEffect(() => {
   </div>
 )}
 
-{/* Authentication Modal */}
-{showAuthModal && (
-  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-      <h3 className="text-lg font-semibold mb-4 dark:text-white">Confirm Payment</h3>
-      <p className="mb-4 dark:text-gray-300">Please enter your credentials to confirm the payment.</p>
-      
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            placeholder="Enter your username"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            placeholder="Enter your password"
-          />
-        </div>
-      </div>
-      
-      <div className="flex justify-between mt-6">
-        
-        <button
-  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-  onClick={async () => {
-    try {
-      setIsProcessing(true);
-      const duration = Number(selectedDuration);
-      const pricing = { 1: 30, 3: 90, 6: 180, 12: 360 };
-      const amount = pricing[duration] || 0;
-      
-      const token = localStorage.getItem('token');
-      const pendingPost = JSON.parse(localStorage.getItem('pendingPost'));
-      
-      if (!pendingPost?.draftId) {
-        toast.error("No draft post found");
-        return;
-      }
 
-      // Verify credentials first
-      const authResponse = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/verify-credentials`,
-        { username, password },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
 
-      if (!authResponse.data.valid) {
-        throw new Error("Invalid credentials");
-      }
-
-      // Calculate UTC dates for the slot
-      const istZone = 'Asia/Kolkata';
-      const now = DateTime.now().setZone(istZone);
-      let startIST = now.set({ 
-        hour: confirmedSlot.startHour, 
-        minute: 0, 
-        second: 0, 
-        millisecond: 0 
-      });
-      let endIST = now.set({ 
-        hour: confirmedSlot.endHour, 
-        minute: 0, 
-        second: 0, 
-        millisecond: 0 
-      });
-
-      if (startIST < now) {
-        startIST = startIST.plus({ days: 1 });
-        endIST = endIST.plus({ days: 1 });
-      }
-
-      const stickyStartUTC = startIST.toUTC().toISO();
-      const stickyEndUTC = endIST.toUTC().toISO();
-
-      // Process payment with deduction logic
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/pay-from-wallet`,
-        {
-          postId: pendingPost.draftId,
-          amount,
-          duration,
-          startHour: confirmedSlot.startHour,
-          endHour: confirmedSlot.endHour,
-          stickyStartUTC,
-          stickyEndUTC
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.data.success) {
-        // Update local wallet balance state based on deduction breakdown
-       {/* setWalletBalance(prev => ({
-          total: paymentResponse.data.newBalance,
-          recharged: prev.recharged - paymentResponse.data.deductedFromRecharged,
-          earned: prev.earned - paymentResponse.data.deductedFromEarned
-        }));*/}
-         setWalletBalance({
-        total: Number(response.data.newBalance),
-        recharged: Number(walletBalance.recharged) - Number(response.data.deductedFromRecharged),
-        earned: Number(walletBalance.earned) - Number(response.data.deductedFromEarned)
-      });
-
-        // Show success details
-        setSuccessDetails({
-          date: startIST.toFormat('dd/MM/yyyy'),
-          time: startIST.toFormat('hh:mm a'),
-          //amount,
-          //newBalance: paymentResponse.data.newBalance,
-          //deductedFromRecharged: paymentResponse.data.deductedFromRecharged,
-          //deductedFromEarned: paymentResponse.data.deductedFromEarned
-        amount: Number(amount),
-        newBalance: Number(response.data.newBalance),
-        deductedFromRecharged: Number(response.data.deductedFromRecharged),
-        deductedFromEarned: Number(response.data.deductedFromEarned)
-        
-        });
-
-        // Close modals and show success
-        setShowAuthModal(false);
-        setShowConfirmationModal(false);
-        setShowSuccessModal(true);
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error(error.response?.data?.error || "Payment failed");
-    } finally {
-      setIsProcessing(false);
-    }
-  }}
-  disabled={isProcessing || !username || !password}
->
-  {isProcessing ? (
-    <>
-      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Processing...
-    </>
-  ) : (
-    'Cancel'
-  )}
-</button>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-         onClick={async () => {
-  try {
-    setIsProcessing(true);
-    const duration = Number(selectedDuration);
-    const pricing = { 1: 30, 3: 90, 6: 180, 12: 360 };
-    const amount = pricing[duration] || 0;
-    
-    const token = localStorage.getItem('token');
-    const pendingPost = JSON.parse(localStorage.getItem('pendingPost'));
-    
-    if (!pendingPost?.draftId) {
-      toast.error("No draft post found");
-      return;
-    }
-
-    // Verify credentials first
-    const authResponse = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/user/verify-credentials`,
-      { username, password },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (!authResponse.data.valid) {
-      throw new Error("Invalid credentials");
-    }
-
-    // Calculate UTC dates for the slot
-    const istZone = 'Asia/Kolkata';
-    const now = DateTime.now().setZone(istZone);
-
-    let startIST = now.set({ hour: confirmedSlot.startHour, minute: 0, second: 0, millisecond: 0 });
-    let endIST = now.set({ hour: confirmedSlot.endHour, minute: 0, second: 0, millisecond: 0 });
-
-    if (startIST < now) {
-      startIST = startIST.plus({ days: 1 });
-      endIST = endIST.plus({ days: 1 });
-    }
-
-    const stickyStartUTC = startIST.toUTC().toISO();
-    const stickyEndUTC = endIST.toUTC().toISO();
-
-    // Format date/time for success message
-    const date = startIST.toFormat('dd/MM/yyyy');
-    const time = startIST.toFormat('hh:mm a');
-
-    // Process payment
-    const paymentResponse = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/user/pay-from-wallet`,
-      {
-        postId: pendingPost.draftId,
-        amount,
-        duration,
-        startHour: confirmedSlot.startHour,
-        endHour: confirmedSlot.endHour,
-        stickyStartUTC,
-        stickyEndUTC
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (paymentResponse.data.success) {
-       setSuccessDetails({
-    date: startIST.toFormat('dd/MM/yyyy'),
-    time: startIST.toFormat('hh:mm a'),
-    amount,
-    newBalance: walletBalance - amount
-  });
-  setWalletBalance(walletBalance - amount);
-  setShowAuthModal(false);
-  setShowConfirmationModal(false);
-  setShowSuccessModal(true);
-    }
-  } catch (error) {
-    console.error("Payment error:", error);
-    toast.error(error.response?.data?.error || "Payment failed");
-  } finally {
-    setIsProcessing(false);
-  }
-}}
-          disabled={isProcessing || !username || !password}
-        >
-          {isProcessing ? 'Processing...' : 'Confirm'}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
 
 {/* Success Modal */}
-{/*{showSuccessModal && (
-  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-      <div className="text-center">
-        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-2 dark:text-white">Payment Successful!</h3>
-        
-        <div className="bg-green-50 dark:bg-gray-700 p-4 rounded-lg mb-4 text-left">
-          <p className="dark:text-gray-300 mb-2">
-            <span className="font-semibold">Post will be pinned on:</span> {successDetails.date} at {successDetails.time}
-          </p>
-          <p className="dark:text-gray-300 mb-2">
-            <span className="font-semibold">Amount deducted:</span> ₹{successDetails.amount}
-          </p>
-          <p className="dark:text-gray-300">
-            <WalletIcon className="inline w-4 h-4 mr-1" />
-            <span className="font-semibold">New wallet balance:</span> ₹{successDetails.newBalance}
-          </p>
-        </div>
-        
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4"
-          onClick={() => {
-            setShowSuccessModal(false);
-            // Optional: Redirect or perform other actions
-          }}
-        >
-          Continue
-        </button>
-      </div>
-    </div>
-  </div>
-)}*/}
+
 
 
 {showSuccessModal && (
   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-      <div className="text-center">
-        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-2 dark:text-white">Payment Successful!</h3>
-        
-        <div className="bg-green-50 dark:bg-gray-700 p-4 rounded-lg mb-4 text-left">
-          <p className="dark:text-gray-300 mb-2">
-            <span className="font-semibold">Post will be pinned on:</span> {successDetails.date} at {successDetails.time}
-          </p>
-          <p className="dark:text-gray-300 mb-2">
-            <span className="font-semibold">Total amount deducted:</span> ₹{successDetails.amount.toFixed(2)}
-          </p>
-          <p className="dark:text-gray-300 mb-1">
-            <span className="font-semibold">From recharged balance:</span> ₹{successDetails.deductedFromRecharged.toFixed(2)}
-          </p>
-          <p className="dark:text-gray-300 mb-1">
-            <span className="font-semibold">From earned balance:</span> ₹{successDetails.deductedFromEarned.toFixed(2)}
-          </p>
-          <p className="dark:text-gray-300 mt-2">
-            <WalletIcon className="inline w-4 h-4 mr-1" />
-            <span className="font-semibold">New wallet balance:</span> ₹{successDetails.newBalance.toFixed(2)}
-          </p>
-        </div>
-        
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4"
-          onClick={() => {
-            setShowSuccessModal(false);
-            navigate('/livefeed'); // or wherever appropriate
-          }}
-        >
-          Continue
-        </button>
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md text-center">
+      <div className="mb-4">
+        <CheckCircle className="w-12 h-12 text-green-500 mx-auto" />
       </div>
+      <h3 className="text-xl font-semibold mb-2 dark:text-white">Booking Confirmed!</h3>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">
+        Your post will be pinned for {successDetails.duration} Hours starting from {successDetails.time} on {successDetails.date}
+      </p>
+      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4 text-left">
+        <p className="text-sm dark:text-gray-300">
+          <span className="font-medium">Amount deducted:</span> ₹{successDetails.amount}
+        </p>
+        <p className="text-sm dark:text-gray-300">
+          <WalletIcon className="inline w-4 h-4 mr-1" />
+          <span className="font-medium">New wallet balance:</span> ₹{successDetails.newBalance}
+        </p>
+      </div>
+      <button
+        className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        onClick={() => {
+          setShowSuccessModal(false);
+          navigate('/livefeed'); // Or wherever you want to redirect
+        }}
+      >
+        Done
+      </button>
     </div>
   </div>
 )}

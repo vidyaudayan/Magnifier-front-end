@@ -395,15 +395,15 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')).render(
-  <ThemeProvider>
-<LanguageProvider>
- <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
   <StrictMode>
- <RouterProvider router={router} />
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider>
+          <LanguageProvider>
+            <RouterProvider router={router} />
+          </LanguageProvider>
+        </ThemeProvider>
+      </PersistGate>
+    </Provider>
   </StrictMode>
-  </PersistGate>
-  </Provider>
-  </LanguageProvider>
-  </ThemeProvider>
 )

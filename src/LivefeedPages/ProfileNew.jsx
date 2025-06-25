@@ -32,10 +32,12 @@ import {
 import { toast } from 'react-toastify';
 import { setUserDetails, updatePostReaction, updateMetrics,setPoints } from '../features/user/userSlice';
 import { HorizontalStats } from '../componenets/Livefeed/HorizontalStats';
+import { useLanguage } from '../context/LanguageContext';
 
 const ProfileNew = () => {
   const dispatch = useDispatch();
   const { userId } = useParams();
+    const { t } = useLanguage();
   const currentUser = useSelector(state => state.user.user);
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
@@ -50,10 +52,10 @@ const ProfileNew = () => {
   const [showDeleteCoverModal, setShowDeleteCoverModal] = useState(false);
   const [showProfilePicDropdown, setShowProfilePicDropdown] = useState(false);
   const tabs = [
-    { id: 'posts', label: 'Posts' },
-    { id: 'media', label: 'Media' },
-    { id: 'stats', label: 'Stats' }
-  ];
+  { id: 'posts', label: t('posts') },
+  { id: 'media', label: t('media') },
+  { id: 'stats', label: t('stats') }
+];
   console.log("currentUser:", currentUser, "user:", user);
   const coverPicInputRef = useRef(null);
   const [src, setSrc] = useState(null);
@@ -906,7 +908,8 @@ const handleFileChange = (event) => {
           <div className="py-1">
             <label className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
               <Camera className="w-4 h-4 mr-2" />
-              <span>{user.coverPic ? "Change" : "Add"} cover photo</span>
+              {/*<span>{user.coverPic ? "Change" : "Add"} cover photo</span>*/}
+               <span>{user.coverPic ? t('changeCoverPhoto') : t('addCoverPhoto')}</span>
               <input
                 type="file"
                 accept="image/*"
@@ -984,7 +987,7 @@ const handleFileChange = (event) => {
                             className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Delete profile photo
+                           {t('deleteProfilePhoto')}
                           </button>
                         )}
                       </div>

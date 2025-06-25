@@ -25,26 +25,29 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify'
-
-const navItems = [
-  { icon: Home, label: 'Home', path: '/livefeed' },
-  { icon: User, label: 'Profile', path: '/livefeed/profile' },
-  { icon: Search, label: 'Search', path: '/livefeed/search' },
-  { icon: Bot, label: 'ElectoAI', path: '/livefeed/electoai' },
-  { icon: Bell, label: 'Notifications', path: '/livefeed/notifications' },
-   { icon: Wallet, label: 'Wallet', path: '/livefeed/wallet' },
-  { icon: Settings, label: 'Settings', path: '/livefeed/settings' },
- 
-];
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 const Sidebar = ({ isCollapsed, onToggle }) => {
+
+  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
+  const navItems = [
+    { icon: Home, label: t('home'), path: '/livefeed' },
+    { icon: User, label: t('profile'), path: '/livefeed/profile' },
+    { icon: Search, label: t('search'), path: '/livefeed/search' },
+    { icon: Bot, label: t('electoAI'), path: '/livefeed/electoai' },
+    { icon: Bell, label: t('notifications'), path: '/livefeed/notifications' },
+    { icon: Wallet, label: t('wallet'), path: '/livefeed/wallet' },
+    { icon: Settings, label: t('settings'), path: '/livefeed/settings' },
+  ];
 
   const handleLogout = async () => {
-    if (window.confirm("Are you sure you want to log out?")) {
+ if (window.confirm(t('confirmLogout'))){
       setIsLoggingOut(true);
       try {
         await axios.post(
@@ -59,11 +62,11 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         );
         localStorage.removeItem("token");
         dispatch(clearUserDetails());
-        toast.success("You are logged out.");
+        toast.success(t('logoutSuccess'));
         navigate("/");
       } catch (error) {
         console.error("Logout failed:", error.response?.data || error.message);
-        toast.error("Logout failed. Please try again.");
+      toast.error(t('logoutFailed'));
       } finally {
         setIsLoggingOut(false);
         setIsMobileMenuOpen(false);
@@ -84,7 +87,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
            
             {!isCollapsed && (
               <span className="ml-2 text-xl font-bold text-gray-800 dark:text-white">
-                Magnifier
+               {t('appName')}
               </span>
             )}
           </div>
@@ -133,7 +136,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             ) : (
               <>
                 <LogOut className={`h-5 w-5 ml-2 ${isCollapsed ? '' : 'mr-4'}`} />
-                {!isCollapsed && <span>Logout</span>}
+                {!isCollapsed && <span>{t('logout')}</span>}
               </>
             )}
           </button>
@@ -146,7 +149,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           <div className="flex items-center space-x-2">
             <img src={logo} className="h-10 w-10 " alt="" />
             <span className="text-lg font-bold text-gray-800 dark:text-white">
-              Magnifier
+            {t('appName')}
             </span>
           </div>
           <button 
@@ -191,7 +194,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
               ) : (
                 <LogOut className="h-5 w-5 mr-3" />
               )}
-              <span>Logout</span>
+              <span>{t('logout')}</span>
             </button>
           </div>
         )}

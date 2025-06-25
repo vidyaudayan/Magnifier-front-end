@@ -37,6 +37,17 @@ export const translations = {
     userGuidelinesDesc: 'Community rules and guidelines',
     deleteAccount: 'Delete Account',
     deleteAccountDesc: 'Permanently delete your account and all data',
+  wallet: 'Wallet',
+    logout: 'Logout',
+    confirmLogout: 'Are you sure you want to log out?',
+    logoutSuccess: 'You are logged out.',
+    logoutFailed: 'Logout failed. Please try again.',
+     posts: 'Posts',
+    comments: 'Comments',
+    likes: 'Likes',
+    dislikes: 'Dislikes',
+    impressions: 'Impressions',
+  
   },
   hindi: {
     // Common
@@ -74,6 +85,16 @@ export const translations = {
     userGuidelinesDesc: 'सामुदायिक नियम और दिशानिर्देश',
     deleteAccount: 'खाता हटाएं',
     deleteAccountDesc: 'अपना खाता और सभी डेटा स्थायी रूप से हटाएं',
+  wallet: 'वॉलेट',
+    logout: 'लॉग आउट',
+    confirmLogout: 'क्या आप लॉग आउट करना चाहते हैं?',
+    logoutSuccess: 'आप लॉग आउट हो चुके हैं।',
+    logoutFailed: 'लॉगआउट विफल। कृपया पुनः प्रयास करें।',
+    posts: 'पोस्ट',
+    comments: 'टिप्पणियाँ',
+    likes: 'पसंद',
+    dislikes: 'नापसंद',
+    impressions: 'इम्प्रेशन',
   },
   marathi: {
     // Common
@@ -110,7 +131,18 @@ export const translations = {
     userGuidelines: 'वापरकर्ता मार्गदर्शक तत्त्वे',
     userGuidelinesDesc: 'समुदाय नियम आणि मार्गदर्शक तत्त्वे',
     deleteAccount: 'खाते हटवा',
-    deleteAccountDesc: 'तुमचे खाते आणि सर्व डेटा कायमस्वरूपी हटवा'
+    deleteAccountDesc: 'तुमचे खाते आणि सर्व डेटा कायमस्वरूपी हटवा',
+     wallet: 'वॉलेट',
+    logout: 'लॉग आउट',
+    confirmLogout: 'तुम्हाला लॉग आउट करायचे आहे का?',
+    logoutSuccess: 'तुम्ही लॉग आउट झाला आहात.',
+    logoutFailed: 'लॉगआउट अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
+     posts: 'पोस्ट',
+    comments: 'टिप्पण्या',
+    likes: 'आवड',
+    dislikes: 'नावड',
+    impressions: 'प्रभाव',
+ 
   },
   bengali: {
     // Common
@@ -147,7 +179,17 @@ export const translations = {
     userGuidelines: 'ব্যবহারকারী নির্দেশিকা',
     userGuidelinesDesc: 'কমিউনিটি নিয়ম ও নির্দেশিকা',
     deleteAccount: 'অ্যাকাউন্ট মুছুন',
-    deleteAccountDesc: 'আপনার অ্যাকাউন্ট এবং সমস্ত ডেটা স্থায়ীভাবে মুছে ফেলুন'
+    deleteAccountDesc: 'আপনার অ্যাকাউন্ট এবং সমস্ত ডেটা স্থায়ীভাবে মুছে ফেলুন',
+     wallet: 'ওয়ালেট',
+    logout: 'লগ আউট',
+    confirmLogout: 'আপনি কি লগ আউট করতে চান?',
+    logoutSuccess: 'আপনি লগ আউট করেছেন।',
+    logoutFailed: 'লগআউট ব্যর্থ হয়েছে। অনুগ্রহপূর্বক আবার চেষ্টা করুন।',
+    posts: 'পোস্ট',
+    comments: 'মন্তব্য',
+    likes: 'পছন্দ',
+    dislikes: 'অপছন্দ',
+    impressions: 'ইম্প্রেশন',
   }
 };
 
