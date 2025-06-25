@@ -182,9 +182,13 @@ const router = createBrowserRouter([
         element:<LoginFormShare/>,
       },
       {
+  path: "/displaypost",
+  element: <Navigate to="/livefeed/displaypost" replace />
+},
+      /*{
         path: "/displaypost",
         element: <SharePostDisplayPage />,
-      },
+      },*/
       {
         path: "/job-application",
         element:<Jobapplication /> ,
@@ -375,10 +379,11 @@ const router = createBrowserRouter([
             path:"profile",
             element:<ProfileNew/>
           },
-          /*{
+          {
             path:"displaypost",
             element:<SharePostDisplayPage/>
-          },*/
+            
+          },
            {
             path:"wallet",
             element:<Wallet/>

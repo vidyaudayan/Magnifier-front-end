@@ -85,7 +85,7 @@ const onSubmit = async (data) => {
       sessionStorage.setItem("sharedPostId", postId);
       
       // Use window.location.href for complete page reload to ensure state is cleared
-      window.location.href = `/displaypost?postId=${postId}`;
+      window.location.href = `/livefeed/displaypost?postId=${postId}`;
     } else {
       navigate("/");
     }
