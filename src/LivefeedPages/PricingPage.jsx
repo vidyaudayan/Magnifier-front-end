@@ -16,7 +16,13 @@ import {
 } from "lucide-react";
 import NavbarLanding from "../componenets/NavbarLanding.jsx";
 
-const socket = io("http://localhost:3000");
+//const socket = io("http://localhost:3000");
+
+
+const socket = io('https://magnifier-backend.onrender.com', {
+  withCredentials: true
+});
+
 
 export default function Paywallet() {
   const [selectedDuration, setSelectedDuration] = useState("");
