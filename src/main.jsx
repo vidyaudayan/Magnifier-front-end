@@ -88,7 +88,6 @@ import Bulletin from "./componenets/Bulletin.jsx";
 import PricingNew from "./LivefeedPages/Paywallet.jsx";
 import Paywallet from "./LivefeedPages/Paywallet.jsx";
 
-   const Navigate = useNavigate();
 
 const router = createBrowserRouter([
   {
@@ -182,14 +181,11 @@ const router = createBrowserRouter([
         path: "/loginshare",
         element:<LoginFormShare/>,
       },
-      {
-  path: "/displaypost",
-  element: <Navigate to="/livefeed/displaypost" replace />
-},
-      /*{
+    
+    {
         path: "/displaypost",
         element: <SharePostDisplayPage />,
-      },*/
+      },
       {
         path: "/job-application",
         element:<Jobapplication /> ,
