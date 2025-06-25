@@ -30,7 +30,7 @@ const LoginFormShare = () => {
     reset: resetLoginForm,
   } = useForm();
 
-  const onSubmit = async (data) => {
+ /* const onSubmit = async (data) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
@@ -60,7 +60,43 @@ const LoginFormShare = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  };*/
+
+  // In LoginFormShare.js
+const onSubmit = async (data) => {
+  setIsLoading(true);
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/user/login`,
+      data,
+      { withCredentials: true }
+    );
+    
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+    }
+    
+    const queryParams = new URLSearchParams(location.search);
+    const postId = queryParams.get("postId");
+    
+    if (postId) {
+      // Store in both localStorage and sessionStorage for redundancy
+      localStorage.setItem("sharedPostId", postId);
+      sessionStorage.setItem("sharedPostId", postId);
+      
+      // Use window.location.href for complete page reload to ensure state is cleared
+      window.location.href = `/livefeed/displaypost?postId=${postId}`;
+    } else {
+      navigate("/");
+    }
+    
+  } catch (error) {
+    console.error("Error signing in:", error);
+    toast.error(error.response?.data?.message || "Login failed");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

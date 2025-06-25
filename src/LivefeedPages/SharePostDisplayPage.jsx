@@ -41,7 +41,7 @@ const SharePostDisplayPage = () => {
     });
   };
 
-  useEffect(() => {
+ /* useEffect(() => {
     let isMounted = true;
     
     const fetchPost = async () => {
@@ -88,7 +88,63 @@ const SharePostDisplayPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [location.search, pathPostId, navigate]);
+  }, [location.search, pathPostId, navigate]);*/
+
+  // In SharePostDisplayPage.js
+useEffect(() => {
+  let isMounted = true;
+  
+  const fetchPost = async () => {
+    try {
+      const queryParams = new URLSearchParams(location.search);
+      let postId = queryParams.get("postId") || 
+                  localStorage.getItem("sharedPostId") || 
+                  sessionStorage.getItem("sharedPostId") || 
+                  pathPostId;
+
+      // Clear storage after getting the ID
+      localStorage.removeItem("sharedPostId");
+      sessionStorage.removeItem("sharedPostId");
+
+      if (!postId) {
+        navigate("/posts");
+        return;
+      }
+
+      // Ensure the URL reflects the postId
+      if (!queryParams.get("postId") && postId) {
+        navigate(`/livefeed/displaypost?postId=${postId}`, { replace: true });
+        return;
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/post/${postId}`
+      );
+      
+      if (isMounted) {
+        if (response.data.success) {
+          setPost(response.data.data);
+        } else {
+          throw new Error("Post not found");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching post:", error);
+      toast.error("The post could not be loaded");
+      navigate("/posts");
+    } finally {
+      if (isMounted) {
+        setLoading(false);
+      }
+    }
+  };
+
+  fetchPost();
+  
+  return () => {
+    isMounted = false;
+  };
+}, [location.search, pathPostId, navigate]);
 
   const handleAddComment = async (postId) => {
     if (!newComment.trim()) return;
