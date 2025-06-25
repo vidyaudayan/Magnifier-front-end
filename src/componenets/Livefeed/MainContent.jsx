@@ -10,6 +10,7 @@ import UsersProfilePage from '../../LivefeedPages/UsersProfilePage';
 import SearchPostDisplayPage from '../../LivefeedPages/SearchPostDisplayPage';
 import PricingPage from '../../LivefeedPages/PricingPage';
 import Wallet from '../../LivefeedPages/Wallet';
+import SharePostDisplayPage from '../../LivefeedPages/SharePostDisplayPage';
 
 
 
@@ -31,6 +32,7 @@ const MainContent = ({ isSidebarCollapsed }) => {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/displaypost" element={<SharePostDisplayPage />} />
           <Route path="/wallet" element={<Wallet/>} />
         </Routes>
       </div>
