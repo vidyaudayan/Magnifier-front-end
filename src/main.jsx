@@ -9,6 +9,7 @@ import {
 import './index.css'
 import App from './App.jsx'
 import Root from './routes/root';
+import { useNavigate } from 'react-router-dom';
 import {store} from './app/store'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react';
@@ -87,7 +88,7 @@ import Bulletin from "./componenets/Bulletin.jsx";
 import PricingNew from "./LivefeedPages/Paywallet.jsx";
 import Paywallet from "./LivefeedPages/Paywallet.jsx";
 
-
+   const Navigate = useNavigate();
 
 const router = createBrowserRouter([
   {
