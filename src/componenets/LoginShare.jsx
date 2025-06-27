@@ -30,37 +30,7 @@ const LoginFormShare = () => {
     reset: resetLoginForm,
   } = useForm();
 
- /* const onSubmit = async (data) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/login`,
-        data,
-        { withCredentials: true }
-      );
-      
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-      }
-      
-      const queryParams = new URLSearchParams(location.search);
-      const postId = queryParams.get("postId");
-      
-      if (postId) {
-        localStorage.setItem("sharedPostId", postId);
-        sessionStorage.setItem("sharedPostId", postId);
-        window.location.href = `/livefeed/displaypost?postId=${postId}`;
-      } else {
-        navigate("/");
-      }
-      
-    } catch (error) {
-      console.error("Error signing in:", error);
-      toast.error(error.response?.data?.message || "Login failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };*/
+
 
   // In LoginFormShare.js
 const onSubmit = async (data) => {
